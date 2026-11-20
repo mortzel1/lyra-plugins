@@ -8,11 +8,12 @@ installierst – von hier, aus dem neuesten Release:
 | Plugin | Version | Was es tut |
 |---|---|---|
 | **Deep Dive** | 1.0.1 | Ein Thema in kleinen Schritten meistern |
+| **Delta** | 1.0.0 | DEAs und NEAs entwerfen, simulieren und erzeugen |
 | **Flip** | 1.1.0 | Karteikarten, die sitzen |
-| **Graphit** | 1.0.0 | Schaubilder zeichnen – direkt in der Eingabezeile |
+| **Graphit** | 1.0.1 | Schaubilder zeichnen – direkt in der Eingabezeile |
 | **Mindmap** | 1.0.0 | Begriffe und Querbezüge deiner Fächer |
 | **Oase** | 1.0.0 | Dein Ruhepol – Stress, Kopf und Motivation |
-| **Quizzard** | 1.0.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
+| **Quizzard** | 1.1.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
 
 ## Sicherheit
 

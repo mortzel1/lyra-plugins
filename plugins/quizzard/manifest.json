@@ -1,7 +1,7 @@
 {
   "kennung": "quizzard",
   "name": "Quizzard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Das Quiz zu jedem Thema – schnell, bunt, mit Punkten",
   "beschreibung": "Nenn ein Thema aus deinen Unterlagen oder irgendein anderes – Quizzard zaubert daraus ein Quiz zum Spielen: Multiple Choice, Wahr/Falsch, Schätzfragen, Reihenfolgen, Zuordnen und Lückentexte, mit Countdown, Zeitbonus, Serien, Jokern und Highscores. In den Einstellungen bestimmst du alles selbst.",
   "farbe": "#8B5CF6",
@@ -16,10 +16,11 @@
   "datenhinweis": "dein Quiz-Thema und die passenden Auszüge aus deinen Unterlagen (wenn du „Aus meinen Unterlagen“ wählst)",
   "funktionen": [
     "Macht aus jedem Thema ein Quiz – aus deinen Unterlagen oder ganz beliebig",
+    "Quiz erstellen und speichern – jetzt spielen oder später, so oft du willst (auch von Lyras Startseite)",
     "Abwechslungsreiche Fragen: Multiple Choice, mehrere richtig, Wahr/Falsch, Schätzen, Reihenfolge, Zuordnen, Lückentext",
     "Spielgefühl mit Countdown, Zeitbonus, Serien-Bonus, Jokern (50:50, +10 s, Überspringen), Tönen und Konfetti",
     "Highscores je Thema, Rückblick am Ende und „Nur die Falschen nochmal“",
-    "Alles einstellbar: Anzahl, Zeit, Schwierigkeit (auch steigend), Fragetypen, Punkte, Joker, Erklärungen, Sprache",
+    "Alles einstellbar: Anzahl, Zeitlimit (oder keins), Schwierigkeit (auch steigend), Fragetypen, Punkte, Joker, Erklärungen, Sprache",
     "Revanche direkt von Lyras Startseite"
   ]
 }

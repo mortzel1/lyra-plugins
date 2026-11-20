@@ -70,7 +70,9 @@ const z = {
   info: null,
   einst: structuredClone(STANDARD),
   lehrer: 'lyra',
-  ansicht: 'lobby', // lobby | zaubern | countdown | frage | feedback | ende
+  ansicht: 'lobby', // lobby | zaubern | bereit | countdown | frage | feedback | ende
+  bereit: null, // fertig erstelltes Quiz (gespeichert) – jetzt spielen oder später
+  meldung: '',
   thema: '',
   themen: [],
   spiel: null,
@@ -154,8 +156,15 @@ async function start() {
   } catch (_) {}
   lyra.bei('zurueck', zurueck);
   lyra.bei('einstellungen', einstellungen);
+  const route = z.info.route || decodeURIComponent(location.hash.slice(1));
+  // Von der Startseite: ein gespeichertes Quiz direkt zum Spielen anbieten
+  const q = route.startsWith('spiel/') && z.spiele.find((x) => x.id === route.slice(6));
+  if (q) {
+    z.bereit = q;
+    z.ansicht = 'bereit';
+  }
   zeichnen();
-  if ((z.info.route || location.hash.slice(1)) === 'einstellungen') einstellungen();
+  if (route === 'einstellungen') einstellungen();
   lyra.themen().then((t) => { z.themen = t || []; if (z.ansicht === 'lobby') zeichnen(); }).catch(() => {});
   startseite();
 }
@@ -163,6 +172,7 @@ async function start() {
 function zurueck() {
   if (document.querySelector('.dialog-grund')) return;
   if (z.ansicht === 'lobby') return lyra.zurueck();
+  if (z.ansicht === 'bereit') z.meldung = '';
   if (z.ansicht === 'zaubern') lyra.abbrechen();
   if ((z.ansicht === 'frage' || z.ansicht === 'feedback') && !window.confirm('Quiz abbrechen?\n\nDein Spielstand geht verloren.')) return;
   stoppeTimer();
@@ -171,17 +181,46 @@ function zurueck() {
 }
 
 function startseite() {
-  const letztes = z.spiele[0];
-  if (!letztes) return lyra.startseite([]).catch(() => {});
-  const rekord = z.rekorde[letztes.thema.toLowerCase()];
-  lyra.startseite([{
-    id: 'revanche',
-    titel: `Quiz: ${letztes.thema}`,
-    untertitel: rekord ? `Rekord ${zahlFormat(rekord.punkte)} Punkte – Revanche?` : 'Nochmal spielen?',
-    route: 'lobby',
-    zeigen_bis: letztes.zeit + 7 * 86400,
-    geaendert: letztes.zeit,
-  }]).catch(() => {});
+  const eintraege = [];
+  // Gespeichert, aber noch nicht gespielt: „Quiz bereit“ (die zwei neuesten)
+  for (const q of z.spiele.filter((x) => !x.gespielt).slice(0, 2)) {
+    eintraege.push({
+      id: 'bereit-' + q.id,
+      titel: `Quiz bereit: ${q.thema}`,
+      untertitel: `${q.fragen.length} Fragen – jetzt spielen?`,
+      route: 'spiel/' + q.id,
+      zeigen_bis: q.zeit + 14 * 86400,
+      geaendert: q.zeit,
+    });
+  }
+  const letztes = z.spiele.find((x) => x.gespielt);
+  if (letztes) {
+    const rekord = z.rekorde[letztes.thema.toLowerCase()];
+    eintraege.push({
+      id: 'revanche',
+      titel: `Quiz: ${letztes.thema}`,
+      untertitel: rekord ? `Rekord ${zahlFormat(rekord.punkte)} Punkte – Revanche?` : 'Nochmal spielen?',
+      route: 'spiel/' + letztes.id,
+      zeigen_bis: (letztes.gespieltAm || letztes.zeit) + 7 * 86400,
+      geaendert: letztes.gespieltAm || letztes.zeit,
+    });
+  }
+  lyra.startseite(eintraege).catch(() => {});
+}
+
+/** Quiz sichern (gleich nach dem Erstellen – gespielt wird, wann du willst). */
+async function quizSichern(q) {
+  try { await lyra.speicher.schreiben('spiele/' + q.id, q); } catch (_) {}
+  z.spiele = [q, ...z.spiele.filter((x) => x.id !== q.id)];
+  startseite();
+}
+
+async function quizLoeschen(q) {
+  if (!window.confirm(`Quiz „${q.thema}“ löschen?\n\nDie ${q.fragen.length} Fragen sind dann weg (dein Rekord bleibt).`)) return;
+  try { await lyra.speicher.loeschen('spiele/' + q.id); } catch (_) {}
+  z.spiele = z.spiele.filter((x) => x.id !== q.id);
+  startseite();
+  zeichnen();
 }
 
 // ================================================================== Quiz erstellen
@@ -317,7 +356,14 @@ Antwort als JSON: {"fragen": [{"art": "auswahl", "frage": "…", "max": 0, "min"
     return zeichnen();
   }
   if (z.einst.schwierigkeit === 'steigend') fragen.sort((a, b) => a.schwierigkeit - b.schwierigkeit);
-  spielStarten({ id: lyra.neueId(), thema, fragen, zeit: lyra.jetzt() });
+  // Erst sichern, dann fragen: jetzt spielen oder später?
+  const quiz = { id: lyra.neueId(), thema, fragen, zeit: lyra.jetzt(), gespielt: 0 };
+  await quizSichern(quiz);
+  z.bereit = quiz;
+  z.ansicht = 'bereit';
+  z.thema = '';
+  ton('los');
+  zeichnen();
 }
 
 // ================================================================== Spielen
@@ -507,10 +553,9 @@ async function ende() {
     z.rekorde[schluessel] = { thema: s.quiz.thema, punkte: s.punkte, richtig: s.antworten.filter((a) => a.teil >= 0.999).length, anzahl: s.fragen.length, zeit: lyra.jetzt() };
     try { await lyra.speicher.schreiben('rekorde', z.rekorde); } catch (_) {}
   }
-  s.quiz.zeit = lyra.jetzt();
-  try { await lyra.speicher.schreiben('spiele/' + s.quiz.id, s.quiz); } catch (_) {}
-  z.spiele = [s.quiz, ...z.spiele.filter((q) => q.id !== s.quiz.id)].slice(0, 30);
-  startseite();
+  s.quiz.gespielt = (s.quiz.gespielt || 0) + 1;
+  s.quiz.gespieltAm = lyra.jetzt();
+  await quizSichern(s.quiz);
   ton('ende');
   konfetti(s.neuerRekord ? 160 : 70);
   zeichnen();
@@ -568,7 +613,8 @@ async function einstellungen() {
   const gruppe = (titel, inhalt, erkl) => h('div', { class: 'einst-gruppe' }, h('div', { class: 'fett' }, titel), erkl ? h('div', { class: 'leise klein', style: { marginBottom: '6px' } }, erkl) : null, inhalt);
   const ok = await lyra.dialog('Quizzard – alles einstellen', h('div', {},
     gruppe('Fragen pro Quiz', h('div', { class: 'zeile' }, anzahl, anzahlWert)),
-    gruppe('Zeit pro Frage', wahl('zeit', [[0, 'Ohne Zeit'], [10, '10 s'], [15, '15 s'], [20, '20 s'], [30, '30 s'], [45, '45 s'], [60, '60 s']]), 'Bei Reihenfolge, Zuordnen und Lückentext gibt es 50 % mehr Zeit.'),
+    gruppe('Zeitlimit pro Frage', wahl('zeit', [[0, 'Kein Zeitlimit'], [10, '10 s'], [15, '15 s'], [20, '20 s'], [30, '30 s'], [45, '45 s'], [60, '60 s'], [90, '90 s']]),
+      'Ohne Zeitlimit läuft keine Uhr (und es gibt keinen Zeitbonus). Bei Reihenfolge, Zuordnen und Lückentext gibt es 50 % mehr Zeit.'),
     gruppe('Schwierigkeit', wahl('schwierigkeit', [['leicht', 'Leicht'], ['mittel', 'Mittel'], ['schwer', 'Schwer'], ['gemischt', 'Gemischt'], ['steigend', 'Steigend']])),
     gruppe('Fragetypen', typen, 'Mindestens einer bleibt an.'),
     gruppe('Woher die Fragen kommen', wahl('quelle', [['unterlagen', 'Nur meine Unterlagen'], ['beides', 'Unterlagen + Wissen'], ['wissen', 'Allgemeinwissen']])),
@@ -632,6 +678,8 @@ function ansicht() {
       return frageAnsicht();
     case 'ende':
       return endeAnsicht();
+    case 'bereit':
+      return bereitAnsicht();
     default:
       return lobby();
   }
@@ -657,8 +705,8 @@ function lobby() {
       h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
         h('span', { class: 'leise klein' }, 'Quelle'), chip('quelle', 'unterlagen', '📚 Unterlagen'), chip('quelle', 'beides', '✨ Beides'), chip('quelle', 'wissen', '🌍 Allgemeinwissen')),
       h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
-        h('span', { class: 'leise klein' }, 'Fragen'), ...[5, 10, 15, 20, 30].map((n) => chip('anzahl', n, String(n))),
-        h('span', { class: 'leise klein', style: { marginLeft: '10px' } }, 'Zeit'), ...[[10, '10 s'], [20, '20 s'], [30, '30 s'], [0, '∞']].map(([n, s]) => chip('zeit', n, s))),
+        h('span', { class: 'leise klein' }, 'Fragen'), ...[5, 10, 15, 20, 30].map((n) => chip('anzahl', n, String(n)))),
+      zeitlimitZeile(),
       h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
         h('span', { class: 'leise klein' }, 'Level'), chip('schwierigkeit', 'leicht', 'Leicht'), chip('schwierigkeit', 'mittel', 'Mittel'), chip('schwierigkeit', 'schwer', 'Schwer'), chip('schwierigkeit', 'gemischt', 'Gemischt'), chip('schwierigkeit', 'steigend', 'Steigend')),
       h('div', { class: 'zeile', style: { marginTop: '6px' } },
@@ -667,14 +715,53 @@ function lobby() {
         h('span', { class: 'wachsen' }),
         h('button', { class: 'knopf riesig', id: 'los', disabled: !z.thema.trim(), onclick: erstellen }, 'Quiz starten ⚡')),
       z.fehler ? lyra.fehlerBox(z.fehler, online() && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null),
+    z.meldung ? h('div', { class: 'meldung' }, z.meldung) : null,
     z.spiele.length ? h('div', { class: 'panel', style: { marginTop: '18px' } },
       h('h3', { style: { marginBottom: '10px' } }, '🏆 Deine Quizze'),
-      z.spiele.slice(0, 6).map((q) => {
+      h('div', { class: 'quiz-liste' }, z.spiele.map((q) => {
         const r = z.rekorde[q.thema.toLowerCase()];
+        const neu = !q.gespielt;
         return h('div', { class: 'zeile', style: { padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.08)' } },
-          h('div', { class: 'wachsen' }, h('div', { class: 'fett' }, q.thema), h('div', { class: 'leise klein' }, `${q.fragen.length} Fragen${r ? ` · Rekord ${zahlFormat(r.punkte)}` : ''}`)),
-          h('button', { class: 'knopf tonal', onclick: () => spielStarten(q) }, 'Nochmal ▶'));
-      })) : null);
+          h('div', { class: 'wachsen' },
+            h('div', { class: 'fett' }, q.thema, neu ? h('span', { class: 'pill neu' }, 'neu') : null),
+            h('div', { class: 'leise klein' }, `${q.fragen.length} Fragen · ${neu ? 'noch nicht gespielt' : `${q.gespielt}× gespielt`}${r ? ` · Rekord ${zahlFormat(r.punkte)}` : ''} · ${datum(q.zeit)}`)),
+          h('button', { class: 'knopf text', title: 'Löschen', onclick: () => quizLoeschen(q) }, '🗑'),
+          h('button', { class: neu ? 'knopf' : 'knopf tonal', onclick: () => { z.meldung = ''; spielStarten(q); } }, neu ? 'Spielen ▶' : 'Nochmal ▶'));
+      }))) : null);
+}
+
+/** „⏱ Zeitlimit: Aus · 10 s · 20 s …“ – gilt fürs nächste Spiel (auch für gespeicherte Quizze). */
+function zeitlimitZeile() {
+  const chip = (wert, name) => h('button', { class: 'chip' + (z.einst.zeit === wert ? ' an' : ''), onclick: () => schnellSetzen('zeit', wert) }, name);
+  return h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
+    h('span', { class: 'leise klein', title: 'Bei Reihenfolge, Zuordnen und Lückentext gibt es 50 % mehr Zeit.' }, '⏱ Zeitlimit pro Frage'),
+    chip(0, 'Aus'), chip(10, '10 s'), chip(20, '20 s'), chip(30, '30 s'), chip(60, '60 s'));
+}
+
+const datum = (t) => new Date(t * 1000).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
+
+/** Das Quiz ist fertig (und schon gesichert): jetzt spielen – oder später. */
+function bereitAnsicht() {
+  const q = z.bereit;
+  if (!q) return lobby();
+  const anzahl = {};
+  for (const f of q.fragen) anzahl[f.art] = (anzahl[f.art] || 0) + 1;
+  return h('div', { class: 'bereit' },
+    h('div', { style: { fontSize: '64px' } }, '🎉'),
+    h('div', { class: 'logo', style: { fontSize: '40px', marginTop: '6px' } }, 'Dein Quiz ist fertig!'),
+    h('div', { class: 'slogan' }, `${q.fragen.length} Fragen zu „${q.thema}“`),
+    h('div', { class: 'zeile umbruch', style: { justifyContent: 'center', gap: '6px', margin: '10px 0 18px' } },
+      Object.entries(anzahl).map(([a, n]) => h('span', { class: 'pill' }, `${n}× ${TYPEN[a][0]}`))),
+    h('div', { class: 'zeile', style: { justifyContent: 'center', marginBottom: '22px' } }, zeitlimitZeile()),
+    h('div', { class: 'zeile', style: { justifyContent: 'center', gap: '12px' } },
+      h('button', { class: 'knopf riesig', onclick: () => { const x = z.bereit; z.bereit = null; spielStarten(x); } }, 'Jetzt spielen ▶'),
+      h('button', { class: 'knopf tonal riesig', onclick: () => {
+        z.bereit = null;
+        z.ansicht = 'lobby';
+        z.meldung = `💾 Gespeichert – „${q.thema}“ wartet unter „Deine Quizze“ (und auf Lyras Startseite).`;
+        zeichnen();
+      } }, 'Später spielen 💾')),
+    h('div', { class: 'leise klein', style: { marginTop: '16px' } }, 'Das Quiz ist schon gesichert – du kannst es jederzeit spielen, auch mehrmals.'));
 }
 
 function frageAnsicht() {

@@ -1,0 +1,114 @@
+/* Delta – ein ruhiger Zeichentisch für Automaten: Punktraster, schwebende Werkzeuge, klare Kreise und Pfeile. */
+:root {
+  --farbe: #16a34a;
+  --akzent: #16a34a;
+  --akzent-weich: rgba(22, 163, 74, 0.12);
+  --zustand: #ffffff;
+  --kante: #3a4050;
+  --aktiv: #dcfce7;
+  --wahl: #2563eb;
+  --punkte: rgba(30, 40, 60, 0.13);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --akzent: #4ade80;
+    --akzent-weich: rgba(74, 222, 128, 0.14);
+    --zustand: #23262d;
+    --kante: #b8bfcc;
+    --aktiv: #14532d;
+    --wahl: #60a5fa;
+    --punkte: rgba(220, 230, 255, 0.10);
+  }
+}
+html, body { height: 100%; overflow: hidden; }
+#app { height: 100vh; }
+.werk { display: flex; flex-direction: column; height: 100vh; }
+
+.kopf { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--linie); background: var(--flaeche); }
+.marke { width: 34px; height: 34px; border-radius: 10px; background: var(--akzent); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; font-style: italic; font-family: "Times New Roman", serif; flex: none; }
+.name-feld { border: 1px solid transparent; background: transparent; font-size: 16px; font-weight: 700; padding: 6px 8px; border-radius: 8px; min-width: 120px; max-width: 280px; color: var(--text); }
+.name-feld:hover, .name-feld:focus { border-color: var(--linie); background: var(--karte); outline: none; }
+.abzeichen { font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 999px; background: var(--karte); color: var(--leise); white-space: nowrap; }
+.abzeichen.gut { background: var(--akzent-weich); color: var(--akzent); }
+.abzeichen.schlecht { background: rgba(229, 72, 77, 0.12); color: var(--falsch); cursor: help; }
+.kopf .knopf { padding: 7px 11px; font-size: 13.5px; }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.knopf.gefahr { color: var(--falsch); }
+.chip.an { background: var(--akzent); color: #fff; }
+
+.hauptteil { flex: 1; display: flex; min-height: 0; }
+.buehne { flex: 1; position: relative; min-width: 0; }
+.flaeche { position: absolute; inset: 0; overflow: auto; background-color: var(--grund);
+  background-image: radial-gradient(var(--punkte) 1.2px, transparent 1.3px); background-size: 22px 22px; }
+.flaeche[data-werkzeug="zustand"] { cursor: copy; }
+.flaeche[data-werkzeug="pfeil"] { cursor: crosshair; }
+.flaeche svg { display: block; user-select: none; -webkit-user-select: none; }
+.flaeche svg [data-z] { cursor: grab; }
+.flaeche svg [data-k] { cursor: pointer; }
+.glimmen { filter: drop-shadow(0 0 8px var(--akzent)); }
+.leer-hinweis { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; max-width: 440px; line-height: 1.5; }
+.leer-hinweis button { pointer-events: auto; }
+.leer-hinweis .gross { font-size: 64px; font-style: italic; font-family: "Times New Roman", serif; color: var(--akzent); opacity: 0.55; line-height: 1; margin-bottom: 8px; }
+
+.werkzeuge { position: absolute; left: 12px; top: 12px; z-index: 2; display: flex; flex-direction: column; gap: 4px; padding: 6px;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; box-shadow: var(--schatten); }
+.wz { width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text); font-size: 18px; cursor: pointer; }
+.wz:hover:not(:disabled) { background: var(--karte-hover); }
+.wz.an { background: var(--akzent); color: #fff; }
+.wz:disabled { opacity: 0.3; cursor: default; }
+.trenner { height: 1px; background: var(--linie); margin: 3px 4px; }
+
+.seite { width: 290px; flex: none; border-left: 1px solid var(--linie); background: var(--flaeche); padding: 16px; overflow: auto; }
+.schalter { display: flex; align-items: center; gap: 10px; border: none; background: none; color: var(--text); font: inherit; cursor: pointer; padding: 2px 0; text-align: left; }
+.schalter .knubbel { width: 34px; height: 20px; border-radius: 10px; background: var(--karte-hover); position: relative; flex: none; transition: background 0.15s; }
+.schalter .knubbel::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: left 0.15s; }
+.schalter.an .knubbel { background: var(--akzent); }
+.schalter.an .knubbel::after { left: 16px; }
+.zeile-k { display: flex; justify-content: space-between; gap: 8px; width: 100%; border: none; background: var(--karte); border-radius: 8px; padding: 7px 10px; font: inherit; color: var(--text); cursor: pointer; }
+.zeile-k:hover { background: var(--karte-hover); }
+.quelle { background: var(--akzent-weich); border-radius: 12px; padding: 10px 12px; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; }
+.warn { color: var(--warnung); }
+.ok { color: var(--akzent); }
+.hinweise { background: var(--karte); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.hilfe { border-top: 1px solid var(--linie); padding-top: 10px; line-height: 1.5; }
+.rechenweg summary { cursor: pointer; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+.tabelle-box { overflow-x: auto; }
+.rechenweg table { border-collapse: collapse; font-size: 12.5px; width: 100%; }
+.rechenweg th, .rechenweg td { border: 1px solid var(--linie); padding: 4px 6px; text-align: left; white-space: nowrap; }
+.rechenweg th { background: var(--karte); }
+
+.sim { border-top: 1px solid var(--linie); background: var(--flaeche); padding: 10px 14px; }
+.sim .wort { flex: 0 1 300px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.sim .knopf { padding: 7px 11px; font-size: 13.5px; }
+.band { display: flex; gap: 3px; flex-wrap: wrap; }
+.band .feld { min-width: 28px; height: 32px; border-radius: 7px; background: var(--karte); display: flex; align-items: center; justify-content: center;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 16px; font-weight: 700; padding: 0 6px; transition: all 0.2s; }
+.band .feld.gelesen { opacity: 0.38; }
+.band .feld.jetzt { background: var(--akzent); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 10px var(--akzent-weich); }
+.menge { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.chip-z { padding: 4px 10px; border-radius: 999px; background: var(--aktiv); border: 1.5px solid var(--akzent); font-weight: 700; font-size: 13.5px; }
+.chip-z.ende { box-shadow: inset 0 0 0 2px var(--flaeche), inset 0 0 0 3.5px var(--akzent); }
+.chip-z.leer { background: rgba(229, 72, 77, 0.12); border-color: var(--falsch); }
+.urteil { display: flex; gap: 10px; align-items: baseline; font-weight: 800; font-size: 15px; padding: 6px 12px; border-radius: 10px; animation: rein 0.3s ease-out; }
+.urteil.gut { background: var(--akzent-weich); color: var(--akzent); }
+.urteil.schlecht { background: rgba(229, 72, 77, 0.12); color: var(--falsch); }
+.urteil .grund { font-weight: 500; font-size: 12.5px; color: var(--text); opacity: 0.8; }
+@keyframes rein { from { opacity: 0; transform: translateY(4px); } }
+
+.test-aus { display: flex; flex-wrap: wrap; gap: 6px; max-height: 220px; overflow: auto; }
+.test-zeile { display: flex; gap: 6px; align-items: center; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; font: inherit; font-weight: 700; }
+.test-zeile.gut { background: var(--akzent-weich); color: var(--akzent); }
+.test-zeile.schlecht { background: rgba(229, 72, 77, 0.12); color: var(--falsch); }
+.listen-zeile { border-radius: 10px; padding: 2px; }
+.listen-zeile.an { background: var(--akzent-weich); }
+.listen-knopf { text-align: left; border: none; background: none; color: var(--text); font: inherit; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.listen-knopf:hover { background: var(--karte-hover); }
+
+.lauf-schild { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; display: flex; gap: 12px; align-items: center;
+  background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 10px 14px; box-shadow: var(--schatten); }
+.kreisel { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--akzent-weich); border-top-color: var(--akzent); animation: drehen 0.8s linear infinite; }
+@keyframes drehen { to { transform: rotate(360deg); } }

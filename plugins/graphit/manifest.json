@@ -1,7 +1,7 @@
 {
   "kennung": "graphit",
   "name": "Graphit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Schaubilder zeichnen – direkt in der Eingabezeile",
   "beschreibung": "Beschreib, was du sehen möchtest – „Aufbau des Herzens“, „Schaltung eines UND-Gatters“, „Körperteile beschriften“ – und Graphit zeichnet dir ein sauberes, beschriftetes Schaubild. Graphit hat kein eigenes Fenster: Du startest es mit dem Stift-Symbol neben Lyras Eingabefeld, das Bild erscheint direkt in der Antwort und lässt sich als PNG oder SVG herunterladen.",
   "farbe": "#E8A317",
