@@ -1,0 +1,54 @@
+/* Graphit – Zeichentisch: Millimeterpapier, Bleistiftgelb, Bilder wie Blätter. */
+:root {
+  --farbe: #e8a317;
+  --akzent: #c98a06;
+  --akzent-weich: rgba(232, 163, 23, 0.14);
+  --raster: rgba(60, 80, 120, 0.07);
+  --raster-fein: rgba(60, 80, 120, 0.035);
+  --blatt: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --akzent: #f2b84b;
+    --akzent-weich: rgba(242, 184, 75, 0.16);
+    --raster: rgba(200, 210, 240, 0.07);
+    --raster-fein: rgba(200, 210, 240, 0.03);
+    --blatt: #1d1f24;
+  }
+}
+html, body { background-color: var(--grund); }
+body {
+  background-image:
+    linear-gradient(var(--raster) 1px, transparent 1px), linear-gradient(90deg, var(--raster) 1px, transparent 1px),
+    linear-gradient(var(--raster-fein) 1px, transparent 1px), linear-gradient(90deg, var(--raster-fein) 1px, transparent 1px);
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+}
+#app { height: 100vh; overflow: auto; }
+.tisch { max-width: 1040px; margin: 0 auto; padding: 26px 28px 40px; }
+
+.kopf { margin-bottom: 16px; }
+.marke { font-size: 34px; font-weight: 850; letter-spacing: -0.02em; display: inline-block; position: relative; }
+.marke::after { content: ''; position: absolute; left: 2px; right: -6px; bottom: 3px; height: 10px; z-index: -1;
+  background: var(--farbe); opacity: 0.45; border-radius: 3px; transform: rotate(-1deg); }
+
+.blatt { background: var(--blatt); border-radius: 16px; padding: 16px 18px; box-shadow: var(--schatten); border: 1px solid var(--linie); }
+.blatt .eingabe { flex: 1; font-size: 16px; padding: 13px 15px; }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); }
+
+.raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin-top: 20px; }
+.kachel-bild { text-align: left; border: 1px solid var(--linie); background: var(--blatt); border-radius: 14px; padding: 10px 10px 12px; cursor: pointer;
+  box-shadow: var(--schatten); transition: transform 0.15s, box-shadow 0.15s; color: var(--text); font: inherit; }
+.kachel-bild:hover { transform: translateY(-3px) rotate(-0.4deg); }
+.vorschau { background: #fff; border-radius: 9px; height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.vorschau svg { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+.gross { background: #fff; border-radius: 14px; box-shadow: var(--schatten); padding: 10px; display: flex; justify-content: center; }
+.gross svg { max-width: 100%; height: auto; max-height: 68vh; width: auto; }
+.leer { text-align: center; padding: 50px 20px; max-width: 520px; margin: 0 auto; line-height: 1.5; }
+
+.lauf-zeile { background: var(--akzent-weich); border-radius: 12px; padding: 8px 12px; }
+.stift-lauf { font-size: 22px; animation: kritzeln 0.9s ease-in-out infinite; }
+@keyframes kritzeln { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(4px, -2px) rotate(8deg); }
+  50% { transform: translate(-3px, 2px) rotate(-6deg); } 75% { transform: translate(3px, 1px) rotate(5deg); } }

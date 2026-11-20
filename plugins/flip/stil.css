@@ -1,0 +1,48 @@
+:root { --farbe: #e5488a; }
+@media (prefers-color-scheme: dark) { :root { --farbe: #f08bb6; } }
+
+.wrap { height: 100vh; overflow: auto; }
+.anzahl { display: flex; align-items: center; gap: 14px; }
+.anzahl input[type=number] { width: 84px; text-align: center; font-weight: 700; font-size: 16px; }
+.anzahl .regler { flex: 1; }
+.schalter { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; }
+.schalter .bahn { width: 38px; height: 22px; border-radius: 11px; background: var(--linie); position: relative; transition: background 0.2s; flex: none; }
+.schalter .bahn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s; }
+.schalter.an .bahn { background: var(--akzent); }
+.schalter.an .bahn::after { transform: translateX(16px); }
+
+.stapel-karte { display: flex; gap: 14px; align-items: center; }
+.stapel-karte .symbol { width: 38px; height: 38px; border-radius: 11px; flex: none; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--farbe) 14%, transparent); color: var(--farbe); font-size: 20px; }
+.kartenzeile { display: flex; gap: 12px; align-items: flex-start; }
+.kartenzeile .hinten { color: var(--leise); }
+.trenner { height: 1px; background: var(--linie); margin: 8px 0; }
+
+/* Lernen: Karte mit echter 3D-Drehung */
+.lernen { height: 100vh; display: flex; flex-direction: column; padding: 18px 28px 22px; }
+.buehne { flex: 1; display: flex; align-items: center; justify-content: center; perspective: 1600px; min-height: 0; }
+.karte3d { width: min(680px, 100%); height: min(400px, 100%); position: relative; cursor: pointer;
+  transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.22, 0.85, 0.3, 1); }
+.karte3d.hinten { transform: rotateY(180deg); }
+.seite3d { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px;
+  background: var(--flaeche); box-shadow: var(--schatten); border: 1.4px solid color-mix(in srgb, var(--farbe) 22%, transparent);
+  display: flex; flex-direction: column; padding: 24px 32px 26px; overflow: hidden; }
+.seite3d.rueck { transform: rotateY(180deg); border-color: color-mix(in srgb, var(--farbe) 45%, transparent); }
+.seite3d .marke { font-size: 11px; letter-spacing: 0.12em; font-weight: 800; color: var(--farbe); text-align: center; }
+.seite3d .inhalt { flex: 1; overflow: auto; display: flex; flex-direction: column; justify-content: center; }
+.seite3d .vorn-text .md { font-size: 21px; text-align: center; }
+.seite3d .rueck-text .md { font-size: 18px; }
+.seite3d .frage-klein { opacity: 0.6; font-size: 14px; }
+.noten { display: flex; gap: 12px; justify-content: center; }
+.note { width: 134px; padding: 11px 0; border-radius: 14px; border: none; cursor: pointer; text-align: center;
+  background: color-mix(in srgb, var(--n) 12%, transparent); transition: transform 0.12s, background 0.15s; }
+.note:hover { background: color-mix(in srgb, var(--n) 20%, transparent); transform: translateY(-1px); }
+.note .n { font-weight: 750; color: var(--n); font-size: 15px; }
+.note .d { font-size: 11.5px; color: var(--leise); margin-top: 2px; }
+.nachfragen { width: min(680px, 100%); margin: 14px auto 0; }
+.nachfragen .antwort { max-height: 180px; overflow: auto; background: var(--flaeche); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+.nur-hinten, .nur-vorn { transition: opacity 0.25s ease 0.15s; }
+.ausblenden { opacity: 0; pointer-events: none; transition: opacity 0.12s ease; }
+.unten { position: relative; height: 66px; margin-top: 14px; }
+.unten > * { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }

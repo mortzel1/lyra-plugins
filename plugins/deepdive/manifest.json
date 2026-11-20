@@ -1,0 +1,26 @@
+{
+  "kennung": "deepdive",
+  "name": "Deep Dive",
+  "version": "1.0.1",
+  "untertitel": "Ein Thema in kleinen Schritten meistern",
+  "beschreibung": "Du nennst ein Thema aus deinen Unterlagen – Lyra baut einen Lernpfad von den Grundlagen bis zum Schweren und bringt ihn dir in kleinen Häppchen bei: kurz erklären, gleich eine Frage zum Anklicken, dann weiter. Am Ende jedes Kapitels ein kurzer Check (erklären, lösen, beweisen). Tempo und Erklärlänge stellst du selbst ein; Lyra merkt sich, wo es hakt.",
+  "farbe": "#0EA5E9",
+  "symbol": "M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20ZM11 6h2v7.2l2.6-2.6 1.4 1.4-5 5-5-5 1.4-1.4 2.6 2.6Z",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "startseite"
+  ],
+  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen sowie deine Antworten und Rückfragen in Deep Dive",
+  "funktionen": [
+    "Baut aus einem Thema deiner Unterlagen einen Lernpfad – von den Grundlagen bis zum Schweren",
+    "Bringt dir jedes Kapitel in kleinen Häppchen bei: kurz erklären, gleich eine Frage zum Anklicken, weiter",
+    "Kapitel-Check am Ende: erklären, Aufgaben lösen, beweisen – mit ehrlicher Bewertung und Musterlösung auf Nachfrage",
+    "Tempo, Erklärlänge und Strenge stellst du selbst ein – alle Inhalte werden trotzdem gründlich durchgenommen",
+    "Merkt sich, wo es hakt, und wiederholt das gezielt",
+    "Deine Lernmodule stehen auf Lyras Startseite – ein Klick und es geht weiter",
+    "Übergibt ein Thema auf Wunsch an Flip, um daraus Karteikarten zu machen"
+  ]
+}

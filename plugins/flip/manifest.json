@@ -1,0 +1,26 @@
+{
+  "kennung": "flip",
+  "name": "Flip",
+  "version": "1.1.0",
+  "untertitel": "Karteikarten, die sitzen",
+  "beschreibung": "Schreib, was du lernen willst – die KI macht daraus Karteikarten aus deinen Unterlagen (5 bis 150 Stück). Gelernt wird mit Wiederholung im passenden Abstand; auf der Antwortseite kannst du dir die Karte genauer erklären lassen. Mit dem Konnektor Anki überträgst du Stapel in deine Anki-App oder holst sie von dort.",
+  "farbe": "#E5488A",
+  "symbol": "M9 3h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM4 7.5v11.5a2 2 0 0 0 2 2h11.5v-1.8H6.2a.4.4 0 0 1-.4-.4V7.5Z",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "startseite",
+    "anki"
+  ],
+  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen, dein Lernwunsch und deine Fragen zu Karten",
+  "funktionen": [
+    "Macht aus deinen Unterlagen Karteikarten – 5 bis 150 Stück, so viele du willst",
+    "Lernen mit Wiederholung im passenden Abstand (was du kannst, kommt seltener)",
+    "Karte umdrehen per Klick oder Leertaste – mit weicher Animation",
+    "Auf der Antwortseite: die Karte von der KI genauer erklären lassen",
+    "Formeln werden sauber gesetzt (LaTeX)",
+    "Stapel nach Anki übertragen oder aus Anki holen (mit dem Konnektor Anki)"
+  ]
+}

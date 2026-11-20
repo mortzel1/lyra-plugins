@@ -1,0 +1,26 @@
+{
+  "kennung": "oase",
+  "name": "Oase",
+  "version": "1.0.0",
+  "untertitel": "Dein Ruhepol – Stress, Kopf und Motivation",
+  "beschreibung": "Oase fragt dich kurz, wie es dir geht – mit Emojis, Schiebereglern und Häkchen statt langer Texte – und gibt dir daraus ehrliche, kleine Ratschläge: worauf du achten solltest, wie du heute am besten lernst und arbeitest, was dir guttut. Mit Atemübung, Verlauf und Tagesplan. Persönlich und ruhig gestaltet; ersetzt keine Therapie.",
+  "farbe": "#F07F63",
+  "symbol": "M20 3C11.5 3 5 8.6 5 16c0 1.5.3 2.8.9 4L4 21.9 5.4 23.3l1.9-1.9c1.1.5 2.4.8 3.7.8C18 22.2 22.2 14 20 3ZM8.4 18.2c1.7-3.8 4.6-6.9 8.4-9.1l.7.9c-3.5 2.1-6.2 5-7.8 8.7Z",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "speicher",
+    "startseite",
+    "fristen"
+  ],
+  "datenhinweis": "deine Angaben im Check-in (Stimmung, Energie, Stress, Schlaf, was dich beschäftigt) und alles, was du in Oase schreibst – das sind sehr persönliche Daten",
+  "funktionen": [
+    "Kurzer Check-in mit Emojis, Schiebereglern und Häkchen statt langer Texte",
+    "Ehrliche, kleine Ratschläge: worauf du achten solltest und wie du heute am besten lernst",
+    "Ein Tagesplan zum Abhaken, eine Atemübung und ein Gespräch, wenn du mehr erzählen möchtest",
+    "Dein Verlauf über die Zeit: Stimmung, Energie, Stress, Schlaf",
+    "Fragt dich auf Lyras Startseite, wie dein Tag war – passend zur Tageszeit",
+    "Zeigt Hilfsangebote (z. B. TelefonSeelsorge), wenn es dir richtig schlecht geht – ersetzt keine Therapie",
+    "Mit Lyra (lokal) bleibt alles auf deinem Mac; bei Claude & Co. warnt Oase deutlich, dass Persönliches hinausgeht"
+  ]
+}

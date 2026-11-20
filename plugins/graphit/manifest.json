@@ -1,0 +1,26 @@
+{
+  "kennung": "graphit",
+  "name": "Graphit",
+  "version": "1.0.0",
+  "untertitel": "Schaubilder zeichnen – direkt in der Eingabezeile",
+  "beschreibung": "Beschreib, was du sehen möchtest – „Aufbau des Herzens“, „Schaltung eines UND-Gatters“, „Körperteile beschriften“ – und Graphit zeichnet dir ein sauberes, beschriftetes Schaubild. Graphit hat kein eigenes Fenster: Du startest es mit dem Stift-Symbol neben Lyras Eingabefeld, das Bild erscheint direkt in der Antwort und lässt sich als PNG oder SVG herunterladen.",
+  "farbe": "#E8A317",
+  "symbol": "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["unterlagen", "ki", "speicher"],
+  "datenhinweis": "deine Bildbeschreibung und – wenn eingeschaltet – passende Fachbegriffe aus deinen Unterlagen",
+  "funktionen": [
+    "Zeichnet beschriftete Schaubilder aus deiner Beschreibung: Anatomie, Biologie, Abläufe, Kreisläufe, Aufbauten",
+    "Schaltungen mit Logikgattern (UND, ODER, NICHT, NAND, NOR, XOR) und Schaltzeichen (Widerstand, Lampe, Batterie, Schalter, Diode …)",
+    "Beschriftungen mit Hinweislinien – ordentlich am Rand, ohne Überlappen",
+    "Läuft direkt in Lyras Eingabezeile: Stift-Symbol antippen, beschreiben, Enter",
+    "Weiterbearbeiten im Gespräch: „beschrifte auch die Aorta“, „färbe die Venen blau“",
+    "Herunterladen als PNG oder verlustfrei als SVG",
+    "Alle Bilder gesammelt in der Graphit-Galerie (Plugins → Graphit)",
+    "Lokal mit Lyra oder – noch genauer – mit Claude, ChatGPT oder Gemini"
+  ],
+  "chat": {
+    "titel": "Schaubild zeichnen",
+    "platzhalter": "Was soll Graphit zeichnen? z. B. Aufbau des Herzens"
+  }
+}
