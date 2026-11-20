@@ -13,7 +13,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Graphit** | 1.0.1 | Schaubilder zeichnen – direkt in der Eingabezeile |
 | **Mindmap** | 1.0.0 | Begriffe und Querbezüge deiner Fächer |
 | **Oase** | 1.0.0 | Dein Ruhepol – Stress, Kopf und Motivation |
-| **Quizzard** | 1.1.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
+| **Quizzard** | 1.1.1 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
 
 ## Sicherheit
 

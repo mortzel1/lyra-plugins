@@ -1,7 +1,7 @@
 {
   "kennung": "quizzard",
   "name": "Quizzard",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "untertitel": "Das Quiz zu jedem Thema – schnell, bunt, mit Punkten",
   "beschreibung": "Nenn ein Thema aus deinen Unterlagen oder irgendein anderes – Quizzard zaubert daraus ein Quiz zum Spielen: Multiple Choice, Wahr/Falsch, Schätzfragen, Reihenfolgen, Zuordnen und Lückentexte, mit Countdown, Zeitbonus, Serien, Jokern und Highscores. In den Einstellungen bestimmst du alles selbst.",
   "farbe": "#8B5CF6",
@@ -22,5 +22,17 @@
     "Highscores je Thema, Rückblick am Ende und „Nur die Falschen nochmal“",
     "Alles einstellbar: Anzahl, Zeitlimit (oder keins), Schwierigkeit (auch steigend), Fragetypen, Punkte, Joker, Erklärungen, Sprache",
     "Revanche direkt von Lyras Startseite"
-  ]
+  ],
+  "neuerungen": {
+    "1.1.1": [
+      "Klarere, sanftere Töne – kein Knacken und kein Durcheinander mehr",
+      "Teilweise richtige Antworten haben jetzt einen eigenen Ton"
+    ],
+    "1.1.0": [
+      "Quizze werden gleich gespeichert – jetzt spielen oder später, so oft du willst",
+      "„Deine Quizze“: alle Quizze mit Spielen- und Löschen-Knopf, neue sind markiert",
+      "Fertige Quizze warten auf Lyras Startseite",
+      "Zeitlimit pro Frage gut sichtbar wählbar – oder ganz aus"
+    ]
+  }
 }

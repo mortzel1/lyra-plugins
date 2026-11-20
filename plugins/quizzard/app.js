@@ -95,29 +95,75 @@ const zahlFormat = (n) => Math.round(n).toLocaleString('de-DE');
 
 // ================================================================== Töne und Konfetti
 
+// Töne: weich ein- und ausgeblendet (kein Knacken), nur Sinus und Dreieck mit leisem Glocken-Oberton, alles über einen
+// gemeinsamen Regler mit Begrenzer (überlagerte Töne übersteuern nicht). WebKit erlaubt Ton erst nach einem Klick oder
+// Tastendruck – vorher wird nichts gespielt und auch nichts gesammelt, das später auf einmal losplärrt.
 let audio = null;
+let summe = null;
+function audioBereit() {
+  if (!audio) {
+    try {
+      audio = new AudioContext();
+      const begrenzer = audio.createDynamicsCompressor();
+      begrenzer.threshold.value = -16;
+      begrenzer.knee.value = 12;
+      begrenzer.ratio.value = 6;
+      begrenzer.attack.value = 0.003;
+      begrenzer.release.value = 0.2;
+      summe = audio.createGain();
+      summe.gain.value = 0.35;
+      summe.connect(begrenzer).connect(audio.destination);
+    } catch (_) {
+      audio = null;
+    }
+  }
+  return audio;
+}
+for (const ereignis of ['pointerdown', 'keydown']) {
+  document.addEventListener(ereignis, () => {
+    if (!z.einst.toene) return;
+    const a = audioBereit();
+    if (a && a.state !== 'running') a.resume().catch(() => {});
+  }, true);
+}
+
+function note(freq, start, dauer, { typ = 'sine', laut = 0.22, glocke = true } = {}) {
+  const t = audio.currentTime + 0.015 + start;
+  const huelle = audio.createGain();
+  huelle.gain.setValueAtTime(0, t);
+  huelle.gain.linearRampToValueAtTime(laut, t + 0.012); // weich an
+  huelle.gain.setTargetAtTime(0, t + 0.012, dauer / 4); // natürlich ausklingen
+  huelle.connect(summe);
+  const stimmen = [[freq, 1, typ]];
+  if (glocke) stimmen.push([freq * 2, 0.22, 'sine'], [freq * 3, 0.08, 'sine']);
+  for (const [f, anteil, art] of stimmen) {
+    const o = audio.createOscillator();
+    const g = audio.createGain();
+    o.type = art;
+    o.frequency.setValueAtTime(f, t);
+    g.gain.value = anteil;
+    o.connect(g).connect(huelle);
+    o.start(t);
+    o.stop(t + dauer + 0.4);
+  }
+}
+
 function ton(art) {
-  if (!z.einst.toene) return;
+  if (!z.einst.toene || !audio || audio.state !== 'running') return;
   try {
-    audio = audio || new AudioContext();
-    const t0 = audio.currentTime;
-    const spielen = (freq, start, dauer, typ = 'sine', laut = 0.12) => {
-      const o = audio.createOscillator();
-      const g = audio.createGain();
-      o.type = typ;
-      o.frequency.value = freq;
-      g.gain.setValueAtTime(laut, t0 + start);
-      g.gain.exponentialRampToValueAtTime(0.001, t0 + start + dauer);
-      o.connect(g).connect(audio.destination);
-      o.start(t0 + start);
-      o.stop(t0 + start + dauer);
-    };
-    if (art === 'richtig') { spielen(660, 0, 0.12); spielen(880, 0.1, 0.22); }
-    else if (art === 'falsch') { spielen(180, 0, 0.35, 'sawtooth', 0.08); }
-    else if (art === 'tick') spielen(1200, 0, 0.05, 'square', 0.03);
-    else if (art === 'count') spielen(520, 0, 0.18, 'triangle', 0.12);
-    else if (art === 'los') { spielen(520, 0, 0.12); spielen(780, 0.1, 0.12); spielen(1040, 0.2, 0.3); }
-    else if (art === 'ende') [523, 659, 784, 1046].forEach((f, i) => spielen(f, i * 0.13, 0.35, 'triangle', 0.1));
+    switch (art) {
+      case 'richtig': note(783.99, 0, 0.16); note(1046.5, 0.08, 0.35); break; // G5 → C6
+      case 'teils': note(880, 0, 0.25, { laut: 0.16 }); break; // A5
+      case 'falsch': note(311.13, 0, 0.2, { typ: 'triangle', laut: 0.18, glocke: false }); note(233.08, 0.13, 0.32, { typ: 'triangle', laut: 0.18, glocke: false }); break;
+      case 'tick': note(1318.5, 0, 0.05, { laut: 0.05, glocke: false }); break;
+      case 'count': note(587.33, 0, 0.18, { typ: 'triangle', laut: 0.18 }); break;
+      case 'los': [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(f, i * 0.07, 0.28, { laut: 0.16 })); break;
+      case 'ende':
+        [523.25, 659.25, 783.99].forEach((f, i) => note(f, i * 0.12, 0.3, { laut: 0.16 }));
+        note(1046.5, 0.4, 0.8, { laut: 0.16 });
+        note(1318.5, 0.4, 0.8, { laut: 0.1 });
+        break;
+    }
   } catch (_) {}
 }
 
@@ -529,7 +575,7 @@ function abgeben(zeitAus = false) {
   s.antworten.push({ teil, punkte, eingabe: structuredClone(z.eingabe), zeitAus });
   z.ergebnis = { teil, punkte, zeitAus };
   z.ansicht = 'feedback';
-  ton(teil >= 0.999 ? 'richtig' : teil > 0 ? 'richtig' : 'falsch');
+  ton(teil >= 0.999 ? 'richtig' : teil > 0 ? 'teils' : 'falsch');
   if (teil >= 0.999 && s.serie >= 3) konfetti(40);
   zeichnen();
   if (z.einst.autoWeiter) setTimeout(() => { if (z.ansicht === 'feedback' && s === z.spiel) weiter(); }, z.einst.autoWeiter * 1000);

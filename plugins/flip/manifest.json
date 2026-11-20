@@ -22,5 +22,11 @@
     "Auf der Antwortseite: die Karte von der KI genauer erklären lassen",
     "Formeln werden sauber gesetzt (LaTeX)",
     "Stapel nach Anki übertragen oder aus Anki holen (mit dem Konnektor Anki)"
-  ]
+  ],
+  "neuerungen": {
+    "1.1.0": [
+      "Anki: Stapel nach Anki übertragen oder von dort holen (mit dem Konnektor Anki)",
+      "Lyra zeigt vor Claude & Co. genau, welche Daten hinausgehen"
+    ]
+  }
 }

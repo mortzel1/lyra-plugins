@@ -22,5 +22,12 @@
     "Merkt sich, wo es hakt, und wiederholt das gezielt",
     "Deine Lernmodule stehen auf Lyras Startseite – ein Klick und es geht weiter",
     "Übergibt ein Thema auf Wunsch an Flip, um daraus Karteikarten zu machen"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Lernt in kleinen Häppchen: kurz erklären, gleich eine Frage zum Anklicken, dann weiter",
+      "Tempo und Erklärlänge stellst du selbst ein – alle Inhalte werden trotzdem gründlich durchgenommen",
+      "Lyra zeigt vor Claude & Co. genau, welche Daten hinausgehen"
+    ]
+  }
 }
