@@ -1,0 +1,21 @@
+{
+  "kennung": "flow",
+  "name": "Flow",
+  "version": "1.0.0",
+  "untertitel": "Fokus-Timer mit Statistik",
+  "kategorie": "planen",
+  "beschreibung": "Konzentriert lernen in Runden: 25 Minuten Fokus, dann Pause – nach vier Runden eine lange. Die Uhr läuft weiter, auch wenn du das Fenster schließt, und macOS meldet sich am Ende. Auf Lyras Startseite siehst du, was gerade läuft und wie weit du heute bist; die Statistik zeigt Woche, Serie und woran du gearbeitet hast. In der Pause hilft Oase beim Durchatmen.",
+  "farbe": "#6366F1",
+  "symbol": "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18Zm0 2a7 7 0 1 0 0 14a7 7 0 1 0 0-14Zm-1 2.5h2v5.1l3.2 1.9-1 1.7-4.2-2.5Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["speicher", "startseite", "erinnerungen"],
+  "datenhinweis": "",
+  "funktionen": [
+    "Fokus-Runden und Pausen (Pomodoro) – Längen frei einstellbar",
+    "Läuft weiter, wenn du das Fenster schließt – macOS meldet sich am Ende",
+    "Auf Lyras Startseite: was gerade läuft und dein Tagesziel",
+    "Statistik: heute, letzte 7 Tage, Serie in Folge, Zeit je Thema",
+    "Pausen-Tipps und „Durchatmen mit Oase“ (wenn installiert)",
+    "Sanfter Gong am Ende (abschaltbar)"
+  ]
+}

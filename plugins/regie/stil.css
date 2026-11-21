@@ -1,0 +1,41 @@
+/* Regie – Storyboard: Bild links, Sprechtext rechts; Vorführung auf dunkler Bühne. */
+:root { --farbe: #b45309; --akzent: #b45309; --akzent-weich: rgba(180, 83, 9, 0.1); }
+@media (prefers-color-scheme: dark) { :root { --akzent: #fbbf24; --akzent-weich: rgba(251, 191, 36, 0.13); } }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); color: #fff; }
+.regie.seite { max-width: 1000px; }
+.held { text-align: center; margin: 8px 0 18px; }
+.logo { font-size: 38px; font-weight: 850; letter-spacing: -0.02em; }
+.raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.mini { height: 110px; background: #fff; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.mini svg { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+.szene { display: grid; grid-template-columns: 44% 1fr; gap: 16px; background: var(--flaeche); border-radius: 16px; padding: 14px; margin-bottom: 12px; break-inside: avoid; }
+.szene-bild { display: flex; flex-direction: column; gap: 6px; }
+.bild { background: #fff; border-radius: 10px; padding: 6px; display: flex; justify-content: center; }
+.bild svg { max-width: 100%; height: auto; max-height: 280px; width: auto; }
+.bild-platz { background: repeating-linear-gradient(45deg, var(--karte), var(--karte) 10px, transparent 10px, transparent 20px); border: 1.5px dashed var(--linie);
+  border-radius: 10px; min-height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 14px; text-align: center; }
+.szene-text { display: flex; flex-direction: column; gap: 8px; }
+.szene-nr { width: 26px; height: 26px; border-radius: 8px; background: var(--akzent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+.sprechtext { font-size: 15px; line-height: 1.6; padding: 8px 10px; border-radius: 10px; background: var(--karte); outline: none; white-space: pre-wrap; }
+.sprechtext:focus { box-shadow: inset 0 0 0 1.5px var(--akzent); }
+.etikett { --farbe: var(--akzent); }
+/* Vorführung */
+.buehne { position: fixed; inset: 0; background: #0b0c10; color: #f5f5f7; display: flex; flex-direction: column; }
+.buehne-kopf { display: flex; align-items: center; gap: 12px; padding: 10px 18px; color: #c7c9d1; }
+.buehne .knopf.text { color: #fbbf24; }
+.folie { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 30px; min-height: 0; }
+.folie-bild { background: #fff; border-radius: 14px; padding: 12px; max-height: 100%; display: flex; }
+.folie-bild svg { max-width: 100%; max-height: 62vh; width: auto; height: auto; }
+.folie-titel { font-size: 46px; font-weight: 850; text-align: center; max-width: 80%; }
+.notizen { margin: 0 auto 10px; max-width: 900px; width: calc(100% - 40px); background: rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 16px; font-size: 16px; line-height: 1.55; color: #e5e7eb; }
+.notizen .md { color: #e5e7eb; }
+.fortschritt { display: flex; gap: 5px; justify-content: center; padding: 0 0 16px; }
+.fortschritt span { width: 26px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.18); cursor: pointer; }
+.fortschritt span.an { background: #fbbf24; }
+@media print {
+  .knopf, .lauf, .nur-bildschirm, .klein.leise:first-of-type { display: none !important; }
+  .szene { box-shadow: none; border: 1px solid #ddd; }
+}

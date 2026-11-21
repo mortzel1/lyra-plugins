@@ -3,6 +3,7 @@
   "name": "Quizzard",
   "version": "1.1.1",
   "untertitel": "Das Quiz zu jedem Thema – schnell, bunt, mit Punkten",
+  "kategorie": "lernen",
   "beschreibung": "Nenn ein Thema aus deinen Unterlagen oder irgendein anderes – Quizzard zaubert daraus ein Quiz zum Spielen: Multiple Choice, Wahr/Falsch, Schätzfragen, Reihenfolgen, Zuordnen und Lückentexte, mit Countdown, Zeitbonus, Serien, Jokern und Highscores. In den Einstellungen bestimmst du alles selbst.",
   "farbe": "#8B5CF6",
   "symbol": "M13.5 1.5 4 13.5h6.2L9 22.5l10-12.6h-6.3l.8-8.4Z",

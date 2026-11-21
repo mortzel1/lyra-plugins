@@ -1,0 +1,21 @@
+{
+  "kennung": "lemma",
+  "name": "Lemma",
+  "version": "1.0.0",
+  "untertitel": "Beweise selbst führen – Schritt für Schritt",
+  "kategorie": "lernen",
+  "beschreibung": "Du schreibst den Beweis, Lemma prüft jeden Schritt: richtig, Lücke oder falsch – mit einer kurzen Rückmeldung, was fehlt. Die Lösung verrät Lemma nie von selbst: Tipps gibt es in zwei Stufen, die Musterlösung nur, wenn du ausdrücklich danach fragst. Formeln in LaTeX, Beweise gespeichert und als Markdown exportierbar.",
+  "farbe": "#BE123C",
+  "symbol": "M4 4h16v16H4Zm2 2v12h12V6Zm2.3 6.2 1.4-1.4 2.1 2.1 4.5-4.5 1.4 1.4-5.9 5.9Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["ki", "speicher", "startseite"],
+  "datenhinweis": "die Aussage, die du beweist, und deine Beweisschritte",
+  "funktionen": [
+    "Jeden Schritt prüfen lassen: richtig, Lücke oder falsch – mit konkreter Rückmeldung",
+    "Verrät nie die Lösung: Tipps in zwei Stufen, Musterlösung nur auf ausdrücklichen Wunsch",
+    "Strenge einstellbar: locker, wie in der Übung oder wie in der Klausur",
+    "Formeln in LaTeX mit Live-Vorschau",
+    "Übungsaufgaben zum Einstieg (Induktion, Widerspruch, Folgen, Abbildungen)",
+    "Beweise gespeichert, offene auf Lyras Startseite, Export als Markdown"
+  ]
+}

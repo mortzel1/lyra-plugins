@@ -1,0 +1,44 @@
+/* Arena – ernst, aufgeräumt, Prüfungsatmosphäre: Schiefergrau, große Uhr, klares Deckblatt. */
+:root { --farbe: #334155; --akzent: #334155; --akzent-weich: rgba(51, 65, 85, 0.1); --gut: #16a34a; --mittel: #d97706; --schlecht: #dc2626; }
+@media (prefers-color-scheme: dark) { :root { --akzent: #cbd5e1; --akzent-weich: rgba(203, 213, 225, 0.12); } }
+.knopf { background: var(--akzent); color: var(--flaeche); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); background: transparent; }
+.chip.an { background: var(--akzent); color: var(--flaeche); }
+.held { text-align: center; margin: 8px 0 18px; }
+.logo { font-size: 42px; font-weight: 900; letter-spacing: 0.18em; }
+.gross-eingabe { font-size: 17px; padding: 14px 16px; }
+.note-kachel { width: 48px; height: 48px; border-radius: 12px; background: var(--akzent-weich); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex: none; }
+.note-kachel.offen { color: var(--leise); }
+.deckblatt { background: var(--flaeche); border-radius: 18px; padding: 30px; text-align: center; margin-top: 20px; box-shadow: var(--schatten); }
+.deckblatt h1 { margin: 6px 0 18px; font-size: 28px; }
+.werte { display: flex; justify-content: center; gap: 36px; margin-bottom: 18px; }
+.werte > div { display: flex; flex-direction: column; }
+.werte b { font-size: 24px; }
+.regeln { text-align: left; max-width: 520px; margin: 0 auto 22px; color: var(--leise); line-height: 1.7; }
+.schreib { display: flex; flex-direction: column; height: 100vh; }
+.leiste { display: flex; align-items: center; gap: 12px; padding: 10px 18px; background: var(--flaeche); border-bottom: 1px solid var(--linie); }
+.uhr { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; padding: 2px 12px; border-radius: 10px; background: var(--karte); }
+.uhr.knapp { color: var(--schlecht); background: color-mix(in srgb, var(--schlecht) 12%, transparent); animation: pochen 1s ease-in-out infinite; }
+@keyframes pochen { 50% { opacity: 0.6; } }
+.schreib-mitte { flex: 1; display: flex; min-height: 0; }
+.nav { width: 92px; padding: 12px 8px; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--linie); overflow: auto; }
+.nav-aufgabe { border: none; border-radius: 10px; padding: 8px 4px; background: var(--karte); color: var(--text); font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; position: relative; }
+.nav-aufgabe.an { background: var(--akzent); color: var(--flaeche); }
+.nav-aufgabe.bearbeitet::after { content: ''; position: absolute; top: 6px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--gut); }
+.aufgabe-spalte { flex: 1; overflow: auto; padding: 16px 22px 30px; display: flex; flex-direction: column; gap: 10px; max-width: 900px; }
+.aufgabe-karte { background: var(--flaeche); border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
+.aufgabe-karte.bewertet { margin-top: 12px; }
+.antwort { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; min-height: 220px; }
+.vorschau { background: var(--karte); border-radius: 10px; padding: 8px 12px; min-height: 38px; }
+.ergebnis { display: flex; gap: 22px; align-items: center; background: var(--flaeche); border-radius: 18px; padding: 22px 26px; }
+.ergebnis > div:last-child { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.note-gross { font-size: 54px; font-weight: 900; line-height: 1; }
+.etikett { --farbe: var(--akzent); }
+.etikett.gut { --farbe: var(--gut); }
+.etikett.mittel { --farbe: var(--mittel); }
+.etikett.schlecht { --farbe: var(--schlecht); }
+.antwort-box { background: var(--karte); border-radius: 10px; padding: 8px 12px; }
+.muster { margin-top: 8px; }
+.muster summary { cursor: pointer; font-weight: 650; color: var(--akzent); }
+@media print { .knopf, .lauf, details summary { display: none !important; } details { display: block; } details > * { display: block !important; } }

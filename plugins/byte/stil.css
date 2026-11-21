@@ -1,0 +1,39 @@
+/* Byte – Editor-Gefühl: dunkle Code-Fläche, Konsole, klare Testergebnisse. */
+:root { --farbe: #c026d3; --akzent: #c026d3; --akzent-weich: rgba(192, 38, 211, 0.1); --gut: #16a34a; --schlecht: #dc2626;
+  --code-grund: #161821; --code-text: #e6e6ef; --code-leise: #6c7086; }
+@media (prefers-color-scheme: dark) { :root { --akzent: #e879f9; --akzent-weich: rgba(232, 121, 249, 0.13); --code-grund: #0f1117; } }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); color: #fff; }
+.chip:disabled { opacity: 0.45; cursor: default; }
+.held { text-align: center; margin: 8px 0 18px; }
+.logo { font-size: 40px; font-weight: 800; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--akzent); }
+.status { width: 26px; height: 26px; border-radius: 8px; background: var(--karte-hover); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; flex: none; }
+.status.geloest { background: color-mix(in srgb, var(--gut) 18%, transparent); color: var(--gut); }
+.labor { display: flex; flex-direction: column; height: 100vh; }
+.leiste { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--linie); background: var(--flaeche); }
+.etikett.gut { --farbe: var(--gut); }
+.labor-mitte { flex: 1; display: flex; min-height: 0; }
+.aufgabe-spalte { width: 40%; max-width: 440px; overflow: auto; padding: 14px 18px; border-right: 1px solid var(--linie); }
+.test-name { color: var(--leise); padding: 2px 0; }
+.hinweis { background: color-mix(in srgb, #eab308 12%, transparent); border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; }
+.loesung { margin-top: 12px; }
+.loesung pre, .konsole pre { background: var(--code-grund); color: var(--code-text); border-radius: 10px; padding: 10px 12px; overflow: auto; font-size: 12.5px; white-space: pre-wrap; }
+.code-spalte { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; min-width: 0; overflow: auto; }
+.editor { display: flex; background: var(--code-grund); border-radius: 12px; overflow: hidden; min-height: 300px; flex: 1 1 340px; }
+.nummern { width: 42px; padding: 12px 8px 12px 0; text-align: right; color: var(--code-leise); font: 13px/1.55 ui-monospace, "SF Mono", Menlo, monospace; white-space: pre; overflow: hidden; user-select: none; }
+.code { flex: 1; border: none; outline: none; resize: none; background: transparent; color: var(--code-text); caret-color: #fff;
+  font: 13px/1.55 ui-monospace, "SF Mono", Menlo, monospace; padding: 12px; white-space: pre; tab-size: 4; }
+.klein-eingabe { font-size: 13px; padding: 8px 11px; }
+.konsole { background: var(--flaeche); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.konsole.leer { align-items: center; padding: 16px; }
+.k-kopf { font-weight: 750; }
+.k-kopf.gut { color: var(--gut); }
+.k-kopf.schlecht { color: var(--schlecht); }
+.fehler-text { color: #fca5a5 !important; }
+.test-zeile { display: flex; gap: 8px; align-items: flex-start; padding: 4px 6px; border-radius: 8px; }
+.test-zeile.gut > span { color: var(--gut); font-weight: 800; }
+.test-zeile.schlecht { background: color-mix(in srgb, var(--schlecht) 7%, transparent); }
+.test-zeile.schlecht > span { color: var(--schlecht); font-weight: 800; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }

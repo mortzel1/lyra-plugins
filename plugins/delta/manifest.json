@@ -3,11 +3,15 @@
   "name": "Delta",
   "version": "1.0.0",
   "untertitel": "DEAs und NEAs entwerfen, simulieren und erzeugen",
+  "kategorie": "informatik",
   "beschreibung": "Zeichne endliche Automaten mit Zuständen und Übergängen, lass Wörter Schritt für Schritt durchlaufen und sieh genau, warum ein Wort akzeptiert oder abgelehnt wird. Gib eine Sprache als regulären Ausdruck oder in Worten an – Delta baut dir den passenden NEA, DEA oder minimalen DEA, samt Rechenweg. Und prüft deinen eigenen Automaten exakt gegen eine Sprache.",
   "farbe": "#16A34A",
   "symbol": "M5.5 7.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 1 1 0-9Zm0 1.5a3 3 0 1 0 0 6a3 3 0 1 0 0-6ZM18.5 7.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 1 1 0-9Zm0 1.5a3 3 0 1 0 0 6a3 3 0 1 0 0-6Zm0 1.25a1.75 1.75 0 1 1 0 3.5a1.75 1.75 0 1 1 0-3.5ZM10.5 11.3h1.6V9.8l2.4 2.2-2.4 2.2v-1.5h-1.6Z",
   "einstieg": "index.html",
-  "berechtigungen": ["ki", "speicher"],
+  "berechtigungen": [
+    "ki",
+    "speicher"
+  ],
   "datenhinweis": "nur deine Beschreibung der Sprache (wenn du sie in Worten statt als regulären Ausdruck angibst)",
   "funktionen": [
     "Baukasten: Zustände (Kreise), Übergänge (Pfeile), Start- und Endzustände, ε-Übergänge, Schleifen – per Doppelklick und Ziehen",

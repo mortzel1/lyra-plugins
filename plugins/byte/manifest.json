@@ -1,0 +1,21 @@
+{
+  "kennung": "byte",
+  "name": "Byte",
+  "version": "1.0.0",
+  "untertitel": "Programmieraufgaben mit Tests – Python & Java",
+  "kategorie": "informatik",
+  "beschreibung": "Byte stellt dir Programmieraufgaben zu deinem Thema – mit Startcode und versteckten Tests, die Byte vorher an der eigenen Musterlösung prüft. Du schreibst den Code, Byte führt ihn auf deinem Mac aus und zeigt, welche Tests bestehen. Hinweise verraten nie die Lösung; die Musterlösung gibt es nur auf Wunsch. Dein Code läuft abgeschottet: ohne Internet, ohne Zugriff auf deine Dateien, mit Zeitlimit.",
+  "farbe": "#C026D3",
+  "symbol": "M8.6 7 4 12l4.6 5 1.4-1.4L6.8 12l3.2-3.6Zm6.8 0-1.4 1.4 3.2 3.6-3.2 3.6 1.4 1.4L20 12Zm-2.1-2.2 1.9.6-4.5 13.8-1.9-.6Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["unterlagen", "ki", "speicher", "code"],
+  "datenhinweis": "das Aufgabenthema, passende Auszüge aus deinen Unterlagen und – für Hinweise – deinen Code",
+  "funktionen": [
+    "Aufgaben in Python oder Java – Thema und Niveau wählbar, gern passend zu deiner Vorlesung",
+    "Versteckte Tests, vorher an der Musterlösung geprüft – kaputte Tests fliegen raus",
+    "Code ausführen und testen direkt auf deinem Mac – abgeschottet: kein Internet, kein Zugriff auf deine Dateien, Zeitlimit",
+    "Editor mit Zeilennummern, Einrückung, Tab und ⌘↩",
+    "Hinweise ohne Lösung; Musterlösung nur auf ausdrücklichen Wunsch",
+    "Spielwiese zum freien Ausprobieren; alle Aufgaben mit Stand gespeichert"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "kennung": "omega",
+  "name": "Omega",
+  "version": "1.0.0",
+  "untertitel": "Kellerautomaten, Turingmaschinen, Grammatiken & CYK",
+  "kategorie": "informatik",
+  "beschreibung": "Deltas großer Bruder für die Theoretische Informatik: Kellerautomaten und Turingmaschinen zeichnen und Schritt für Schritt simulieren – mit Keller bzw. Band und Lesekopf. Dazu kontextfreie Grammatiken: in Chomsky-Normalform bringen (jeder Schritt erklärt), Wörter mit dem CYK-Algorithmus prüfen – samt Tabelle und Ableitungsbaum.",
+  "farbe": "#1E40AF",
+  "symbol": "M12 3a8 8 0 0 1 4.6 14.5H20V20h-6v-3.4a5.5 5.5 0 1 0-4 0V20H4v-2.5h3.4A8 8 0 0 1 12 3Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["speicher"],
+  "datenhinweis": "",
+  "funktionen": [
+    "Kellerautomaten: nichtdeterministisch, ε-Übergänge, Annahme per Endzustand oder leerem Keller",
+    "Simulation mit Eingabe, Keller und Weg zur Annahme – oder dem Grund, warum es nicht geht",
+    "Turingmaschinen: Band mit Lesekopf, Schritt für Schritt, erkennt Endlosschleifen",
+    "Grammatiken: Chomsky-Normalform mit allen Zwischenschritten erklärt",
+    "CYK-Algorithmus mit Tabelle und gezeichnetem Ableitungsbaum",
+    "Kurze Wörter der Sprache aufzählen, Beispiele (aⁿbⁿ, Ausdrücke) zum Loslegen",
+    "Export als PNG oder SVG – komplett lokal, ohne KI"
+  ]
+}

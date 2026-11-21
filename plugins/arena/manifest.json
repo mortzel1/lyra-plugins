@@ -1,0 +1,22 @@
+{
+  "kennung": "arena",
+  "name": "Arena",
+  "version": "1.0.0",
+  "untertitel": "Probeklausur unter echten Bedingungen",
+  "kategorie": "lernen",
+  "beschreibung": "Arena stellt dir eine Probeklausur zusammen – zu deinem Stoff und, wenn Lyra Altklausuren in deinen Unterlagen findet, in deren Stil. Mit Punkten, Zeitlimit und einer Uhr, die weiterläuft, auch wenn du das Fenster schließt. Nach der Abgabe korrigiert die KI jede Aufgabe mit Punkten, Begründung und Tipp, zeigt Musterlösung und Bewertungsschema und schätzt deine Note.",
+  "farbe": "#334155",
+  "symbol": "M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3Zm-1 4v1a2 2 0 0 0 1 1.7Zm12 0v2.7A2 2 0 0 0 18 8Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["unterlagen", "ki", "speicher", "startseite", "erinnerungen"],
+  "datenhinweis": "das Klausurthema, passende Auszüge aus deinen Unterlagen und – zum Korrigieren – deine Antworten",
+  "funktionen": [
+    "Probeklausur zu deinem Stoff – im Stil deiner Altklausuren, wenn Lyra welche findet",
+    "Zeit, Anzahl Aufgaben und Niveau wählbar; Punkte wie in der echten Klausur",
+    "Uhr läuft weiter, auch bei geschlossenem Fenster; Erinnerung 5 Minuten vor Schluss, automatische Abgabe",
+    "Antworten mit LaTeX-Vorschau, laufend gesichert",
+    "Korrektur je Aufgabe: Punkte, Begründung, Lerntipp – dazu Musterlösung und Bewertungsschema",
+    "Notenschätzung (1,0 bis 5,0) und Verlauf deiner Probeklausuren",
+    "Auswertung drucken oder als PDF sichern"
+  ]
+}

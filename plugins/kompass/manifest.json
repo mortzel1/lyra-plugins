@@ -1,0 +1,22 @@
+{
+  "kennung": "kompass",
+  "name": "Kompass",
+  "version": "1.0.0",
+  "untertitel": "Lernzeit rückwärts von deinen Fristen planen",
+  "kategorie": "planen",
+  "beschreibung": "Kompass nimmt deine Abgaben und Klausuren, fragt, wie viel Arbeit jede braucht und wie viel Zeit du an welchem Wochentag hast – und plant daraus rückwärts einen Wochenplan mit Lernblöcken zum Abhaken. Täglich erinnert dich macOS, was dran ist, und am Abend vor jeder Frist. Auf Lyras Startseite steht, was heute ansteht. Alles lokal, ganz ohne KI.",
+  "farbe": "#EA580C",
+  "symbol": "M12 2a10 10 0 1 1 0 20a10 10 0 1 1 0-20Zm0 2a8 8 0 1 0 0 16a8 8 0 1 0 0-16Zm3.5 4.5-2 5-5 2 2-5Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["fristen", "speicher", "startseite", "erinnerungen"],
+  "datenhinweis": "",
+  "funktionen": [
+    "Findet deine Abgaben und Klausuren der nächsten 120 Tage",
+    "Plant rückwärts: Aufwand je Frist auf die Tage davor verteilt – nichts landet auf dem letzten Abend",
+    "Wochenplan mit Blöcken in Fachfarben, Lernzeit je Wochentag einstellbar",
+    "Blöcke abhaken – Kompass rechnet den Rest neu und warnt, wenn die Zeit knapp wird",
+    "Tägliche Erinnerung zur Wunschzeit und am Abend vor jeder Frist (Mitteilung von macOS)",
+    "Auf Lyras Startseite: was heute dran ist und die nächste Frist",
+    "Komplett lokal – ohne KI, nichts verlässt deinen Mac"
+  ]
+}

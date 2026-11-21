@@ -7,13 +7,21 @@ installierst – von hier, aus dem neuesten Release:
 
 | Plugin | Version | Was es tut |
 |---|---|---|
+| **Arena** | 1.0.0 | Probeklausur unter echten Bedingungen |
+| **Byte** | 1.0.0 | Programmieraufgaben mit Tests – Python & Java |
 | **Deep Dive** | 1.0.1 | Ein Thema in kleinen Schritten meistern |
 | **Delta** | 1.0.0 | DEAs und NEAs entwerfen, simulieren und erzeugen |
+| **Essenz** | 1.0.0 | Formelblatt aus deinen Unterlagen |
 | **Flip** | 1.1.0 | Karteikarten, die sitzen |
+| **Flow** | 1.0.0 | Fokus-Timer mit Statistik |
 | **Graphit** | 1.0.1 | Schaubilder zeichnen – direkt in der Eingabezeile |
+| **Kompass** | 1.0.0 | Lernzeit rückwärts von deinen Fristen planen |
+| **Lemma** | 1.0.0 | Beweise selbst führen – Schritt für Schritt |
 | **Mindmap** | 1.0.0 | Begriffe und Querbezüge deiner Fächer |
 | **Oase** | 1.0.0 | Dein Ruhepol – Stress, Kopf und Motivation |
+| **Omega** | 1.0.0 | Kellerautomaten, Turingmaschinen, Grammatiken & CYK |
 | **Quizzard** | 1.1.1 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
+| **Regie** | 1.0.0 | Vom Thema zum Erklärvideo |
 
 ## Sicherheit
 

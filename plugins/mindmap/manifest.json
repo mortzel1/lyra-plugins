@@ -3,6 +3,7 @@
   "name": "Mindmap",
   "version": "1.0.0",
   "untertitel": "Begriffe und Querbezüge deiner Fächer",
+  "kategorie": "erstellen",
   "beschreibung": "Zeigt die wichtigsten Begriffe aus deinen Unterlagen als Mindmap: je Fach eine Ansicht, in der Übersicht die Brücken zwischen den Fächern. Ein Klick zeigt Fundstellen und verwandte Begriffe – und lässt dir den Begriff von Lyra erklären.",
   "farbe": "#14B8A6",
   "symbol": "M12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5ZM5 3.7a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM19 3.7a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM12 17.2a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM10.56 9.84L7.21 6.97L6.29 8.03L9.64 10.9ZM13.44 9.84L16.79 6.97L17.71 8.03L14.36 10.9ZM11.3 14.5H12.7V17.2H11.3Z",

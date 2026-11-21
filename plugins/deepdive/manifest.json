@@ -3,6 +3,7 @@
   "name": "Deep Dive",
   "version": "1.0.1",
   "untertitel": "Ein Thema in kleinen Schritten meistern",
+  "kategorie": "lernen",
   "beschreibung": "Du nennst ein Thema aus deinen Unterlagen – Lyra baut einen Lernpfad von den Grundlagen bis zum Schweren und bringt ihn dir in kleinen Häppchen bei: kurz erklären, gleich eine Frage zum Anklicken, dann weiter. Am Ende jedes Kapitels ein kurzer Check (erklären, lösen, beweisen). Tempo und Erklärlänge stellst du selbst ein; Lyra merkt sich, wo es hakt.",
   "farbe": "#0EA5E9",
   "symbol": "M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20ZM11 6h2v7.2l2.6-2.6 1.4 1.4-5 5-5-5 1.4-1.4 2.6 2.6Z",

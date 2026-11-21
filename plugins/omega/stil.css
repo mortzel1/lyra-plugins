@@ -1,0 +1,77 @@
+/* Omega – Deltas großer Bruder: gleicher Zeichentisch, tiefblau, Keller als Stapel, Band mit Lesekopf. */
+:root { --farbe: #1e40af; --akzent: #1e40af; --akzent-weich: rgba(30, 64, 175, 0.1); --zustand: #ffffff; --kante: #3a4050; --aktiv: #dbeafe; --wahl: #2563eb; --punkte: rgba(30, 40, 60, 0.13); }
+@media (prefers-color-scheme: dark) { :root { --akzent: #93c5fd; --akzent-weich: rgba(147, 197, 253, 0.14); --zustand: #23262d; --kante: #b8bfcc; --aktiv: #1e3a8a; --wahl: #60a5fa; --punkte: rgba(220, 230, 255, 0.10); } }
+html, body { height: 100%; overflow: hidden; }
+#app { height: 100vh; }
+.werk { display: flex; flex-direction: column; height: 100vh; }
+.kopf { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--linie); background: var(--flaeche); }
+.marke { width: 34px; height: 34px; border-radius: 10px; background: var(--akzent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 800; font-family: "Times New Roman", serif; flex: none; }
+.reiter { display: inline-flex; background: var(--karte); border-radius: 11px; padding: 3px; gap: 2px; }
+.reiter button { border: none; background: transparent; color: var(--leise); font: inherit; font-weight: 650; font-size: 13px; padding: 6px 11px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+.reiter button.an { background: var(--flaeche); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.name-feld { border: 1px solid transparent; background: transparent; font-size: 14.5px; font-weight: 700; padding: 6px 8px; border-radius: 8px; min-width: 100px; max-width: 240px; color: var(--text); }
+.name-feld:hover, .name-feld:focus { border-color: var(--linie); background: var(--karte); outline: none; }
+.knopf { background: var(--akzent); color: #fff; }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); background: transparent; }
+.knopf.gefahr { color: var(--falsch); }
+.kopf .knopf { padding: 7px 10px; font-size: 13.5px; }
+.chip.an { background: var(--akzent); color: #fff; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.hauptteil { flex: 1; display: flex; min-height: 0; }
+.buehne { flex: 1; position: relative; min-width: 0; }
+.flaeche { position: absolute; inset: 0; overflow: auto; background-color: var(--grund); background-image: radial-gradient(var(--punkte) 1.2px, transparent 1.3px); background-size: 22px 22px; }
+.flaeche[data-werkzeug="zustand"] { cursor: copy; }
+.flaeche[data-werkzeug="pfeil"] { cursor: crosshair; }
+.flaeche svg { display: block; user-select: none; -webkit-user-select: none; }
+.flaeche svg [data-z] { cursor: grab; }
+.flaeche svg [data-k] { cursor: pointer; }
+.werkzeuge { position: absolute; left: 12px; top: 12px; z-index: 2; display: flex; flex-direction: column; gap: 4px; padding: 6px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; box-shadow: var(--schatten); }
+.wz { width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text); font-size: 18px; cursor: pointer; }
+.wz:hover:not(:disabled) { background: var(--karte-hover); }
+.wz.an { background: var(--akzent); color: #fff; }
+.wz:disabled { opacity: 0.3; }
+.trenner { height: 1px; background: var(--linie); margin: 3px 4px; }
+.seite-leiste { width: 300px; flex: none; border-left: 1px solid var(--linie); background: var(--flaeche); padding: 16px; overflow: auto; }
+.schalter { display: flex; align-items: center; gap: 10px; border: none; background: none; color: var(--text); font: inherit; cursor: pointer; padding: 2px 0; text-align: left; }
+.schalter .knubbel { width: 34px; height: 20px; border-radius: 10px; background: var(--karte-hover); position: relative; flex: none; }
+.schalter .knubbel::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: left 0.15s; }
+.schalter.an .knubbel { background: var(--akzent); }
+.schalter.an .knubbel::after { left: 16px; }
+.hilfe { border-top: 1px solid var(--linie); padding-top: 10px; line-height: 1.5; }
+.sim { border-top: 1px solid var(--linie); background: var(--flaeche); padding: 10px 14px; }
+.sim .wort { flex: 0 1 260px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.sim .knopf { padding: 7px 11px; font-size: 13.5px; }
+.band { display: flex; gap: 3px; flex-wrap: wrap; }
+.band .feld { min-width: 28px; height: 32px; border-radius: 7px; background: var(--karte); display: flex; align-items: center; justify-content: center; font: 700 16px ui-monospace, "SF Mono", Menlo, monospace; padding: 0 6px; transition: all 0.2s; }
+.band .feld.gelesen { opacity: 0.38; }
+.band .feld.jetzt { background: var(--akzent); color: #fff; }
+.band.tm .feld { border: 1.5px solid var(--linie); background: var(--flaeche); }
+.band.tm .feld.leer { color: var(--leise); }
+.band.tm .feld.kopf { border-color: var(--akzent); box-shadow: 0 -6px 0 -3px var(--akzent); background: var(--aktiv); }
+.keller { display: flex; gap: 3px; align-items: center; }
+.kfeld { min-width: 28px; height: 32px; border-radius: 7px; background: var(--karte); display: inline-flex; align-items: center; justify-content: center; font: 700 16px ui-monospace, "SF Mono", Menlo, monospace; padding: 0 6px; }
+.kfeld.oben { background: var(--akzent); color: #fff; }
+.urteil { display: flex; gap: 10px; align-items: baseline; font-weight: 800; font-size: 15px; padding: 6px 12px; border-radius: 10px; }
+.urteil.gut { background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); }
+.urteil.schlecht { background: color-mix(in srgb, var(--falsch) 12%, transparent); color: var(--falsch); }
+.urteil .grund { font-weight: 500; font-size: 12.5px; color: var(--text); opacity: 0.85; }
+.listen-knopf { text-align: left; border: none; background: none; color: var(--text); font: inherit; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.listen-knopf:hover { background: var(--karte-hover); }
+/* Grammatik */
+.grammatik-seite { flex: 1; overflow: auto; display: grid; grid-template-columns: minmax(300px, 1fr) minmax(320px, 1.2fr); gap: 22px; padding: 18px 22px; align-items: start; }
+.grammatik { font-size: 15px; line-height: 1.6; }
+.schritt { background: var(--flaeche); border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; }
+.schritt summary { cursor: pointer; font-weight: 700; font-size: 13.5px; }
+.schritt pre { margin: 6px 0 0; font: 13px/1.55 ui-monospace, "SF Mono", Menlo, monospace; white-space: pre-wrap; }
+.cyk-box { overflow: auto; }
+.cyk { border-collapse: separate; border-spacing: 3px; }
+.cyk td { min-width: 54px; height: 38px; text-align: center; border-radius: 7px; background: var(--karte); font: 12.5px ui-monospace, "SF Mono", Menlo, monospace; padding: 2px 6px; color: var(--leise); }
+.cyk td.voll { background: var(--akzent-weich); color: var(--text); font-weight: 650; }
+.cyk td.start { background: color-mix(in srgb, var(--ok) 20%, transparent); box-shadow: inset 0 0 0 2px var(--ok); }
+.cyk td.aus { background: transparent; }
+.cyk th.wortzeichen { font: 800 16px ui-monospace, "SF Mono", Menlo, monospace; padding-top: 4px; }
+.baum { overflow: auto; background: var(--flaeche); border-radius: 12px; padding: 8px; }
+.baum-linie { stroke: var(--leise); stroke-width: 1.5; }
+.baum-nt { fill: var(--akzent); font: 700 15px -apple-system, sans-serif; }
+.baum-t { fill: var(--text); font: 800 16px ui-monospace, "SF Mono", Menlo, monospace; }

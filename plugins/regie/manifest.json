@@ -1,0 +1,21 @@
+{
+  "kennung": "regie",
+  "name": "Regie",
+  "version": "1.0.0",
+  "untertitel": "Vom Thema zum Erklärvideo",
+  "kategorie": "erstellen",
+  "beschreibung": "Regie schreibt dir zu einem Thema das Drehbuch für ein kurzes Erklärvideo oder eine Präsentation: Szenen mit Sprechtext, Dauer und Bildidee – auf Wunsch aus deinen Unterlagen. Die Schaubilder zeichnet Graphit im Hintergrund. Mit Vorführmodus samt Sprechernotizen; als Drehbuch (Markdown) oder PDF sichern.",
+  "farbe": "#B45309",
+  "symbol": "M3 5h18v14H3Zm2 2v10h14V7Zm5 2 5 3-5 3Z",
+  "einstieg": "index.html",
+  "berechtigungen": ["unterlagen", "ki", "speicher", "werkzeuge"],
+  "datenhinweis": "das Thema und passende Auszüge aus deinen Unterlagen (die Bildbeschreibungen gehen an Graphit – mit dessen Einstellungen)",
+  "funktionen": [
+    "Drehbuch aus einem Thema: Einstieg, Erklärung in Schritten, Zusammenfassung",
+    "Je Szene Sprechtext, Dauer und eine genaue Bildidee – Länge, Publikum und Ton wählbar",
+    "Schaubilder zu jeder Szene – Graphit zeichnet sie im Hintergrund",
+    "Vorführmodus mit Pfeiltasten und Sprechernotizen",
+    "Sprechtexte direkt bearbeiten",
+    "Als Drehbuch (Markdown) oder PDF sichern"
+  ]
+}

@@ -1,0 +1,39 @@
+/* Flow – ruhig und konzentriert: viel Raum, ein großer Ring, sanfte Farbe je Phase. */
+:root { --farbe: #6366f1; --akzent: #6366f1; --akzent-weich: rgba(99, 102, 241, 0.12); --phase: #6366f1; }
+@media (prefers-color-scheme: dark) { :root { --akzent: #818cf8; --akzent-weich: rgba(129, 140, 248, 0.16); --phase: #818cf8; } }
+.flow.kurz { --phase: #14b8a6; }
+.flow.lang { --phase: #22c55e; }
+html, body { height: 100%; }
+body { background: radial-gradient(1200px 600px at 50% -10%, color-mix(in srgb, var(--phase) 14%, transparent), transparent 70%), var(--grund); transition: background 0.6s; }
+#app { min-height: 100vh; }
+.mitte-spalte { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 24px 30px; max-width: 760px; margin: 0 auto; text-align: center; }
+.kopfzeile { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; }
+.reiter { display: inline-flex; background: var(--karte); border-radius: 12px; padding: 3px; gap: 2px; }
+.reiter button { border: none; background: transparent; color: var(--leise); font: inherit; font-weight: 650; font-size: 13.5px; padding: 7px 14px; border-radius: 9px; cursor: pointer; }
+.reiter button.an { background: var(--flaeche); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.heute { display: flex; align-items: center; gap: 10px; min-width: 220px; }
+.heute .balken { flex: 1; }
+.ring-box { position: relative; width: min(320px, 70vw); aspect-ratio: 1; margin-top: 6px; }
+.ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .spur { fill: none; stroke: var(--karte-hover); stroke-width: 14; }
+.ring .fortschritt { fill: none; stroke: var(--phase); stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.3s linear, stroke 0.6s; }
+.ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.gross-zeit { font-size: 64px; font-weight: 750; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1; }
+.eingabe.thema { text-align: center; }
+.knopf { background: var(--phase); }
+.knopf.tonal { background: color-mix(in srgb, var(--phase) 14%, transparent); color: var(--phase); }
+.chip.an { background: var(--phase); color: #fff; }
+.meldung { width: 100%; max-width: 520px; }
+.pause-karte { max-width: 460px; width: 100%; margin-top: 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.werte { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+.wert { background: var(--flaeche); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.wert b { font-size: 22px; }
+.balken-tage { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; align-items: end; }
+.tag { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.saeule-box { position: relative; width: 100%; height: 160px; display: flex; align-items: flex-end; justify-content: center; }
+.saeule { width: 60%; min-height: 3px; border-radius: 8px 8px 3px 3px; background: color-mix(in srgb, var(--akzent) 55%, transparent); transition: height 0.4s; }
+.saeule.voll { background: var(--akzent); }
+.tag.heute .klein:last-child { color: var(--akzent); font-weight: 700; }
+.ziel-linie { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--leise); opacity: 0.5; }
+.thema-zeile { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 6px 0; }
+.thema-balken { grid-column: 1 / -1; }

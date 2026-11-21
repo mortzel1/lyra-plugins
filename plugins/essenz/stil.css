@@ -1,0 +1,44 @@
+/* Essenz – wie ein gutes Formelblatt: dicht, klar, gedruckt genauso schön wie am Bildschirm. */
+:root { --farbe: #0891b2; --akzent: #0891b2; --akzent-weich: rgba(8, 145, 178, 0.11); }
+@media (prefers-color-scheme: dark) { :root { --akzent: #22d3ee; --akzent-weich: rgba(34, 211, 238, 0.13); } }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); color: #fff; }
+.seite.breit { max-width: 1100px; }
+.held { text-align: center; margin: 8px 0 18px; }
+.logo { font-size: 40px; font-weight: 850; letter-spacing: -0.03em; background: linear-gradient(120deg, #0891b2, #6366f1); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.werkzeuge { gap: 6px; margin-bottom: 10px; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; }
+.vorschau { background: var(--karte); border-radius: 10px; padding: 8px 12px; min-height: 40px; }
+
+/* Das Blatt */
+.blatt { background: #fff; color: #1a1b25; border-radius: 6px; padding: 26px 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); column-gap: 26px; column-rule: 1px solid #e5e7eb; }
+.blatt-titel-feld { column-span: all; display: block; width: 100%; border: none; background: transparent; font: inherit; font-size: 22px; font-weight: 800; color: #1a1b25;
+  border-bottom: 2.5px solid var(--farbe); padding: 0 0 6px; margin-bottom: 12px; outline: none; }
+.blatt h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--farbe); margin: 10px 0 6px; break-after: avoid; }
+.eintrag { break-inside: avoid; padding: 6px 8px 7px; margin-bottom: 6px; border-radius: 6px; border-left: 3px solid #d1d5db; background: #fafafa; position: relative; }
+.eintrag.formel { border-left-color: #0891b2; }
+.eintrag.definition { border-left-color: #7c3aed; }
+.eintrag.satz { border-left-color: #ea580c; }
+.eintrag.merke { border-left-color: #16a34a; }
+.eintrag-kopf { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 750; color: #374151; }
+.marke { width: 17px; height: 17px; border-radius: 5px; background: #eef2f7; display: inline-flex; align-items: center; justify-content: center; font-size: 10.5px; color: #4b5563; flex: none; }
+.bez { flex: 1; }
+.aktionen { display: none; gap: 2px; }
+.eintrag:hover .aktionen { display: inline-flex; }
+.aktionen button { border: none; background: #eef2f7; border-radius: 5px; width: 22px; height: 20px; cursor: pointer; font-size: 11px; color: #374151; }
+.eintrag .md { font-size: 13.5px; line-height: 1.45; color: #111827; }
+.eintrag .md p { margin: 2px 0; }
+.zusatz { font-size: 11.5px; color: #6b7280; font-style: italic; margin-top: 2px; }
+.zusatz .md { font-size: 11.5px; color: #6b7280; }
+.groesse-klein .eintrag .md { font-size: 12px; }
+.groesse-klein .eintrag { padding: 4px 6px 5px; margin-bottom: 4px; }
+
+@media print {
+  body { background: #fff !important; }
+  .werkzeuge, .nur-bildschirm, .aktionen, .klein.leise { display: none !important; }
+  .seite { padding: 0; max-width: none; }
+  .blatt { box-shadow: none; padding: 0; border-radius: 0; }
+}
