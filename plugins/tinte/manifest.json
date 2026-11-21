@@ -1,0 +1,25 @@
+{
+  "kennung": "tinte",
+  "name": "Tinte",
+  "version": "1.0.0",
+  "untertitel": "Briefe & E-Mails, die sitzen",
+  "kategorie": "buero",
+  "beschreibung": "Sag in Stichpunkten, worum es geht – Tinte schreibt den Brief oder die E-Mail im passenden Ton: Kündigung, Widerspruch, Beschwerde, Krankmeldung, Antrag, Dank und mehr. Briefe setzt Tinte nach DIN 5008 mit deinem Absender, fertig zum Drucken oder als PDF. Vorhandene Texte überarbeitet Tinte auf Knopfdruck: kürzer, freundlicher, bestimmter, fehlerfrei oder auf Englisch.",
+  "farbe": "#312E81",
+  "symbol": "<rect x='2' y='6' width='15' height='11' rx='2' opacity='.55'/><path d='M2.8 7.2l6.7 5 6.7-5' stroke-width='1.4' opacity='.9'/><path class='aus' d='M17 2.8c2.5 1.6 4 4.2 4 7.2 0 1.4-.4 2.6-1 3.5L17 19l-3-5.5c-.6-.9-1-2.1-1-3.5 0-3 1.5-5.6 4-7.2z' stroke-width='2.6' transform='rotate(35 17 11)'/><path d='M17 2.8c2.5 1.6 4 4.2 4 7.2 0 1.4-.4 2.6-1 3.5L17 19l-3-5.5c-.6-.9-1-2.1-1-3.5 0-3 1.5-5.6 4-7.2z' transform='rotate(35 17 11)'/><path class='aus' d='M17 12v5' stroke-width='1.1' transform='rotate(35 17 11)'/><circle class='aus' cx='17' cy='11' r='1.3' transform='rotate(35 17 11)'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "speicher"
+  ],
+  "datenhinweis": "deine Stichpunkte, der Empfänger und der Text, den du überarbeiten lässt",
+  "funktionen": [
+    "Briefe und E-Mails aus Stichpunkten – zehn Anlässe von Kündigung bis Zahlungserinnerung",
+    "Ton (förmlich, freundlich, bestimmt, locker), Länge und Sie/Du wählbar",
+    "Brief nach DIN 5008 (Form B) mit Absender, Anschriftfeld, Falzmarken – drucken oder als PDF",
+    "Umformulieren auf Knopfdruck: kürzer, freundlicher, bestimmter, Fehler korrigieren, auf Englisch",
+    "Platzhalter wie [Kundennummer] statt erfundener Angaben",
+    "Alle Entwürfe bleiben gespeichert"
+  ],
+  "neuerungen": {}
+}

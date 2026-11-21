@@ -1,14 +1,18 @@
 {
   "kennung": "flow",
   "name": "Flow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Fokus-Timer mit Statistik",
   "kategorie": "planen",
   "beschreibung": "Konzentriert lernen in Runden: 25 Minuten Fokus, dann Pause – nach vier Runden eine lange. Die Uhr läuft weiter, auch wenn du das Fenster schließt, und macOS meldet sich am Ende. Auf Lyras Startseite siehst du, was gerade läuft und wie weit du heute bist; die Statistik zeigt Woche, Serie und woran du gearbeitet hast. In der Pause hilft Oase beim Durchatmen.",
   "farbe": "#6366F1",
-  "symbol": "M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18Zm0 2a7 7 0 1 0 0 14a7 7 0 1 0 0-14Zm-1 2.5h2v5.1l3.2 1.9-1 1.7-4.2-2.5Z",
+  "symbol": "<path d='M10 2.5h4M12 2.5v2' stroke-width='2'/><circle cx='12' cy='13' r='8' stroke-width='2'/><circle cx='12' cy='13' r='5.4' opacity='.35'/><path d='M12 13V7.6A5.4 5.4 0 0 1 16.68 15.7Z'/><path d='M18.6 5.4l1.4-1.4' stroke-width='2'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["speicher", "startseite", "erinnerungen"],
+  "berechtigungen": [
+    "speicher",
+    "startseite",
+    "erinnerungen"
+  ],
   "datenhinweis": "",
   "funktionen": [
     "Fokus-Runden und Pausen (Pomodoro) – Längen frei einstellbar",
@@ -17,5 +21,12 @@
     "Statistik: heute, letzte 7 Tage, Serie in Folge, Zeit je Thema",
     "Pausen-Tipps und „Durchatmen mit Oase“ (wenn installiert)",
     "Sanfter Gong am Ende (abschaltbar)"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Zahlen im deutschen Format",
+      "Einheitliche Rückfrage beim Abbrechen",
+      "Neues Symbol"
+    ]
+  }
 }

@@ -429,7 +429,7 @@ async function einstellungen() {
 }
 
 async function allesLoeschen() {
-  if (!window.confirm('Alle Check-ins löschen?\n\nDein ganzer Verlauf in Oase wird endgültig gelöscht.')) return;
+  if (!(await lyra.bestaetigen({ titel: 'Alle Check-ins löschen?', text: 'Dein ganzer Verlauf in Oase wird endgültig gelöscht.', ja: 'Alles löschen', nein: 'Abbrechen', gefahr: true }))) return;
   for (const c of z.verlauf) {
     try { await lyra.speicher.loeschen('checkins/' + c.datum); } catch (_) {}
   }

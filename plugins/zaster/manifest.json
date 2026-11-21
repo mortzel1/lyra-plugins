@@ -1,0 +1,28 @@
+{
+  "kennung": "zaster",
+  "name": "Zaster",
+  "version": "1.0.0",
+  "untertitel": "Haushaltsbuch mit Abo-Radar",
+  "kategorie": "buero",
+  "beschreibung": "Lies den Kontoauszug deiner Bank ein (CSV oder Excel) – Zaster ordnet jede Buchung einer Kategorie zu, zeigt dir je Monat Einnahmen, Ausgaben und Sparquote und vergleicht sie mit deinen Budgets. Der Abo-Radar findet wiederkehrende Abbuchungen, rechnet aus, was sie dich im Jahr kosten, und erinnert dich vor der nächsten Abbuchung. Ganz ohne KI – deine Kontodaten verlassen deinen Mac nie.",
+  "farbe": "#059669",
+  "symbol": "<circle cx='15' cy='6.2' r='4.3' opacity='.6'/><path class='aus' d='M16.5 4.6a2.1 2.1 0 1 0 0 3.2M12.8 5.7h2.5M12.8 6.9h2.5' stroke-width='1'/><rect class='aus' x='2.5' y='9' width='19' height='12.5' rx='3' stroke-width='2.6'/><rect x='2.5' y='9' width='19' height='12.5' rx='3'/><rect class='aus' x='14.5' y='12.6' width='7' height='5.2' rx='2.6'/><circle cx='17.4' cy='15.2' r='1.2'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "dateien",
+    "speicher",
+    "startseite",
+    "erinnerungen"
+  ],
+  "datenhinweis": "",
+  "funktionen": [
+    "Kontoauszüge als CSV oder Excel einlesen – Spalten werden erkannt, doppelte Buchungen übersprungen",
+    "Automatisch eingeordnet in 15 Kategorien; korrigierst du eine, merkt Zaster sich den Empfänger",
+    "Monatsübersicht: Einnahmen, Ausgaben, Sparquote, Ausgaben je Kategorie, Verlauf der letzten Monate",
+    "Budgets je Kategorie mit Fortschrittsbalken",
+    "Abo-Radar: wiederkehrende Abbuchungen, Kosten pro Jahr, Preiserhöhungen, nächste Abbuchung",
+    "Erinnerung zwei Tage vor der nächsten Abbuchung – kündigen, bevor es zu spät ist",
+    "Ohne KI, ohne Internet: alles bleibt auf deinem Mac"
+  ],
+  "neuerungen": {}
+}

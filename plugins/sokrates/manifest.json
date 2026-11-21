@@ -1,0 +1,26 @@
+{
+  "kennung": "sokrates",
+  "name": "Sokrates",
+  "version": "1.0.0",
+  "untertitel": "Nachhilfe, die dich selbst draufkommen lässt",
+  "kategorie": "lernen",
+  "beschreibung": "Gib deine Hausaufgabe oder Frage ein – Sokrates verrät dir nicht die Lösung, sondern führt dich mit Fragen Schritt für Schritt dahin, ganz wie der Philosoph. Wenn du feststeckst, gibt es einen kleinen oder einen deutlicheren Tipp; die Lösung nur, wenn du sie ausdrücklich willst. Hast du es geschafft, gibt es eine ähnliche Übungsaufgabe zum Festigen. Für alle Fächer von Klasse 5 bis 13.",
+  "farbe": "#4D7C0F",
+  "symbol": "<path d='M5 8.5c0-2.2.4-4.3 1.1-6L9 5.4c1-.3 2-.5 3-.5s2 .2 3 .5l2.9-2.9c.7 1.7 1.1 3.8 1.1 6v5.5c0 4.4-3.1 8-7 8s-7-3.6-7-8z'/><circle class='aus' cx='9' cy='10' r='2.9'/><circle class='aus' cx='15' cy='10' r='2.9'/><circle cx='9' cy='10.3' r='1.3'/><circle cx='15' cy='10.3' r='1.3'/><path class='aus' d='M11 12.9h2l-1 1.7z'/><path class='aus' d='M9 17.3c.75.7 1.5.7 2.25 0 .75.7 1.5.7 2.25 0 .75.7 1.5.7 2.25 0' stroke-width='1'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "speicher",
+    "startseite"
+  ],
+  "datenhinweis": "deine Aufgabe und deine Antworten im Gespräch",
+  "funktionen": [
+    "Für 15 Fächer und Klasse 5 bis 13 – Sprache passt sich dem Alter an",
+    "Sokratisches Gespräch: Rückmeldung und genau eine Leitfrage pro Schritt",
+    "Tipps in zwei Stärken – die Lösung nur auf ausdrücklichen Wunsch",
+    "Fortschrittsbalken und Lob, wenn du es selbst geschafft hast",
+    "Ähnliche Übungsaufgabe auf Knopfdruck zum Festigen",
+    "Formeln sauber gesetzt; offene Aufgaben auf Lyras Startseite"
+  ],
+  "neuerungen": {}
+}

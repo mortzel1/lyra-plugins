@@ -1,14 +1,20 @@
 {
   "kennung": "arena",
   "name": "Arena",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Probeklausur unter echten Bedingungen",
   "kategorie": "lernen",
   "beschreibung": "Arena stellt dir eine Probeklausur zusammen – zu deinem Stoff und, wenn Lyra Altklausuren in deinen Unterlagen findet, in deren Stil. Mit Punkten, Zeitlimit und einer Uhr, die weiterläuft, auch wenn du das Fenster schließt. Nach der Abgabe korrigiert die KI jede Aufgabe mit Punkten, Begründung und Tipp, zeigt Musterlösung und Bewertungsschema und schätzt deine Note.",
-  "farbe": "#334155",
-  "symbol": "M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3Zm-1 4v1a2 2 0 0 0 1 1.7Zm12 0v2.7A2 2 0 0 0 18 8Z",
+  "farbe": "#DC2626",
+  "symbol": "<rect x='3' y='2.5' width='12' height='16' rx='2' opacity='.5'/><path d='M6 7h6M6 10.5h6M6 14h3' stroke-width='1.6'/><circle class='aus' cx='16' cy='16' r='6.6'/><circle cx='16' cy='16' r='5'/><rect x='14.8' y='8.4' width='2.4' height='2' rx='.6'/><path class='aus' d='M16 16v-3M16 16l2.2 1.4' stroke-width='1.6'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["unterlagen", "ki", "speicher", "startseite", "erinnerungen"],
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "startseite",
+    "erinnerungen"
+  ],
   "datenhinweis": "das Klausurthema, passende Auszüge aus deinen Unterlagen und – zum Korrigieren – deine Antworten",
   "funktionen": [
     "Probeklausur zu deinem Stoff – im Stil deiner Altklausuren, wenn Lyra welche findet",
@@ -18,5 +24,12 @@
     "Korrektur je Aufgabe: Punkte, Begründung, Lerntipp – dazu Musterlösung und Bewertungsschema",
     "Notenschätzung (1,0 bis 5,0) und Verlauf deiner Probeklausuren",
     "Auswertung drucken oder als PDF sichern"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Neue Startseite mit kompakter Auswahl von Zeit, Aufgaben und Niveau",
+      "Probeklausuren lassen sich löschen",
+      "Farben passend zum neuen Symbol"
+    ]
+  }
 }

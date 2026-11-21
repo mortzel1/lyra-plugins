@@ -1,14 +1,19 @@
 {
   "kennung": "byte",
   "name": "Byte",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Programmieraufgaben mit Tests – Python & Java",
   "kategorie": "informatik",
   "beschreibung": "Byte stellt dir Programmieraufgaben zu deinem Thema – mit Startcode und versteckten Tests, die Byte vorher an der eigenen Musterlösung prüft. Du schreibst den Code, Byte führt ihn auf deinem Mac aus und zeigt, welche Tests bestehen. Hinweise verraten nie die Lösung; die Musterlösung gibt es nur auf Wunsch. Dein Code läuft abgeschottet: ohne Internet, ohne Zugriff auf deine Dateien, mit Zeitlimit.",
   "farbe": "#C026D3",
-  "symbol": "M8.6 7 4 12l4.6 5 1.4-1.4L6.8 12l3.2-3.6Zm6.8 0-1.4 1.4 3.2 3.6-3.2 3.6 1.4 1.4L20 12Zm-2.1-2.2 1.9.6-4.5 13.8-1.9-.6Z",
+  "symbol": "<rect x='2' y='3.5' width='18' height='14.5' rx='2.8' opacity='.5'/><path d='M6 8.5l3 2.5-3 2.5M11 13.5h3.5' stroke-width='2'/><circle class='aus' cx='18.5' cy='18' r='5.6'/><circle cx='18.5' cy='18' r='4.3'/><path class='aus' d='M16.6 18.1l1.3 1.3 2.4-2.6' stroke-width='1.6'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["unterlagen", "ki", "speicher", "code"],
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "code"
+  ],
   "datenhinweis": "das Aufgabenthema, passende Auszüge aus deinen Unterlagen und – für Hinweise – deinen Code",
   "funktionen": [
     "Aufgaben in Python oder Java – Thema und Niveau wählbar, gern passend zu deiner Vorlesung",
@@ -17,5 +22,13 @@
     "Editor mit Zeilennummern, Einrückung, Tab und ⌘↩",
     "Hinweise ohne Lösung; Musterlösung nur auf ausdrücklichen Wunsch",
     "Spielwiese zum freien Ausprobieren; alle Aufgaben mit Stand gespeichert"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Aufgaben gelingen viel zuverlässiger: Byte rechnet die Erwartungen der Tests an der Musterlösung nach",
+      "Aufgaben lassen sich löschen",
+      "Neue Startseite mit kompakter Auswahl",
+      "Neues Symbol"
+    ]
+  }
 }

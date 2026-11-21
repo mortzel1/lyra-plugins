@@ -131,7 +131,7 @@ async function pausieren() {
 
 async function abbrechen() {
   const l = z.lauf;
-  if (l && l.art === 'fokus' && !window.confirm('Fokus-Runde abbrechen?\n\nDie angefangene Zeit zählt nicht.')) return;
+  if (l && l.art === 'fokus' && !(await lyra.bestaetigen({ titel: 'Fokus-Runde abbrechen?', text: 'Die angefangene Zeit zählt nicht.', ja: 'Runde abbrechen', nein: 'Weitermachen', gefahr: true }))) return;
   z.lauf = null;
   await sichern();
   erinnerungSetzen();
@@ -303,7 +303,7 @@ function statistik() {
       wert(`${heuteMinuten()} min`, 'heute'),
       wert(`${woche.reduce((a, s) => a + s.minuten, 0)} min`, 'letzte 7 Tage'),
       wert(`🔥 ${serie}`, serie === 1 ? 'Tag in Folge' : 'Tage in Folge'),
-      wert(`${(gesamt / 60).toFixed(1)} h`, 'insgesamt')),
+      wert(`${(gesamt / 60).toFixed(1).replace('.', ',')} h`, 'insgesamt')),
     h('div', { class: 'flaeche', style: { marginTop: '14px' } },
       h('div', { class: 'ueberschrift-klein', style: { marginBottom: '10px' } }, 'Letzte 7 Tage'),
       h('div', { class: 'balken-tage' }, tage.map((t) => h('div', { class: 'tag' + (t.heute ? ' heute' : '') },

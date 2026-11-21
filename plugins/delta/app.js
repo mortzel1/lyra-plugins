@@ -1220,7 +1220,7 @@ async function listeDialog() {
     } }, h('div', { class: 'fett' }, a.name || 'Ohne Namen'),
       h('div', { class: 'leise klein' }, `${(a.art || 'dea').toUpperCase()} · ${a.n} Zustände · ${new Date(a.zeit * 1000).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`)),
     h('button', { class: 'knopf text gefahr', title: 'Löschen', onclick: async () => {
-      if (!window.confirm(`„${a.name}“ löschen?`)) return;
+      if (!(await lyra.bestaetigen({ titel: `„${a.name}“ löschen?`, text: ``, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
       try { await lyra.speicher.loeschen('automaten/' + a.id); } catch (_) {}
       z.liste = z.liste.filter((x) => x.id !== a.id);
       if (a.id === z.A.id) oeffnen(neuerAutomat());

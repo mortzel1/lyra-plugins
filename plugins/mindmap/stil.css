@@ -27,3 +27,7 @@ svg.linien { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .treffer { position: absolute; right: 18px; top: 8px; width: 260px; background: var(--flaeche); border-radius: 12px; box-shadow: var(--schatten); padding: 6px; z-index: 6; }
 .treffer button { display: block; width: 100%; text-align: left; border: none; background: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text); }
 .treffer button:hover { background: var(--karte-hover); }
+
+/* Offene Details verdecken keine Begriffe: die Karte rückt zur Seite */
+.flaeche-mm.mit-details .karte-mm { padding-right: 370px; transition: padding .2s ease; }
+.details { position: fixed; top: 64px; max-height: calc(100vh - 82px); }

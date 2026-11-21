@@ -136,6 +136,33 @@ ${tests.map((t) => `      () -> { ${t.code} }`).join(',\n')}
   return { dateien: { 'Loesung.java': code, 'TestsByte.java': runner }, start: 'TestsByte' };
 }
 
+/** Python: Erwartungswerte fehlgeschlagener `assert ausdruck == wert` aus der Musterlösung neu berechnen (die KI verrechnet
+ *  sich bei Erwartungen öfter als in der Lösung). → neue Testcodes (oder null, wo es nicht geht). */
+async function testsReparieren(code, tests) {
+  const runner = `import json, io, re, contextlib
+TESTS = json.loads(${JSON.stringify(JSON.stringify(tests.map((t) => t.code)))})
+with contextlib.redirect_stdout(io.StringIO()):
+    import loesung
+umgebung = {k: getattr(loesung, k) for k in dir(loesung) if not k.startswith('__')}
+aus = []
+for c in TESTS:
+    m = re.match(r'^assert\\s+(.+?)\\s*==\\s*(.+?)(\\s*,\\s*(.+))?$', c.strip(), re.S)
+    if not m:
+        aus.append(None)
+        continue
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            wert = eval(m.group(1), dict(umgebung))
+        aus.append("assert " + m.group(1) + " == " + repr(wert) + ", " + repr(m.group(1) + " soll " + repr(wert) + " sein"))
+    except Exception:
+        aus.append(None)
+print(${JSON.stringify(MARKE)} + json.dumps(aus, ensure_ascii=False))
+`;
+  const r = await lyra.code({ sprache: 'python', dateien: { 'loesung.py': code, 'reparieren_byte.py': runner }, start: 'reparieren_byte.py', sekunden: 15 });
+  const zeile = (r.ausgabe || '').split('\n').find((l) => l.startsWith(MARKE));
+  try { return zeile ? JSON.parse(zeile.slice(MARKE.length)) : null; } catch (_) { return null; }
+}
+
 /** Tests laufen lassen → {ergebnisse: [{name, ok, fehler}], roh} */
 async function testsLaufen(sprache, code, tests) {
   const { dateien, start } = testDateien(sprache, code, tests);
@@ -157,7 +184,7 @@ function erstellen() {
     try { block = ((await lyra.suchen(`${thema} Programmieren Übung`, 4)).block || '').slice(0, 4000); } catch (_) {}
     let aufgabe = null;
     let rueck = '';
-    for (let versuch = 0; versuch < 2 && !aufgabe; versuch++) {
+    for (let versuch = 0; versuch < 3 && !aufgabe; versuch++) {
       status(versuch ? 'Byte bessert die Aufgabe nach …' : 'Byte denkt sich eine Aufgabe aus …');
       const sp = SPRACHEN[sprache];
       const r = await lyra.ki({
@@ -185,8 +212,17 @@ Antwort als JSON: {"aufgabe": "…", "loesung": "…", "tests": [{"code": "…",
       if (!kandidat.aufgabe || !kandidat.loesung || !kandidat.tests.length) { rueck = '\n\nAchtung: Es fehlten Felder – gib alles vollständig an.'; continue; }
       // Tests an der eigenen Musterlösung prüfen
       status('Byte prüft die Tests an der Musterlösung …');
-      const { ergebnisse, roh } = await testsLaufen(sprache, kandidat.loesung, kandidat.tests);
+      let { ergebnisse, roh } = await testsLaufen(sprache, kandidat.loesung, kandidat.tests);
       if (!ergebnisse) { rueck = `\n\nAchtung: Lösung und Tests ließen sich nicht ausführen:\n${(roh.fehler || roh.ausgabe || '').slice(0, 800)}\nKorrigiere das.`; continue; }
+      if (sprache === 'python' && ergebnisse.some((x) => !x.ok)) {
+        status('Byte rechnet die Erwartungen der Tests an der Musterlösung nach …');
+        const neu = await testsReparieren(kandidat.loesung, kandidat.tests);
+        if (neu) {
+          kandidat.tests = kandidat.tests.map((t, i) => (ergebnisse[i] && !ergebnisse[i].ok && neu[i] ? { ...t, code: neu[i] } : t));
+          ({ ergebnisse, roh } = await testsLaufen(sprache, kandidat.loesung, kandidat.tests));
+          if (!ergebnisse) { rueck = '\n\nAchtung: Lösung und Tests ließen sich nicht ausführen. Korrigiere das.'; continue; }
+        }
+      }
       const gute = kandidat.tests.filter((t, i) => ergebnisse[i] && ergebnisse[i].ok);
       if (gute.length < 2) { rueck = `\n\nAchtung: Deine Musterlösung bestand deine eigenen Tests nicht (${ergebnisse.filter((x) => !x.ok).map((x) => x.fehler).slice(0, 3).join('; ')}). Korrigiere Lösung oder Tests.`; continue; }
       aufgabe = { ...kandidat, tests: gute, verworfen: kandidat.tests.length - gute.length };
@@ -261,44 +297,63 @@ function zeichnen() {
 }
 
 function laufZeile() {
-  return z.laeuft ? h('div', { class: 'lauf' }, h('div', { class: 'lade' }), h('span', { class: 'wachsen', id: 'status' }, z.status),
-    h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen')) : null;
+  return z.laeuft ? h('div', { style: { marginTop: '12px' } }, lyra.arbeit(z.status || 'Byte arbeitet …')) : null;
 }
+
 function fehlerZeile() {
   return z.fehler ? lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null;
 }
 
+async function aufgabeLoeschen(a) {
+  if (!(await lyra.bestaetigen({ titel: `„${a.titel}“ löschen?`, text: 'Aufgabe, dein Code und die Tests werden gelöscht.', ja: 'Löschen', gefahr: true }))) return;
+  try { await lyra.speicher.loeschen('aufgaben/' + a.id); } catch (_) {}
+  z.aufgaben = z.aufgaben.filter((x) => x.id !== a.id);
+  zeichnen();
+}
+
 function startAnsicht() {
-  const t = h('input', { class: 'eingabe', 'data-feld': 'thema', placeholder: 'Thema der Aufgabe, z. B. Rekursion, Listen umdrehen, Primzahlen, Klassen & Objekte', value: z.thema });
-  t.addEventListener('input', () => { z.thema = t.value; const b = document.getElementById('los'); if (b) b.disabled = !t.value.trim() || !vorhanden(z.einst.sprache); });
-  t.addEventListener('keydown', (e) => { if (e.key === 'Enter') erstellen(); });
-  const chip = (schl, w, n, aus) => h('button', { class: 'chip' + (z.einst[schl] === w ? ' an' : ''), disabled: aus, onclick: async () => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); } }, n);
   const fehlt = z.sprachen.filter((s) => !s.vorhanden);
+  const setzen = async (schl, w) => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); };
+  const spielwiese = () => {
+    z.spielwiese = { sprache: z.einst.sprache, code: z.einst.sprache === 'python' ? 'print("Hallo, Byte!")\n' : 'public class Loesung {\n    public static void main(String[] args) {\n        System.out.println("Hallo, Byte!");\n    }\n}\n' };
+    z.ausgabe = null;
+    zeichnen();
+  };
   return h('div', { class: 'seite' },
-    h('div', { class: 'held' }, h('div', { class: 'logo' }, '<Byte/>'), h('div', { class: 'leise' }, 'Programmieren üben – mit Tests, direkt auf deinem Mac, sicher abgeschottet.')),
-    h('div', { class: 'flaeche spalte', style: { gap: '12px' } },
-      t,
-      z.themen.length ? h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 10).map((x) => h('button', { class: 'chip', onclick: () => { z.thema = x; zeichnen(); } }, x))) : null,
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Sprache'),
-        ...Object.entries(SPRACHEN).map(([k, s]) => chip('sprache', k, s.name + (vorhanden(k) ? '' : ' (fehlt)'), !vorhanden(k)))),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Niveau'), chip('niveau', 'leicht', 'Einstieg'), chip('niveau', 'mittel', 'Übungsblatt'), chip('niveau', 'schwer', 'Knobelei')),
-      h('div', { class: 'zeile' },
+    lyra.kopf({
+      titel: 'Programmieren üben',
+      unter: 'Eine Aufgabe mit Tests – du schreibst den Code, Byte führt ihn abgeschottet auf deinem Mac aus und zeigt, welche Tests bestehen.',
+      aktionen: [h('button', { class: 'knopf tonal klein', disabled: !vorhanden(z.einst.sprache), onclick: spielwiese }, '🧪 Spielwiese')],
+    }),
+    lyra.verfasser({
+      wert: z.thema,
+      feld: 'thema',
+      zeilen: 1,
+      platzhalter: 'Thema der Aufgabe, z. B. Rekursion, Listen umdrehen, Primzahlen, Klassen & Objekte',
+      beiEingabe: (v) => { z.thema = v; },
+      beiSenden: (v) => { z.thema = v; erstellen(); },
+      knopf: 'Aufgabe stellen',
+      deaktiviert: !!z.laeuft || !vorhanden(z.einst.sprache),
+      unten: [
         z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('button', { class: 'knopf text', disabled: !vorhanden(z.einst.sprache), onclick: () => {
-          z.spielwiese = { sprache: z.einst.sprache, code: z.einst.sprache === 'python' ? 'print("Hallo, Byte!")\n' : 'public class Loesung {\n    public static void main(String[] args) {\n        System.out.println("Hallo, Byte!");\n    }\n}\n' };
-          z.ausgabe = null;
-          zeichnen();
-        } }, '🧪 Spielwiese'),
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf gross', id: 'los', disabled: z.laeuft || !z.thema.trim() || !vorhanden(z.einst.sprache), onclick: erstellen }, 'Aufgabe stellen')),
-      laufZeile(), fehlerZeile(),
-      fehlt.length ? h('div', { class: 'kasten warn klein' }, `Nicht installiert: ${fehlt.map((s) => `${SPRACHEN[s.name] ? SPRACHEN[s.name].name : s.name} – dafür ${s.hinweis}`).join('; ')}. Lyra installiert nichts von selbst.`) : null,
-      h('div', { class: 'leise klein' }, '🔒 Dein Code läuft abgeschottet: ohne Internet, ohne Zugriff auf deine Dateien, mit Zeitlimit.')),
-    z.aufgaben.length ? h('div', { style: { marginTop: '18px' } },
-      h('div', { class: 'ueberschrift-klein', style: { marginBottom: '8px' } }, 'Deine Aufgaben'),
-      z.aufgaben.map((a) => h('div', { class: 'karte klickbar zeile', style: { marginBottom: '8px' }, onclick: () => { z.a = a; z.ausgabe = null; z.zeigeLoesung = false; zeichnen(); } },
-        h('span', { class: 'status' + (a.geloest ? ' geloest' : '') }, a.geloest ? '✓' : '…'),
-        h('div', { class: 'wachsen' }, h('div', { class: 'fett' }, a.titel), h('div', { class: 'klein leise' }, `${SPRACHEN[a.sprache].name} · ${a.tests.length} Tests`))))) : null);
+        lyra.auswahl({ titel: 'Sprache', wert: z.einst.sprache, beiWahl: (w) => setzen('sprache', w),
+          optionen: Object.entries(SPRACHEN).map(([k, s]) => [k, s.name + (vorhanden(k) ? '' : ' (fehlt)'), vorhanden(k) ? '' : 'Auf diesem Mac nicht installiert']) }),
+        lyra.auswahl({ titel: 'Niveau', wert: z.einst.niveau, beiWahl: (w) => setzen('niveau', w),
+          optionen: [['leicht', 'Einstieg', 'Ein Konzept, wenige Zeilen'], ['mittel', 'Übungsblatt', 'Wie im Studium'], ['schwer', 'Knobelei', 'Für Tüftler']] }),
+      ],
+    }),
+    z.themen.length && !z.laeuft ? lyra.vorschlaege(z.themen, (x) => { z.thema = x; zeichnen(); const f = document.querySelector('[data-feld="thema"]'); if (f) f.focus(); }, { titel: 'Aus deinen Unterlagen:' }) : null,
+    laufZeile(), fehlerZeile(),
+    fehlt.length ? h('div', { class: 'kasten warn klein', style: { marginTop: '12px' } }, `Nicht installiert: ${fehlt.map((s) => `${SPRACHEN[s.name] ? SPRACHEN[s.name].name : s.name} – dafür ${s.hinweis}`).join('; ')}. Lyra installiert nichts von selbst.`) : null,
+    z.aufgaben.length ? lyra.abschnitt('Deine Aufgaben', h('div', { class: 'ly-liste' }, z.aufgaben.map((a) => lyra.eintrag({
+      symbol: a.geloest ? '✓' : '{ }',
+      farbe: a.geloest ? 'var(--ok)' : '',
+      titel: a.titel,
+      unter: `${SPRACHEN[a.sprache].name} · ${a.tests.length} Tests${a.geloest ? ' · gelöst' : ''} · ${lyra.zeitText(a.zeit || lyra.jetzt())}`,
+      beiKlick: () => { z.a = a; z.ausgabe = null; z.zeigeLoesung = false; zeichnen(); },
+      aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => aufgabeLoeschen(a) }],
+    })))) : null,
+    h('div', { class: 'leise klein', style: { marginTop: '20px', textAlign: 'center' } }, '🔒 Dein Code läuft abgeschottet: ohne Internet, ohne Zugriff auf deine Dateien, mit Zeitlimit.'));
 }
 
 function editor(ziel) {
@@ -374,7 +429,7 @@ function labor() {
         h('div', { class: 'zeile', style: { marginTop: '12px', gap: '6px' } },
           h('button', { class: 'knopf tonal klein', disabled: z.laeuft, onclick: hinweis }, '💡 Hinweis'),
           h('button', { class: 'knopf text klein', disabled: z.laeuft, onclick: loesungZeigen }, 'Musterlösung …'),
-          h('button', { class: 'knopf text klein', onclick: async () => { if (!window.confirm('Code auf die Vorlage zurücksetzen?')) return; a.code = a.vorlage; await sichern(); zeichnen(); } }, 'Zurücksetzen')),
+          h('button', { class: 'knopf text klein', onclick: async () => { if (!(await lyra.bestaetigen({ titel: 'Code auf die Vorlage zurücksetzen?', text: '', ja: 'Zurücksetzen', nein: 'Abbrechen', gefahr: true }))) return; a.code = a.vorlage; await sichern(); zeichnen(); } }, 'Zurücksetzen')),
         z.zeigeLoesung ? h('div', { class: 'loesung' }, h('div', { class: 'ueberschrift-klein' }, 'Musterlösung'), h('pre', {}, a.loesung)) : null)
         : null,
       h('div', { class: 'code-spalte' },

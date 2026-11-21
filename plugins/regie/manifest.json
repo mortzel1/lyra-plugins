@@ -1,14 +1,19 @@
 {
   "kennung": "regie",
   "name": "Regie",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Vom Thema zum Erklärvideo",
   "kategorie": "erstellen",
   "beschreibung": "Regie schreibt dir zu einem Thema das Drehbuch für ein kurzes Erklärvideo oder eine Präsentation: Szenen mit Sprechtext, Dauer und Bildidee – auf Wunsch aus deinen Unterlagen. Die Schaubilder zeichnet Graphit im Hintergrund. Mit Vorführmodus samt Sprechernotizen; als Drehbuch (Markdown) oder PDF sichern.",
   "farbe": "#B45309",
-  "symbol": "M3 5h18v14H3Zm2 2v10h14V7Zm5 2 5 3-5 3Z",
+  "symbol": "<rect x='3' y='10.5' width='18' height='10.5' rx='2'/><path class='aus' d='M10.3 13.2l4.6 2.6-4.6 2.6z'/><rect x='3' y='5.4' width='18' height='3.6' rx='1' transform='rotate(-14 3 9)'/><path class='aus' d='M7 5.4h2.6l-2 3.6H5zM12.2 5.4h2.6l-2 3.6h-2.6zM17.4 5.4H20l-2 3.6h-2.6z' transform='rotate(-14 3 9)'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["unterlagen", "ki", "speicher", "werkzeuge"],
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "werkzeuge"
+  ],
   "datenhinweis": "das Thema und passende Auszüge aus deinen Unterlagen (die Bildbeschreibungen gehen an Graphit – mit dessen Einstellungen)",
   "funktionen": [
     "Drehbuch aus einem Thema: Einstieg, Erklärung in Schritten, Zusammenfassung",
@@ -17,5 +22,11 @@
     "Vorführmodus mit Pfeiltasten und Sprechernotizen",
     "Sprechtexte direkt bearbeiten",
     "Als Drehbuch (Markdown) oder PDF sichern"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Neue Startseite mit kompakter Auswahl von Länge, Publikum und Ton",
+      "Neues Symbol"
+    ]
+  }
 }

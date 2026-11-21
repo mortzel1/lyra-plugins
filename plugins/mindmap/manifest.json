@@ -1,12 +1,12 @@
 {
   "kennung": "mindmap",
   "name": "Mindmap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Begriffe und Querbezüge deiner Fächer",
   "kategorie": "erstellen",
   "beschreibung": "Zeigt die wichtigsten Begriffe aus deinen Unterlagen als Mindmap: je Fach eine Ansicht, in der Übersicht die Brücken zwischen den Fächern. Ein Klick zeigt Fundstellen und verwandte Begriffe – und lässt dir den Begriff von Lyra erklären.",
   "farbe": "#14B8A6",
-  "symbol": "M12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5ZM5 3.7a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM19 3.7a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM12 17.2a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6ZM10.56 9.84L7.21 6.97L6.29 8.03L9.64 10.9ZM13.44 9.84L16.79 6.97L17.71 8.03L14.36 10.9ZM11.3 14.5H12.7V17.2H11.3Z",
+  "symbol": "<path d='M8 12C6 12 6.5 5.5 4.5 5.5M16 12C18 12 17.5 5.5 19.5 5.5M8 12C6 12 6.5 18.5 4.5 18.5M16 12C18 12 17.5 18.5 19.5 18.5' stroke-width='1.6' opacity='.6'/><rect x='7.5' y='9.3' width='9' height='5.4' rx='2.7'/><circle cx='4.5' cy='5.5' r='2.2'/><circle cx='19.5' cy='5.5' r='2.2'/><circle cx='4.5' cy='18.5' r='2.2'/><circle cx='19.5' cy='18.5' r='2.2'/>",
   "einstieg": "index.html",
   "berechtigungen": [
     "unterlagen",
@@ -17,5 +17,11 @@
     "Übersicht mit den Brücken zwischen deinen Fächern",
     "Ein Klick auf einen Begriff zeigt Fundstellen und verwandte Begriffe",
     "„Erklären lassen“ schickt den Begriff als Frage an Lyra"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Die Details verdecken keine Begriffe mehr",
+      "Neues Symbol"
+    ]
+  }
 }

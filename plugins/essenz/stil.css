@@ -42,3 +42,4 @@
   .seite { padding: 0; max-width: none; }
   .blatt { box-shadow: none; padding: 0; border-radius: 0; }
 }
+.themenwahl { background: var(--flaeche); border-radius: 18px; padding: 14px 16px; margin-bottom: 12px; }

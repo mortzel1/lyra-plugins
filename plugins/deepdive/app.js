@@ -300,7 +300,8 @@ async function anlegen() {
   const { block } = await stellen(`${thema} ${ziel}`, online() ? 10 : 6);
   const r = await ki('anlegen', {
     prompt: `Thema, das ich vollständig lernen möchte: ${thema}\n${ziel ? `Mein Ziel: ${ziel}\n` : ''}\n${unterlagen(block)}\
-Erstelle einen Lernpfad, der mir dieses Thema vollständig beibringt: 4 bis 8 Kapitel, die aufeinander aufbauen – zuerst \
+Erstelle einen Lernpfad, der mir genau dieses Thema vollständig beibringt. Bleib streng beim Thema „${thema}“: Auszüge, \
+die zu anderen Themen oder Fächern gehören, ignorierst du – keine Kapitel über andere Gebiete. 4 bis 8 Kapitel, die aufeinander aufbauen – zuerst \
 die nötigen Grundlagen und Begriffe, dann Schritt für Schritt bis zu den anspruchsvollen Teilen (Sätze und Beweise, \
 Verfahren, Anwendungen, typische Aufgaben). Jedes Kapitel hat einen klaren Titel, ein Ziel („Danach kannst du …“) und \
 2 bis 6 Kerninhalte, die zusammen alles Wichtige des Kapitels abdecken.\n\n\
@@ -764,7 +765,7 @@ async function loesungZeigen(i) {
   const a = k.schritte[n].aufgaben[i];
   if (z.laeuft) return;
   if (!a.bewertet) {
-    const ok = window.confirm('Lösung zeigen?\n\nVersuch es ruhig erst selbst – ein Tipp hilft oft schon weiter. Wenn du die Lösung jetzt ansiehst, zählt die Aufgabe in dieser Runde als nicht gelöst.');
+    const ok = (await lyra.bestaetigen({ titel: 'Lösung zeigen?', text: 'Versuch es ruhig erst selbst – ein Tipp hilft oft schon weiter. Wenn du die Lösung jetzt ansiehst, zählt die Aufgabe in dieser Runde als nicht gelöst.', ja: 'Lösung zeigen', nein: 'Lieber selbst versuchen', gefahr: false }));
     if (!ok) return;
     a.bewertet = true;
     a.punkte = 0;
@@ -834,7 +835,7 @@ function kapitelWaehlen(n) {
 }
 
 async function loeschen(k) {
-  if (!window.confirm(`„${k.titel}“ löschen?\n\nLernpfad, Erklärungen, Fragen und Fortschritt werden endgültig gelöscht.`)) return;
+  if (!(await lyra.bestaetigen({ titel: `„${k.titel}“ löschen?`, text: `Lernpfad, Erklärungen, Fragen und Fortschritt werden endgültig gelöscht.`, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
   try {
     await lyra.speicher.loeschen('kurse/' + k.id);
   } catch (_) {}
@@ -909,11 +910,25 @@ function laufZeile() {
     h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen'));
 }
 
+function nochmal(art) {
+  z.fehler = null;
+  const nr = +String(art).split(':')[1];
+  if (art === 'anlegen') return anlegen();
+  if (art === 'quiz') return quizStellen(z.kapitel, z.hp, true).then(zeichnen);
+  if (art === 'check') return neuerCheck();
+  if (art === 'rueckfrage') return rueckfrage(z.hp);
+  if (String(art).startsWith('abgeben:')) return abgeben(nr);
+  if (String(art).startsWith('loesung:')) return loesungZeigen(nr);
+  zeichnen();
+  return weiter();
+}
+
 function fehlerZeile(art) {
   if (z.fehlerBei !== art || !z.fehler) return null;
   return h('div', { style: { marginTop: '12px' } }, fehlerBox(z.fehler,
-    online() ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); weiter(); } : null,
-    () => { z.fehler = null; zeichnen(); }));
+    online() ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); nochmal(art); } : null,
+    () => { z.fehler = null; zeichnen(); },
+    () => nochmal(art)));
 }
 
 function feld(name, eigenschaften) {
@@ -951,40 +966,69 @@ function zeichnen() {
   z.nachOben = false;
 }
 
+async function einstellungSetzen(schl, wert) {
+  z.einst[schl] = wert;
+  try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {}
+  zeichnen();
+}
+
 function uebersicht() {
+  const fertig = (k) => k.schritte.every((s) => s.stand === 'gemeistert');
+  const laufend = z.kurse.filter((k) => !fertig(k));
+  const gemeistert = z.kurse.filter(fertig);
+  const kursEintrag = (k) => {
+    const gem = k.schritte.filter((s) => s.stand === 'gemeistert').length;
+    const offen = k.schwierigkeiten.filter((d) => !d.geloest).length;
+    const naechstes = k.schritte[Math.min(k.aktuell || 0, k.schritte.length - 1)];
+    return lyra.eintrag({
+      symbol: fertig(k) ? '🏆' : '🤿',
+      farbe: fertig(k) ? 'var(--ok)' : '',
+      titel: k.titel,
+      unter: fertig(k)
+        ? `Alle ${k.schritte.length} Kapitel gemeistert · ${lyra.zeitText(k.geaendert)}`
+        : `Kapitel ${gem + 1 > k.schritte.length ? k.schritte.length : (k.aktuell || 0) + 1} von ${k.schritte.length}: ${naechstes ? naechstes.titel : ''}${offen ? ` · ${offen} offen${offen === 1 ? 'e Schwierigkeit' : 'e Schwierigkeiten'}` : ''}`,
+      fortschritt: k.fortschritt || 0,
+      rechts: h('div', { class: 'prozent-klein' }, `${Math.round((k.fortschritt || 0) * 100)} %`),
+      beiKlick: () => oeffnen(k.id),
+      aktionen: [
+        { symbol: '🃏', titel: 'Mit Flip festigen', bei: () => mitFlip(k) },
+        { symbol: '🗑', titel: 'Löschen', bei: () => loeschen(k) },
+      ],
+    });
+  };
+  const zielZeile = z.zielOffen || z.eingaben.ziel
+    ? h('div', { class: 'ziel-zeile' }, h('span', { class: 'leise klein' }, 'Ziel'),
+      feld('ziel', { platzhalter: 'z. B. „Klausur in drei Wochen“ oder „Beweise selbst führen können“', beiEnter: anlegen, immer: true }))
+    : null;
   const seite = h('div', { class: 'seite' },
-    h('div', { class: 'zeile', style: { marginBottom: '6px' } },
-      h('h1', { class: 'wachsen' }, 'Was willst du lernen?'),
-      z.info ? lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null),
-    h('p', { class: 'leise', style: { marginBottom: '18px' } },
-      `Nenne ein Thema aus deinen Unterlagen. ${lehrerName()} baut daraus einen Lernpfad und bringt ihn dir in kleinen Häppchen bei: kurz erklären, gleich eine Frage, dann weiter. Tempo und Erklärlänge stellst du oben rechts beim Zahnrad ein.`),
-    h('div', { class: 'flaeche spalte' },
-      h('label', { class: 'feld' }, 'Thema', feld('thema', { platzhalter: 'z. B. Vollständige Induktion, Eigenwerte, Rekursion …', beiEnter: anlegen })),
-      h('label', { class: 'feld' }, 'Dein Ziel (optional)', feld('ziel', { platzhalter: 'z. B. „Klausur in drei Wochen“ oder „Beweise selbst führen können“', beiEnter: anlegen })),
-      z.themen.length ? h('div', {},
-        h('div', { class: 'leise klein', style: { marginBottom: '6px' } }, 'Aus deinen Unterlagen'),
-        h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 14).map((t) =>
-          h('button', { class: 'chip', disabled: !!z.laeuft, onclick: () => { z.eingaben.thema = t; zeichnen(); } }, t)))) : null,
-      h('div', { class: 'zeile', style: { marginTop: '4px' } },
-        h('span', { class: 'leise klein wachsen' }, online() ? `${lehrerName()} unterrichtet über dein Abo (braucht Internet).` : 'Lyra unterrichtet lokal – nichts verlässt deinen Mac.'),
-        h('button', { class: 'knopf', disabled: !!z.laeuft, onclick: anlegen }, 'Lernpfad erstellen')),
-      z.laeuft === 'anlegen' ? laufZeile() : null,
-      fehlerZeile('anlegen')),
-    z.kurse.length ? h('div', { style: { marginTop: '28px' } },
-      h('h3', { style: { marginBottom: '10px' } }, 'Deine Themen'),
-      z.kurse.map((k) => {
-        const fertig = k.schritte.every((s) => s.stand === 'gemeistert');
-        const gem = k.schritte.filter((s) => s.stand === 'gemeistert').length;
-        const offen = k.schwierigkeiten.filter((d) => !d.geloest).length;
-        return h('div', { class: 'karte klickbar kurs-karte', style: { marginBottom: '10px' }, onclick: () => oeffnen(k.id) },
-          h('div', { class: 'symbol' }, fertig ? '🏆' : '↓'),
-          h('div', { class: 'wachsen spalte', style: { gap: '6px' } },
-            h('div', { class: 'fett' }, k.titel),
-            h('div', { class: 'leise klein' }, `${gem} von ${k.schritte.length} Kapiteln gemeistert${offen ? ` · ${offen} ${offen === 1 ? 'Schwierigkeit' : 'Schwierigkeiten'} offen` : ''}`),
-            balken(k.fortschritt, null, true)),
-          h('div', { class: 'fett' }, `${Math.round((k.fortschritt || 0) * 100)} %`),
-          h('button', { class: 'knopf symbol', title: 'Löschen', onclick: (e) => { e.stopPropagation(); loeschen(k); } }, '🗑'));
-      })) : null);
+    lyra.kopf({ titel: 'Was willst du lernen?', unter: `Nenne ein Thema – ${lehrerName()} baut daraus einen Lernpfad und bringt ihn dir in kleinen Häppchen bei: kurz erklären, gleich eine Frage, dann weiter.` }),
+    lyra.verfasser({
+      wert: z.eingaben.thema || '',
+      feld: 'thema',
+      zeilen: 1,
+      platzhalter: 'Thema, z. B. Eigenwerte, Vollständige Induktion, Rekursion …',
+      beiEingabe: (v) => { z.eingaben.thema = v; },
+      beiSenden: (v) => { z.eingaben.thema = v; anlegen(); },
+      knopf: 'Lernpfad erstellen',
+      deaktiviert: !!z.laeuft,
+      unten: [
+        z.info ? lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
+        lyra.auswahl({ titel: 'Tempo', wert: z.einst.tempo, beiWahl: (w) => einstellungSetzen('tempo', w), optionen: [
+          ['gruendlich', 'Gründlich', 'Sehr kleine Häppchen – lieber eines mehr'], ['normal', 'Normal', 'Kleine Häppchen'], ['zuegig', 'Zügig', 'Größere Häppchen, weniger Fragen']] }),
+        lyra.auswahl({ titel: 'Erklärungen', wert: z.einst.input, beiWahl: (w) => einstellungSetzen('input', w), optionen: [
+          ['kurz', 'Kurz', 'Ein paar Sätze mit Mini-Beispiel'], ['mittel', 'Mittel', 'Etwa ein Absatz mit Beispiel'], ['ausfuehrlich', 'Ausführlich', 'Mit Beispiel und Begründung']] }),
+        !zielZeile ? h('button', { class: 'ly-pille', onclick: () => { z.zielOffen = true; zeichnen(); setTimeout(() => { const f = document.querySelector('[data-feld="ziel"]'); if (f) f.focus(); }); } }, '＋ Ziel') : null,
+      ],
+    }),
+    zielZeile,
+    z.themen.length && !z.laeuft ? lyra.vorschlaege(z.themen, (t) => { z.eingaben.thema = t; zeichnen(); const f = document.querySelector('[data-feld="thema"]'); if (f) f.focus(); }, { titel: 'Aus deinen Unterlagen:' }) : null,
+    z.laeuft === 'anlegen' ? h('div', { style: { marginTop: '14px' } }, lyra.arbeit(z.hinweis || standardHinweis(), { id: 'hinweis' })) : null,
+    fehlerZeile('anlegen'),
+    laufend.length ? lyra.abschnitt('Weiterlernen', h('div', { class: 'ly-liste' }, laufend.map(kursEintrag))) : null,
+    gemeistert.length ? lyra.abschnitt('Gemeistert', h('div', { class: 'ly-liste' }, gemeistert.map(kursEintrag))) : null,
+    !z.kurse.length && !z.laeuft ? h('div', { class: 'leise klein hinweis-unten' }, online()
+      ? `${lehrerName()} unterrichtet über dein Abo (braucht Internet). Lösungen gibt es nur, wenn du sie aufrufst.`
+      : '🔒 Lyra unterrichtet lokal – nichts verlässt deinen Mac. Lösungen gibt es nur, wenn du sie aufrufst.') : null);
   return h('div', { class: 'uebersicht', style: { height: '100vh', overflow: 'auto' } }, seite);
 }
 

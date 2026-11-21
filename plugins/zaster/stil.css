@@ -1,0 +1,60 @@
+/* Zaster – frisches Grün, klare Zahlen, ein Radar für Abos. */
+:root { --farbe: #059669; --akzent: #059669; --akzent-weich: rgba(5, 150, 105, 0.11); }
+@media (prefers-color-scheme: dark) { :root { --akzent: #34d399; --akzent-weich: rgba(52, 211, 153, 0.14); } }
+.knopf { background: var(--akzent); }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); color: #fff; }
+.seite.breit { max-width: 1080px; }
+.logo { font-size: 30px; font-weight: 850; letter-spacing: -0.03em; background: linear-gradient(120deg, #059669, #14b8a6 60%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.reiter { display: flex; gap: 4px; border-bottom: 1px solid var(--linie); margin-bottom: 14px; }
+.reiter-knopf { background: none; border: none; padding: 9px 14px; cursor: pointer; color: var(--leise); font-weight: 600; border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
+.reiter-knopf.an { color: var(--akzent); border-bottom-color: var(--akzent); }
+.meldung { display: flex; align-items: center; gap: 8px; background: var(--akzent-weich); color: var(--akzent); border-radius: 10px; padding: 6px 6px 6px 12px; margin-bottom: 12px; font-size: 13.5px; }
+.meldung > :first-child { flex: 1; }
+.monatswahl { justify-content: center; margin-bottom: 14px; gap: 6px; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpi { background: var(--flaeche); border-radius: 14px; padding: 12px 14px; }
+.kpi-wert { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.zwei { display: grid; grid-template-columns: 1.25fr 1fr; gap: 12px; }
+@media (max-width: 860px) { .zwei, .kpis { grid-template-columns: 1fr 1fr; } }
+.ring { position: relative; width: 180px; height: 180px; flex: none; }
+.ring-mitte { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.kat-zeile { cursor: pointer; border-radius: 8px; padding: 3px 6px; margin: 0 -6px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.kat-zeile:hover { background: var(--karte); }
+.kat-zeile .balken { margin-top: 4px; }
+.saeulen { display: flex; align-items: flex-end; gap: 10px; height: 130px; }
+.saeule-paar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; cursor: pointer; border-radius: 8px; padding: 4px 0; }
+.saeule-paar.an { background: var(--karte); }
+.saeulen-paar { flex: 1; display: flex; align-items: flex-end; gap: 3px; width: 100%; justify-content: center; }
+.saeule { width: 12px; border-radius: 4px 4px 0 0; min-height: 2px; }
+.saeule.ein { background: var(--ok); opacity: .75; }
+.saeule.aus { background: var(--falsch); opacity: .75; }
+.buchung { display: flex; align-items: center; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--linie); }
+.buchung:last-child { border-bottom: none; }
+.buchung.kompakt { padding: 5px 0; }
+.liste { padding: 6px 14px; }
+.kat-punkt { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex: none; background-image: linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)); }
+@media (prefers-color-scheme: dark) { .kat-punkt { background-image: linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)); } }
+.kat-punkt.gross { width: 40px; height: 40px; font-size: 19px; border-radius: 12px; }
+.eine-zeile { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.betrag { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.betrag.minus { color: var(--text); }
+.betrag.plus { color: var(--ok); }
+.kat-wahl { font: inherit; font-size: 12.5px; border: 1px solid var(--linie); border-radius: 8px; background: var(--flaeche); color: var(--leise); padding: 3px 4px; max-width: 170px; }
+.eingabe.kompakt { padding: 7px 10px; width: auto; }
+.raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+.raster-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.vorschau { background: var(--karte); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.abo { padding: 14px 16px; }
+.abo.vorbei { opacity: .6; }
+.etikett-warn { display: inline-block; margin-top: 5px; font-size: 11.5px; font-weight: 700; color: var(--falsch); background: color-mix(in srgb, var(--falsch) 12%, transparent); border-radius: 6px; padding: 1px 7px; }
+.abo-kopf { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(120deg, color-mix(in srgb, var(--akzent) 16%, var(--flaeche)), var(--flaeche)); border-radius: 18px; padding: 18px 22px; margin-bottom: 14px; }
+.abo-summe { font-size: 34px; font-weight: 850; letter-spacing: -0.02em; color: var(--akzent); font-variant-numeric: tabular-nums; }
+.radar { width: 86px; height: 86px; border-radius: 50%; position: relative; overflow: hidden; background: radial-gradient(circle, transparent 0 22%, color-mix(in srgb, var(--akzent) 22%, transparent) 23% 24%, transparent 25% 47%, color-mix(in srgb, var(--akzent) 22%, transparent) 48% 49%, transparent 50% 72%, color-mix(in srgb, var(--akzent) 22%, transparent) 73% 74%, transparent 75%); }
+.radar-strahl { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, color-mix(in srgb, var(--akzent) 55%, transparent), transparent 70deg); animation: drehen 3.2s linear infinite; }
+@keyframes drehen { to { transform: rotate(360deg); } }
+.budget-zeile { font-size: 14px; }
+.budget-feld { width: 100px; text-align: right; padding: 6px 10px; }
+.leer-start { text-align: center; padding: 50px 10px; }
+.leer-symbol { font-size: 54px; margin-bottom: 8px; }

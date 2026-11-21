@@ -177,7 +177,7 @@ function ticken() {
 
 async function abgeben(zeitUm) {
   const k = z.k;
-  if (!zeitUm && !window.confirm('Klausur abgeben?\n\nDanach kannst du nichts mehr ändern; Arena bewertet deine Antworten.')) return;
+  if (!zeitUm && !(await lyra.bestaetigen({ titel: 'Klausur abgeben?', text: 'Danach kannst du nichts mehr ändern; Arena bewertet deine Antworten.', ja: 'Abgeben', nein: 'Weiterschreiben', gefahr: false }))) return;
   k.abgegeben = true;
   k.abgegebenUm = Math.min(jetzt(), k.ende || jetzt());
   await sichern();
@@ -241,37 +241,52 @@ function zeichnen() {
 }
 
 function laufZeile() {
-  return z.laeuft ? h('div', { class: 'lauf' }, h('div', { class: 'lade' }), h('span', { class: 'wachsen', id: 'status' }, z.status),
-    h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen')) : null;
+  return z.laeuft ? h('div', { style: { marginTop: '12px' } }, lyra.arbeit(z.status || 'Arena stellt die Klausur zusammen …')) : null;
 }
+
 function fehlerZeile() {
   return z.fehler ? lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null;
 }
 
+async function klausurLoeschen(k) {
+  if (!(await lyra.bestaetigen({ titel: 'Probeklausur löschen?', text: `„${k.thema}“ samt deinen Antworten und der Bewertung.`, ja: 'Löschen', gefahr: true }))) return;
+  try { await lyra.speicher.loeschen('klausuren/' + k.id); } catch (_) {}
+  z.klausuren = z.klausuren.filter((x) => x.id !== k.id);
+  startseite();
+  zeichnen();
+}
+
 function lobby() {
-  const t = h('input', { class: 'eingabe gross-eingabe', 'data-feld': 'thema', placeholder: 'Fach oder Thema der Probeklausur, z. B. Lineare Algebra I', value: z.thema });
-  t.addEventListener('input', () => { z.thema = t.value; const b = document.getElementById('los'); if (b) b.disabled = !t.value.trim(); });
-  t.addEventListener('keydown', (e) => { if (e.key === 'Enter') erstellen(); });
-  const chip = (schl, w, n) => h('button', { class: 'chip' + (z.einst[schl] === w ? ' an' : ''), onclick: async () => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); } }, n);
+  const pille = (schl, titel, optionen) => lyra.auswahl({ titel, optionen, wert: z.einst[schl], beiWahl: async (w) => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); } });
   return h('div', { class: 'seite' },
-    h('div', { class: 'held' }, h('div', { class: 'logo' }, 'ARENA'), h('div', { class: 'leise' }, 'Probeklausur unter echten Bedingungen.')),
-    h('div', { class: 'flaeche spalte', style: { gap: '12px' } },
-      t,
-      z.themen.length ? h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 12).map((x) => h('button', { class: 'chip', onclick: () => { z.thema = x; zeichnen(); } }, x))) : null,
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Zeit'), ...[30, 60, 90, 120].map((m) => chip('dauer', m, `${m} min`))),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Aufgaben'), ...[3, 4, 5, 6, 8].map((n) => chip('anzahl', n, String(n)))),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Niveau'), chip('niveau', 'uebung', 'Übung'), chip('niveau', 'klausur', 'Klausur'), chip('niveau', 'schwer', 'Knackig')),
-      h('div', { class: 'zeile' },
+    lyra.kopf({ titel: 'Probeklausur', unter: 'Unter echten Bedingungen: Deckblatt, Uhr, keine Hilfe – danach eine faire Korrektur mit Punkten, Note und Musterlösung.' }),
+    lyra.verfasser({
+      wert: z.thema,
+      feld: 'thema',
+      zeilen: 1,
+      platzhalter: 'Fach oder Thema, z. B. Lineare Algebra I – Eigenwerte und Diagonalisierung',
+      beiEingabe: (v) => { z.thema = v; },
+      beiSenden: (v) => { z.thema = v; erstellen(); },
+      knopf: 'Klausur zusammenstellen',
+      deaktiviert: !!z.laeuft,
+      unten: [
         z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf gross', id: 'los', disabled: z.laeuft || !z.thema.trim(), onclick: erstellen }, 'Klausur zusammenstellen')),
-      laufZeile(), fehlerZeile()),
-    z.klausuren.length ? h('div', { style: { marginTop: '18px' } },
-      h('div', { class: 'ueberschrift-klein', style: { marginBottom: '8px' } }, 'Deine Probeklausuren'),
-      z.klausuren.map((k) => h('div', { class: 'karte klickbar zeile', style: { marginBottom: '8px' }, onclick: () => { z.k = k; z.aktuell = 0; zeichnen(); } },
-        h('div', { class: 'note-kachel' + (k.ergebnis ? '' : ' offen') }, k.ergebnis ? k.ergebnis.note : '–'),
-        h('div', { class: 'wachsen' }, h('div', { class: 'fett' }, k.thema),
-          h('div', { class: 'klein leise' }, `${k.aufgaben.length} Aufgaben · ${k.dauer} min · ${k.ergebnis ? `${punkteText(k.ergebnis.punkte)}/${k.ergebnis.max} Punkte` : k.start ? 'abgegeben' : 'noch nicht geschrieben'} · ${new Date(k.zeit * 1000).toLocaleDateString('de-DE')}`))))) : null);
+        pille('dauer', '⏱', [[30, '30 min'], [45, '45 min'], [60, '60 min'], [90, '90 min'], [120, '120 min']]),
+        pille('anzahl', 'Aufgaben', [3, 4, 5, 6, 8].map((n) => [n, String(n)])),
+        pille('niveau', 'Niveau', [['uebung', 'Übung', 'Zum Warmwerden'], ['klausur', 'Klausur', 'Wie eine echte Prüfung'], ['schwer', 'Knackig', 'Für die Eins']]),
+      ],
+    }),
+    z.themen.length && !z.laeuft ? lyra.vorschlaege(z.themen, (x) => { z.thema = x; zeichnen(); const f = document.querySelector('[data-feld="thema"]'); if (f) f.focus(); }, { titel: 'Aus deinen Unterlagen:' }) : null,
+    laufZeile(), fehlerZeile(),
+    z.klausuren.length ? lyra.abschnitt('Deine Probeklausuren', h('div', { class: 'ly-liste' }, z.klausuren.map((k) => lyra.eintrag({
+      symbol: h('span', { class: 'note-text' }, k.ergebnis ? k.ergebnis.note : '–'),
+      farbe: k.ergebnis ? (k.ergebnis.prozent >= 75 ? 'var(--gut)' : k.ergebnis.prozent >= 50 ? 'var(--mittel)' : 'var(--schlecht)') : 'var(--leise)',
+      titel: k.thema,
+      unter: `${k.aufgaben.length} Aufgaben · ${k.dauer} min · ${k.ergebnis ? `${punkteText(k.ergebnis.punkte)}/${k.ergebnis.max} Punkte` : k.start ? 'abgegeben' : 'noch nicht geschrieben'} · ${lyra.zeitText(k.zeit)}`,
+      beiKlick: () => { z.k = k; z.aktuell = 0; zeichnen(); },
+      rechts: !k.start ? h('button', { class: 'knopf klein', onclick: (e) => { e.stopPropagation(); z.k = k; z.aktuell = 0; zeichnen(); } }, 'Schreiben') : null,
+      aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => klausurLoeschen(k) }],
+    })))) : null);
 }
 
 function vorStart() {

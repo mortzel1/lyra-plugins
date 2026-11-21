@@ -606,6 +606,30 @@ function anschliessen(formen) {
   return formen.filter((f) => !(f.art === 'punkt' && alt.some((q) => nah(q, f.punkte[0])) && !jetzt.some((q) => nah(q, f.punkte[0]))));
 }
 
+/** Texte im Bild, die sich gegenseitig überdecken, auseinanderschieben: der spätere weicht nach unten bzw. oben aus,
+ *  in Schritten seiner Höhe, bis er frei steht (höchstens ein paar Versuche – dann bleibt er, wo er ist). */
+function texteEntzerren(L, texte) {
+  const rahmen = (t, dy = 0) => {
+    const b = Math.max(...t.zeilen.map((x) => textBreite(x, t.groesse, t.gewicht)));
+    const x0 = t.anker === 'start' ? t.x : t.anker === 'end' ? t.x - b : t.x - b / 2;
+    const hh = t.zeilen.length * t.zh;
+    return [x0 - 4, t.y + dy - hh / 2 - 3, x0 + b + 4, t.y + dy + hh / 2 + 3];
+  };
+  const schneidet = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  const frei = [];
+  for (const t of texte) {
+    let r = rahmen(t);
+    if (frei.some((f) => schneidet(f, r))) {
+      const schritt = r[3] - r[1];
+      for (const dy of [1, -1, 2, -2, 3, -3].map((k) => k * schritt)) {
+        const probe = rahmen(t, dy);
+        if (!frei.some((f) => schneidet(f, probe))) { t.y += dy; r = probe; dehnen(L.box, r[0], r[1]); dehnen(L.box, r[2], r[3]); break; }
+      }
+    }
+    frei.push(r);
+  }
+}
+
 /** Ganze Zeichnung aus der geprüften Beschreibung. */
 function aufbauen(spec, e = z.einst) {
   const L = neueListe();
@@ -615,6 +639,7 @@ function aufbauen(spec, e = z.einst) {
   // Reihenfolge: Formen → Hinweislinien → Texte im Bild → Zielpunkte → Beschriftungen
   const bildTexte = L.teile.filter((t) => t.typ === 'text');
   L.teile = L.teile.filter((t) => t.typ !== 'text');
+  texteEntzerren(L, bildTexte);
   const vorne = beschriften(L, spec.markierungen);
   L.teile.push(...bildTexte, ...vorne.punkte, ...vorne.texte);
   if (spec.bildtitel) {
@@ -1010,7 +1035,7 @@ function bildAnsicht() {
     zeichnen();
   };
   const loeschen = async () => {
-    if (!window.confirm(`„${b.spec.bildtitel || 'Schaubild'}“ löschen?\n\nDas Bild verschwindet aus der Galerie.`)) return;
+    if (!(await lyra.bestaetigen({ titel: `„${b.spec.bildtitel || 'Schaubild'}“ löschen?`, text: `Das Bild verschwindet aus der Galerie.`, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
     try { await lyra.speicher.loeschen('bilder/' + b.id); } catch (_) {}
     z.bilder = z.bilder.filter((x) => x.id !== b.id);
     z.ansicht = 'galerie';

@@ -66,3 +66,9 @@
 .kurs-karte { display: flex; gap: 14px; align-items: center; }
 .kurs-karte .symbol { font-size: 22px; width: 38px; height: 38px; border-radius: 11px; flex: none; display: flex; align-items: center; justify-content: center;
   background: color-mix(in srgb, var(--farbe) 14%, transparent); color: var(--farbe); }
+
+/* Startseite */
+.ziel-zeile { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 0 4px; }
+.ziel-zeile .eingabe { padding: 8px 12px; }
+.prozent-klein { font-weight: 800; font-size: 14px; color: var(--leise); min-width: 44px; text-align: right; }
+.hinweis-unten { margin-top: 22px; text-align: center; }

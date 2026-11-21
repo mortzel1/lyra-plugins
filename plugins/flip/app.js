@@ -509,7 +509,7 @@ async function umbenennen() {
 
 async function stapelLoeschen() {
   const s = z.aktiv;
-  if (!window.confirm(`„${s.titel}“ löschen?\n\nAlle ${s.karten.length} Karten und dein Lernstand werden endgültig gelöscht.`)) return;
+  if (!(await lyra.bestaetigen({ titel: `„${s.titel}“ löschen?`, text: `Alle ${s.karten.length} Karten und dein Lernstand werden endgültig gelöscht.`, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
   try { await lyra.speicher.loeschen('stapel/' + s.id); } catch (_) {}
   z.stapel = z.stapel.filter((x) => x.id !== s.id);
   z.aktiv = null;
@@ -668,9 +668,10 @@ function laufZeile() {
 
 function fehlerZeile(art) {
   if (z.fehlerBei !== art || !z.fehler) return null;
+  const nochmal = art === 'neu' ? () => { z.fehler = null; neuErstellen(); } : art === 'nachfragen' ? () => { z.fehler = null; nachfragen(); } : null;
   return h('div', { style: { marginTop: '12px' } }, fehlerBox(z.fehler,
     online() && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null,
-    () => { z.fehler = null; zeichnen(); }));
+    () => { z.fehler = null; zeichnen(); }, nochmal));
 }
 
 function feld(name, e) {
@@ -712,44 +713,54 @@ function zeichnen() {
 function stapelZeile(s) {
   const { neu, faellig, sitzen } = zahlen(s);
   const dran = faellig + Math.min(neu, z.einst.neue);
-  return h('div', { class: 'karte klickbar stapel-karte', style: { marginBottom: '10px' }, onclick: () => oeffnen(s.id) },
-    h('div', { class: 'symbol' }, '❐'),
-    h('div', { class: 'wachsen spalte', style: { gap: '6px' } },
-      h('div', { class: 'fett' }, s.titel),
-      h('div', { class: 'leise klein' }, [`${s.karten.length} Karten`, faellig ? `${faellig} fällig` : null, neu ? `${neu} neu` : null, sitzen ? `${sitzen} sitzen` : null].filter(Boolean).join(' · ')),
-      balken(fortschritt(s), null, true)),
-    h('button', { class: 'knopf tonal', disabled: !dran || !!z.laeuft, onclick: async (e) => { e.stopPropagation(); await oeffnen(s.id); lernen(false); } },
-      dran ? `Lernen · ${dran}` : 'Alles erledigt'));
+  return lyra.eintrag({
+    symbol: '🃏',
+    titel: s.titel,
+    unter: [`${s.karten.length} Karten`, faellig ? `${faellig} fällig` : null, neu ? `${neu} neu` : null, sitzen ? `${sitzen} sitzen` : null].filter(Boolean).join(' · '),
+    fortschritt: fortschritt(s),
+    beiKlick: () => oeffnen(s.id),
+    rechts: dran
+      ? h('button', { class: 'knopf tonal klein', disabled: !!z.laeuft, onclick: async (e) => { e.stopPropagation(); await oeffnen(s.id); lernen(false); } }, `Lernen · ${dran}`)
+      : h('span', { class: 'etikett', style: { '--farbe': 'var(--ok)' } }, '✓ erledigt'),
+  });
 }
 
 function uebersicht() {
+  const dran = z.stapel.map((s) => { const x = zahlen(s); return [s, x.faellig + Math.min(x.neu, z.einst.neue)]; }).filter(([, n]) => n > 0);
+  const summe = dran.reduce((a, [, n]) => a + n, 0);
   const seite = h('div', { class: 'seite' },
-    h('div', { class: 'zeile', style: { marginBottom: '6px' } },
-      h('h1', { class: 'wachsen' }, 'Was willst du mit Karteikarten lernen?'),
-      z.info ? lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null),
-    h('p', { class: 'leise', style: { marginBottom: '18px' } },
-      `Beschreib dein Ziel – ${lehrerName()} macht daraus Karten aus deinen Unterlagen: eine Sache pro Karte, klar gefragt, kurz beantwortet, mit Fundstelle.`),
-    h('div', { class: 'flaeche spalte', style: { gap: '14px' } },
-      h('label', { class: 'feld' }, 'Was willst du lernen?', feld('wunsch', { zeilen: 3, platzhalter: 'z. B. „Die Definitionen und Sätze aus Kapitel 2 für die Klausur“ oder „Fachbegriffe zu Rekursion – mit Beispielen“' })),
-      h('label', { class: 'feld' }, 'Thema', feld('thema', { platzhalter: 'z. B. Vollständige Induktion', beiEnter: neuErstellen })),
-      z.themen.length ? h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 12).map((t) =>
-        h('button', { class: 'chip', disabled: !!z.laeuft, onclick: () => { z.eingaben.thema = t; zeichnen(); } }, t))) : null,
-      h('label', { class: 'feld' }, 'Wie viele Karten?', anzahlWahl(z.anzahl, (n) => {
-        z.anzahl = n;
-        const b = document.getElementById('erstellen');
-        if (b) b.textContent = `${n} Karten erstellen`;
-      })),
-      h('div', { class: 'schalter' + (z.mitWissen ? ' an' : ''), onclick: () => { if (!z.laeuft) { z.mitWissen = !z.mitWissen; zeichnen(); } } },
-        h('div', { class: 'bahn' }), 'Auch Wissen über meine Unterlagen hinaus'),
-      h('div', { class: 'zeile' },
-        h('span', { class: 'leise klein wachsen' }, online() ? `${lehrerName()} erstellt die Karten über dein Abo (braucht Internet).` : 'Lyra erstellt die Karten lokal – nichts verlässt deinen Mac.'),
-        h('button', { class: 'knopf', id: 'erstellen', disabled: !!z.laeuft, onclick: neuErstellen }, `${z.anzahl} Karten erstellen`)),
-      z.laeuft === 'neu' ? h('div', {}, laufZeile(), z.fortschrittErstellen ? balken(z.fortschrittErstellen.fertig / z.fortschrittErstellen.gesamt, null, true) : null) : null,
-      fehlerZeile('neu')),
-    h('div', { class: 'zeile', style: { marginTop: '28px', marginBottom: '10px' } },
-      h('h3', { class: 'wachsen' }, z.stapel.length ? 'Deine Stapel' : ''),
-      h('button', { class: 'knopf text klein', onclick: ausAnki, title: 'Einen Stapel aus deiner Anki-App holen' }, 'Aus Anki holen')),
-    z.stapel.map(stapelZeile));
+    lyra.kopf({
+      titel: 'Karteikarten, die sitzen',
+      unter: `Sag, was du lernen willst – ${lehrerName()} macht daraus Karten aus deinen Unterlagen. Gelernt wird mit Wiederholung im richtigen Abstand.`,
+      aktionen: [h('button', { class: 'knopf text klein', onclick: ausAnki, title: 'Einen Stapel aus deiner Anki-App holen' }, 'Aus Anki holen')],
+    }),
+    summe ? h('div', { class: 'heute' },
+      h('div', { class: 'heute-zahl' }, String(summe)),
+      h('div', { class: 'wachsen' }, h('div', { class: 'fett' }, `${summe === 1 ? 'Karte ist' : 'Karten sind'} heute dran`),
+        h('div', { class: 'leise klein' }, dran.map(([s, n]) => `${s.titel} (${n})`).slice(0, 3).join(' · '))),
+      h('button', { class: 'knopf', disabled: !!z.laeuft, onclick: async () => { await oeffnen(dran[0][0].id); lernen(false); } }, dran.length > 1 ? `Mit „${kuerzen(dran[0][0].titel, 24)}“ anfangen` : 'Jetzt lernen')) : null,
+    lyra.verfasser({
+      wert: z.eingaben.wunsch || '',
+      feld: 'wunsch',
+      platzhalter: 'Was willst du lernen? z. B. „Definitionen und Sätze aus Kapitel 2 für die Klausur“ oder „Fachbegriffe zu Rekursion“',
+      beiEingabe: (v) => { z.eingaben.wunsch = v; },
+      beiSenden: (v) => { z.eingaben.wunsch = v; neuErstellen(); },
+      knopf: `${z.anzahl} Karten erstellen`,
+      deaktiviert: !!z.laeuft,
+      unten: [
+        z.info ? lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
+        lyra.auswahl({ titel: 'Karten', wert: z.anzahl, beiWahl: (n) => { z.anzahl = n; zeichnen(); }, optionen: [5, 10, 15, 20, 30, 50, 80, 100, 150].map((n) => [n, String(n)]) }),
+        lyra.auswahl({ titel: 'Wissen', wert: z.mitWissen ? 'mehr' : 'unterlagen', beiWahl: (w) => { z.mitWissen = w === 'mehr'; zeichnen(); }, optionen: [
+          ['unterlagen', 'Nur Unterlagen', 'Nur, was in deinen Unterlagen steht – mit Fundstelle'],
+          ['mehr', 'Unterlagen + mehr', 'Ergänzt Wichtiges, das in deinen Unterlagen fehlt']] }),
+      ],
+    }),
+    z.themen.length && !z.laeuft ? lyra.vorschlaege(z.themen, (t) => { z.eingaben.wunsch = t; zeichnen(); const f = document.querySelector('[data-feld="wunsch"]'); if (f) f.focus(); }, { titel: 'Aus deinen Unterlagen:' }) : null,
+    z.laeuft === 'neu' ? h('div', { class: 'ly-arbeit', style: { marginTop: '14px' } }, laufZeile(),
+      z.fortschrittErstellen ? balken(z.fortschrittErstellen.fertig / z.fortschrittErstellen.gesamt, 'var(--akzent)', true) : null) : null,
+    fehlerZeile('neu'),
+    z.stapel.length ? lyra.abschnitt('Deine Stapel', h('div', { class: 'ly-liste' }, z.stapel.map(stapelZeile))) : null,
+    !z.stapel.length && !z.laeuft ? lyra.leer({ symbol: '🃏', titel: 'Noch keine Stapel', text: 'Schreib oben, was du lernen willst – oder hol einen Stapel aus Anki.' }) : null);
   return h('div', { class: 'wrap' }, seite);
 }
 
@@ -758,16 +769,22 @@ function stapelAnsicht() {
   const { neu, faellig, sitzen } = zahlen(s);
   const dran = faellig + Math.min(neu, z.einst.neue);
   const t = jetzt();
+  const suche = (z.eingaben.kartensuche || '').trim().toLowerCase();
+  const karten = suche ? s.karten.filter((k) => `${k.vorne} ${k.hinten}`.toLowerCase().includes(suche)) : s.karten;
+  const kachel = (zahl, name, farbe) => h('div', { class: 'stat', style: { '--f': farbe } }, h('div', { class: 'stat-zahl' }, String(zahl)), h('div', { class: 'leise klein' }, name));
   return h('div', { class: 'wrap' }, h('div', { class: 'seite' },
-    h('div', { class: 'zeile' },
-      h('h1', { class: 'wachsen' }, s.titel),
-      h('button', { class: 'knopf symbol', title: 'Umbenennen', onclick: umbenennen }, '✎'),
-      h('button', { class: 'knopf symbol', title: 'Stapel löschen', onclick: stapelLoeschen }, '🗑')),
-    s.wunsch ? h('p', { class: 'leise', style: { marginTop: '4px' } }, s.wunsch) : null,
-    h('div', { class: 'zeile', style: { margin: '14px 0 8px' } },
-      h('span', { class: 'prozent', style: { fontSize: '20px', fontWeight: 800 } }, `${Math.round(fortschritt(s) * 100)} %`),
-      h('span', { class: 'leise klein' }, [`${s.karten.length} Karten`, `${sitzen} sitzen`, `${faellig} fällig`, `${neu} neu`].join(' · '))),
-    balken(fortschritt(s)),
+    lyra.kopf({
+      titel: s.titel,
+      unter: s.wunsch && s.wunsch !== s.titel ? s.wunsch : `${s.karten.length} Karten · erstellt ${lyra.zeitText(s.erstellt)}`,
+      zurueck: { titel: 'Alle Stapel', bei: zurueck },
+      aktionen: [
+        h('button', { class: 'knopf symbol', title: 'Umbenennen', onclick: umbenennen }, '✎'),
+        h('button', { class: 'knopf symbol', title: 'Stapel löschen', onclick: stapelLoeschen }, '🗑'),
+      ],
+    }),
+    h('div', { class: 'stats' },
+      h('div', { class: 'stat gross' }, h('div', { class: 'stat-zahl' }, `${Math.round(fortschritt(s) * 100)} %`), h('div', { style: { margin: '6px 0 2px' } }, balken(fortschritt(s), 'var(--akzent)', true)), h('div', { class: 'leise klein' }, 'gelernt')),
+      kachel(faellig, 'fällig', 'var(--bernstein)'), kachel(neu, 'neu', 'var(--akzent)'), kachel(sitzen, 'sitzen', 'var(--ok)')),
     h('div', { class: 'zeile umbruch', style: { margin: '18px 0 6px' } },
       h('button', { class: 'knopf', disabled: !dran || !!z.laeuft, onclick: () => lernen(false) }, dran ? `▶ Lernen · ${dran} Karten` : 'Heute alles gelernt'),
       h('button', { class: 'knopf rand', disabled: !s.karten.length || !!z.laeuft, onclick: () => lernen(true) }, 'Alle Karten üben'),
@@ -777,7 +794,10 @@ function stapelAnsicht() {
       h('button', { class: 'knopf text', disabled: !!z.laeuft || !s.karten.length, onclick: nachAnki, title: 'Diesen Stapel in deine Anki-App übertragen' }, '→ Anki')),
     z.laeuft === 'mehr' ? h('div', {}, laufZeile(), z.fortschrittErstellen ? balken(z.fortschrittErstellen.fertig / z.fortschrittErstellen.gesamt, null, true) : null) : null,
     fehlerZeile('mehr'), fehlerZeile('stapel'),
-    h('div', { style: { marginTop: '18px' } }, s.karten.map((k) => {
+    s.karten.length > 8 ? h('input', { class: 'eingabe', 'data-feld': 'kartensuche', placeholder: `In ${s.karten.length} Karten suchen …`, value: z.eingaben.kartensuche || '', style: { marginTop: '16px' },
+      oninput: (e) => { z.eingaben.kartensuche = e.target.value; zeichnen(); } }) : null,
+    suche && !karten.length ? h('div', { class: 'leise', style: { padding: '20px 4px' } }, 'Keine Karte passt.') : null,
+    h('div', { style: { marginTop: '14px' } }, karten.map((k) => {
       const [stand, farbe] = !k.gesehen ? ['neu', 'var(--akzent)'] : k.intervall >= 7 ? ['sitzt', 'var(--ok)'] : k.faellig <= t ? ['fällig', 'var(--bernstein)'] : [`in ${dauerText((k.faellig - t) / 86400)}`, 'var(--leise)'];
       return h('div', { class: 'karte', style: { marginBottom: '10px' } }, h('div', { class: 'kartenzeile' },
         h('div', { class: 'wachsen' }, mdElement(k.vorne), h('div', { class: 'trenner' }), mdElement(k.hinten, 'hinten'),

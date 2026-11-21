@@ -176,37 +176,40 @@ function zeichnen() {
 }
 
 function laufZeile() {
-  return z.laeuft ? h('div', { class: 'lauf' }, h('div', { class: 'lade' }), h('span', { class: 'wachsen', id: 'status' }, z.status),
-    h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen')) : null;
+  return z.laeuft ? h('div', { style: { marginTop: '12px' } }, lyra.arbeit(z.status || 'Regie arbeitet …')) : null;
 }
-function fehlerZeile() {
-  return z.fehler ? lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null;
+function fehlerZeile(nochmal) {
+  return z.fehler ? h('div', { style: { marginTop: '12px' } }, lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null,
+    () => { z.fehler = null; zeichnen(); }, nochmal ? () => { z.fehler = null; nochmal(); } : null)) : null;
 }
 
 function startAnsicht() {
-  const t = h('input', { class: 'eingabe', 'data-feld': 'thema', placeholder: 'Worüber soll das Video gehen? z. B. „Wie funktioniert der Dijkstra-Algorithmus?“', value: z.thema, style: { fontSize: '17px', padding: '14px 16px' } });
-  t.addEventListener('input', () => { z.thema = t.value; const b = document.getElementById('los'); if (b) b.disabled = !t.value.trim(); });
-  t.addEventListener('keydown', (e) => { if (e.key === 'Enter') schreiben(); });
-  const chip = (schl, w, n) => h('button', { class: 'chip' + (z.einst[schl] === w ? ' an' : ''), onclick: async () => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); } }, n);
+  const pille = (schl, titel, optionen) => lyra.auswahl({ titel, optionen, wert: z.einst[schl], beiWahl: async (w) => { z.einst[schl] = w; try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {} zeichnen(); } });
   return h('div', {},
-    h('div', { class: 'held' }, h('div', { class: 'logo' }, '🎬 Regie'), h('div', { class: 'leise' }, 'Vom Thema zum Erklärvideo – Drehbuch, Bilder, Vorführung.')),
-    h('div', { class: 'flaeche spalte', style: { gap: '12px' } },
-      t,
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Länge'), ...[1, 3, 5].map((m) => chip('laenge', m, `${m} min`))),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Für'), chip('publikum', 'erstis', 'Erstis'), chip('publikum', 'mitstudierende', 'Mitstudierende'), chip('publikum', 'laien', 'Laien')),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, h('span', { class: 'leise klein' }, 'Ton'), chip('ton', 'locker', 'Locker'), chip('ton', 'sachlich', 'Sachlich')),
-      h('div', { class: 'zeile' },
+    lyra.kopf({ titel: 'Dein Erklärvideo', unter: 'Vom Thema zum fertigen Drehbuch: Szenen mit Sprechtext, Schaubilder von Graphit und eine Vorführung zum Üben.' }),
+    lyra.verfasser({
+      wert: z.thema,
+      feld: 'thema',
+      zeilen: 1,
+      platzhalter: 'Worüber soll das Video gehen? z. B. „Wie funktioniert der Dijkstra-Algorithmus?“',
+      beiEingabe: (v) => { z.thema = v; },
+      beiSenden: (v) => { z.thema = v; schreiben(); },
+      knopf: 'Drehbuch schreiben',
+      symbol: '✍️',
+      deaktiviert: !!z.laeuft,
+      unten: [
         z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf gross', id: 'los', disabled: z.laeuft || !z.thema.trim(), onclick: schreiben }, '✍️ Drehbuch schreiben')),
-      laufZeile(), fehlerZeile(),
-      !z.graphit ? h('div', { class: 'kasten warn klein' }, 'Für die Schaubilder braucht Regie das Plugin Graphit – installier es im Plugin-Menü, dann zeichnet es die Bilder zu jeder Szene.') : null),
-    z.projekte.length ? h('div', { style: { marginTop: '18px' } },
-      h('div', { class: 'ueberschrift-klein', style: { marginBottom: '8px' } }, 'Deine Drehbücher'),
-      h('div', { class: 'raster' }, z.projekte.map((p) => h('div', { class: 'karte klickbar', onclick: () => { z.p = p; zeichnen(); } },
-        svgElement((p.szenen.find((s) => s.svg) || {}).svg, 'mini'),
-        h('div', { class: 'fett' }, p.titel),
-        h('div', { class: 'klein leise' }, `${p.szenen.length} Szenen · ${dauerText(p.szenen.reduce((a, s) => a + s.dauer, 0))} min`))))) : null);
+        pille('laenge', 'Länge', [[1, '1 min'], [3, '3 min'], [5, '5 min']]),
+        pille('publikum', 'Für', [['erstis', 'Erstis'], ['mitstudierende', 'Mitstudierende'], ['laien', 'Laien']]),
+        pille('ton', 'Ton', [['locker', 'Locker'], ['sachlich', 'Sachlich']]),
+      ],
+    }),
+    laufZeile(), fehlerZeile(schreiben),
+    !z.graphit ? h('div', { class: 'kasten warn klein', style: { marginTop: '12px' } }, 'Für die Schaubilder braucht Regie das Plugin Graphit – installier es im Plugin-Menü, dann zeichnet es die Bilder zu jeder Szene.') : null,
+    z.projekte.length ? lyra.abschnitt('Deine Drehbücher', h('div', { class: 'raster' }, z.projekte.map((p) => h('div', { class: 'karte klickbar projekt-karte', onclick: () => { z.p = p; zeichnen(); } },
+      svgElement((p.szenen.find((s) => s.svg) || {}).svg, 'mini'),
+      h('div', { class: 'fett' }, p.titel),
+      h('div', { class: 'klein leise' }, `${p.szenen.length} Szenen · ${dauerText(p.szenen.reduce((a, s) => a + s.dauer, 0))} min · ${lyra.zeitText(p.zeit || lyra.jetzt())}`))))) : null);
 }
 
 function projektAnsicht() {
@@ -215,14 +218,14 @@ function projektAnsicht() {
   const gesamt = p.szenen.reduce((a, s) => a + s.dauer, 0);
   return h('div', {},
     h('div', { class: 'zeile umbruch', style: { marginBottom: '12px', gap: '6px' } },
-      h('button', { class: 'knopf text', onclick: () => { z.p = null; zeichnen(); } }, '← Alle'),
+      h('button', { class: 'knopf text', onclick: () => { z.p = null; zeichnen(); } }, '← Alle Drehbücher'),
       h('span', { class: 'wachsen' }),
       z.graphit && fehlen ? h('button', { class: 'knopf tonal', disabled: z.laeuft, onclick: () => zeichnenLassen() }, `🖌 ${fehlen} Bild${fehlen > 1 ? 'er' : ''} zeichnen`) : null,
       h('button', { class: 'knopf', onclick: () => { z.vorfuehren = 0; zeichnen(); } }, '▶ Vorführen'),
       h('button', { class: 'knopf tonal', onclick: () => lyra.drucken() }, '🖨 PDF'),
       h('button', { class: 'knopf tonal', onclick: async () => { try { await lyra.speichern(`${p.titel.replace(/[/\\:*?"<>|]/g, ' ')}.md`, alsMarkdown(p)); } catch (_) {} } }, 'Drehbuch (.md)'),
       h('button', { class: 'knopf text', onclick: async () => {
-        if (!window.confirm(`„${p.titel}“ löschen?`)) return;
+        if (!(await lyra.bestaetigen({ titel: `„${p.titel}“ löschen?`, text: ``, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
         try { await lyra.speicher.loeschen('projekte/' + p.id); } catch (_) {}
         z.projekte = z.projekte.filter((x) => x.id !== p.id);
         z.p = null;

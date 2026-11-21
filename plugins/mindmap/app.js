@@ -81,7 +81,7 @@ function ansicht() {
       },
       onkeydown: (e) => { if (e.key === 'Enter' && z.treffer[0]) waehlen(z.treffer[0].i); },
     }));
-  const flaeche = h('div', { class: 'flaeche-mm' }, z.fokus === null ? uebersicht() : fachAnsicht(z.fokus), details());
+  const flaeche = h('div', { class: 'flaeche-mm' + (z.gewaehlt !== null ? ' mit-details' : '') }, z.fokus === null ? uebersicht() : fachAnsicht(z.fokus), details());
   return h('div', { class: 'mm' }, reiter, flaeche);
 }
 

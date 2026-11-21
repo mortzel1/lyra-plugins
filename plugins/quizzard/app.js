@@ -215,12 +215,12 @@ async function start() {
   startseite();
 }
 
-function zurueck() {
+async function zurueck() {
   if (document.querySelector('.dialog-grund')) return;
   if (z.ansicht === 'lobby') return lyra.zurueck();
   if (z.ansicht === 'bereit') z.meldung = '';
   if (z.ansicht === 'zaubern') lyra.abbrechen();
-  if ((z.ansicht === 'frage' || z.ansicht === 'feedback') && !window.confirm('Quiz abbrechen?\n\nDein Spielstand geht verloren.')) return;
+  if ((z.ansicht === 'frage' || z.ansicht === 'feedback') && !(await lyra.bestaetigen({ titel: 'Quiz abbrechen?', text: 'Dein Spielstand geht verloren.', ja: 'Quiz abbrechen', nein: 'Weiterspielen', gefahr: true }))) return;
   stoppeTimer();
   z.ansicht = 'lobby';
   zeichnen();
@@ -262,7 +262,7 @@ async function quizSichern(q) {
 }
 
 async function quizLoeschen(q) {
-  if (!window.confirm(`Quiz „${q.thema}“ löschen?\n\nDie ${q.fragen.length} Fragen sind dann weg (dein Rekord bleibt).`)) return;
+  if (!(await lyra.bestaetigen({ titel: `Quiz „${q.thema}“ löschen?`, text: `Die ${q.fragen.length} Fragen sind dann weg (dein Rekord bleibt).`, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
   try { await lyra.speicher.loeschen('spiele/' + q.id); } catch (_) {}
   z.spiele = z.spiele.filter((x) => x.id !== q.id);
   startseite();
@@ -731,57 +731,54 @@ function ansicht() {
   }
 }
 
+const OPT = {
+  quelle: [['unterlagen', '📚 Unterlagen', 'Nur aus deinen Unterlagen'], ['beides', '✨ Beides', 'Unterlagen, ergänzt um Wissen'], ['wissen', '🌍 Allgemeinwissen', 'Jedes Thema – auch ohne Unterlagen']],
+  anzahl: [5, 10, 15, 20, 30, 40, 50].map((n) => [n, String(n)]),
+  zeit: [[0, 'Aus', 'Keine Uhr, kein Zeitbonus'], [10, '10 s'], [15, '15 s'], [20, '20 s'], [30, '30 s'], [45, '45 s'], [60, '60 s'], [90, '90 s']],
+  schwierigkeit: [['leicht', 'Leicht'], ['mittel', 'Mittel'], ['schwer', 'Schwer'], ['gemischt', 'Gemischt'], ['steigend', 'Steigend', 'Wird von Frage zu Frage schwerer']],
+};
+
 function lobby() {
-  const chip = (schluessel, wert, name) => h('button', { class: 'chip' + (z.einst[schluessel] === wert ? ' an' : ''), onclick: () => schnellSetzen(schluessel, wert) }, name);
-  const t = h('input', { class: 'eingabe', 'data-feld': 'thema', placeholder: 'Worum soll’s gehen? z. B. Vollständige Induktion, Photosynthese, 80er-Musik …', style: { fontSize: '18px', padding: '16px 18px' } });
-  t.value = z.thema;
-  t.addEventListener('input', () => {
-    z.thema = t.value;
-    const k = document.getElementById('los');
-    if (k) k.disabled = !z.thema.trim();
-  });
-  t.addEventListener('keydown', (e) => { if (e.key === 'Enter') erstellen(); });
+  const pille = (schl, titel) => lyra.auswahl({ titel, optionen: OPT[schl], wert: z.einst[schl], beiWahl: (w) => schnellSetzen(schl, w) });
   return h('div', {},
     h('div', { class: 'logo' }, 'Quizzard'),
     h('div', { class: 'slogan' }, 'Ein Thema rein – ein Quiz raus. Bereit? ⚡'),
-    h('div', { class: 'panel spalte', style: { gap: '14px' } },
-      t,
-      z.themen.length && z.einst.quelle !== 'wissen' ? h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 10).map((x) =>
-        h('button', { class: 'chip', onclick: () => { z.thema = x; zeichnen(); } }, x))) : null,
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
-        h('span', { class: 'leise klein' }, 'Quelle'), chip('quelle', 'unterlagen', '📚 Unterlagen'), chip('quelle', 'beides', '✨ Beides'), chip('quelle', 'wissen', '🌍 Allgemeinwissen')),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
-        h('span', { class: 'leise klein' }, 'Fragen'), ...[5, 10, 15, 20, 30].map((n) => chip('anzahl', n, String(n)))),
-      zeitlimitZeile(),
-      h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
-        h('span', { class: 'leise klein' }, 'Level'), chip('schwierigkeit', 'leicht', 'Leicht'), chip('schwierigkeit', 'mittel', 'Mittel'), chip('schwierigkeit', 'schwer', 'Schwer'), chip('schwierigkeit', 'gemischt', 'Gemischt'), chip('schwierigkeit', 'steigend', 'Steigend')),
-      h('div', { class: 'zeile', style: { marginTop: '6px' } },
+    lyra.verfasser({
+      wert: z.thema,
+      feld: 'thema',
+      zeilen: 1,
+      platzhalter: 'Worum soll’s gehen? z. B. Vollständige Induktion, Photosynthese, 80er-Musik …',
+      beiEingabe: (v) => { z.thema = v; },
+      beiSenden: (v) => { z.thema = v; erstellen(); },
+      knopf: 'Quiz zaubern',
+      symbol: '⚡',
+      unten: [
         z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('button', { class: 'knopf text', onclick: einstellungen }, '⚙ Alle Einstellungen'),
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf riesig', id: 'los', disabled: !z.thema.trim(), onclick: erstellen }, 'Quiz starten ⚡')),
-      z.fehler ? lyra.fehlerBox(z.fehler, online() && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null),
+        pille('quelle', ''), pille('anzahl', 'Fragen'), pille('zeit', '⏱'), pille('schwierigkeit', 'Level'),
+        h('button', { class: 'ly-pille', onclick: einstellungen, title: 'Fragetypen, Joker, Punkte, Effekte …' }, '⚙ Mehr'),
+      ],
+    }),
+    z.themen.length && z.einst.quelle !== 'wissen' ? lyra.vorschlaege(z.themen, (x) => { z.thema = x; zeichnen(); const f = document.querySelector('[data-feld="thema"]'); if (f) f.focus(); }, { titel: 'Aus deinen Unterlagen:' }) : null,
+    z.fehler ? h('div', { style: { marginTop: '12px' } }, lyra.fehlerBox(z.fehler, online() && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null,
+      () => { z.fehler = null; zeichnen(); }, () => { z.fehler = null; erstellen(); })) : null,
     z.meldung ? h('div', { class: 'meldung' }, z.meldung) : null,
-    z.spiele.length ? h('div', { class: 'panel', style: { marginTop: '18px' } },
-      h('h3', { style: { marginBottom: '10px' } }, '🏆 Deine Quizze'),
-      h('div', { class: 'quiz-liste' }, z.spiele.map((q) => {
-        const r = z.rekorde[q.thema.toLowerCase()];
-        const neu = !q.gespielt;
-        return h('div', { class: 'zeile', style: { padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.08)' } },
-          h('div', { class: 'wachsen' },
-            h('div', { class: 'fett' }, q.thema, neu ? h('span', { class: 'pill neu' }, 'neu') : null),
-            h('div', { class: 'leise klein' }, `${q.fragen.length} Fragen · ${neu ? 'noch nicht gespielt' : `${q.gespielt}× gespielt`}${r ? ` · Rekord ${zahlFormat(r.punkte)}` : ''} · ${datum(q.zeit)}`)),
-          h('button', { class: 'knopf text', title: 'Löschen', onclick: () => quizLoeschen(q) }, '🗑'),
-          h('button', { class: neu ? 'knopf' : 'knopf tonal', onclick: () => { z.meldung = ''; spielStarten(q); } }, neu ? 'Spielen ▶' : 'Nochmal ▶'));
-      }))) : null);
+    z.spiele.length ? lyra.abschnitt('🏆 Deine Quizze', h('div', { class: 'ly-liste' }, z.spiele.map((q) => {
+      const r = z.rekorde[q.thema.toLowerCase()];
+      const neu = !q.gespielt;
+      return lyra.eintrag({
+        symbol: neu ? '✨' : '🏆',
+        titel: q.thema,
+        unter: `${q.fragen.length} Fragen · ${neu ? 'noch nicht gespielt' : `${q.gespielt}× gespielt`}${r ? ` · Rekord ${zahlFormat(r.punkte)}` : ''} · ${datum(q.zeit)}`,
+        beiKlick: () => { z.meldung = ''; spielStarten(q); },
+        rechts: h('button', { class: neu ? 'knopf klein' : 'knopf tonal klein', onclick: (e) => { e.stopPropagation(); z.meldung = ''; spielStarten(q); } }, neu ? 'Spielen ▶' : 'Nochmal ▶'),
+        aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => quizLoeschen(q) }],
+      });
+    }))) : null);
 }
 
-/** „⏱ Zeitlimit: Aus · 10 s · 20 s …“ – gilt fürs nächste Spiel (auch für gespeicherte Quizze). */
+/** Zeitlimit fürs nächste Spiel (gilt auch für gespeicherte Quizze). */
 function zeitlimitZeile() {
-  const chip = (wert, name) => h('button', { class: 'chip' + (z.einst.zeit === wert ? ' an' : ''), onclick: () => schnellSetzen('zeit', wert) }, name);
-  return h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
-    h('span', { class: 'leise klein', title: 'Bei Reihenfolge, Zuordnen und Lückentext gibt es 50 % mehr Zeit.' }, '⏱ Zeitlimit pro Frage'),
-    chip(0, 'Aus'), chip(10, '10 s'), chip(20, '20 s'), chip(30, '30 s'), chip(60, '60 s'));
+  return lyra.auswahl({ titel: '⏱ Zeitlimit', optionen: OPT.zeit, wert: z.einst.zeit, beiWahl: (w) => schnellSetzen('zeit', w) });
 }
 
 const datum = (t) => new Date(t * 1000).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
@@ -886,7 +883,7 @@ function antwortBereich(f, fertig) {
             style: zu[i] === undefined && e.aktiv !== i ? { background: 'rgba(255,255,255,0.12)' } : null,
             disabled: fertig,
             onclick: () => { e.aktiv = i; zeichnen(); },
-          }, mdElement(p.links), fertig ? h('div', { class: 'klein', style: { marginTop: '4px', opacity: 0.9 } }, (zu[i] === p.rechts ? '✓ ' : '✗ ') + p.rechts) : null))),
+          }, h('span', { class: 'paar-nr' }, String(i + 1)), mdElement(p.links), fertig ? h('div', { class: 'klein', style: { marginTop: '4px', opacity: 0.9 } }, (zu[i] === p.rechts ? '✓ ' : '✗ ') + p.rechts) : null))),
           h('div', { class: 'spalte', style: { gap: '10px' } }, f.rechtsGemischt.map((r) => {
             const von = Object.keys(zu).find((k) => zu[k] === r);
             return h('button', {
@@ -900,7 +897,7 @@ function antwortBereich(f, fertig) {
                 e.aktiv = frei >= 0 ? frei : null;
                 zeichnen();
               },
-            }, mdElement(r));
+            }, von !== undefined ? h('span', { class: 'paar-nr' }, String(Number(von) + 1)) : null, mdElement(r));
           }))),
         !fertig ? h('div', { class: 'zeile', style: { justifyContent: 'center', marginTop: '14px' } },
           h('button', { class: 'knopf', disabled: verbundenRechts.length < f.paare.length, onclick: () => abgeben() }, 'Abgeben')) : null);
@@ -911,7 +908,7 @@ function antwortBereich(f, fertig) {
       t.addEventListener('input', () => { z.eingabe = t.value; });
       t.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') abgeben(); });
       return h('div', { class: 'panel spalte' }, t,
-        fertig ? h('div', { class: 'mitte fett', style: { fontSize: '20px' } }, `Richtig: ${f.optionen[0]}`) :
+        fertig ? mdElement(`Richtig: ${f.optionen[0]}`, 'mitte fett gross-text') :
           h('div', { class: 'zeile', style: { justifyContent: 'center' } }, h('button', { class: 'knopf', onclick: () => abgeben() }, 'Abgeben')));
     }
   }
@@ -946,7 +943,7 @@ function endeAnsicht() {
   const falsche = s.fragen.map((f, i) => (s.antworten[i] && s.antworten[i].teil < 0.999 ? s.quiz.fragen.find((q) => q.frage === f.frage) : null)).filter(Boolean);
   return h('div', { class: 'podest' },
     h('div', { style: { fontSize: '70px' } }, quote >= 80 ? '🏆' : quote >= 50 ? '🥈' : '🌱'),
-    s.neuerRekord ? h('div', { class: 'pill', style: { display: 'inline-block', marginBottom: '8px' } }, '✨ Neuer Rekord!') : null,
+    s.neuerRekord && richtig > 0 ? h('div', { class: 'pill', style: { display: 'inline-block', marginBottom: '8px' } }, '✨ Neuer Rekord!') : null,
     h('div', { class: 'punkte-gross' }, zahlFormat(s.punkte)),
     h('div', { class: 'leise' }, 'Punkte'),
     h('div', { class: 'werte' },
@@ -964,7 +961,7 @@ function endeAnsicht() {
         const a = s.antworten[i] || { teil: 0 };
         return h('div', { class: 'zeile-r' },
           h('span', { style: { fontSize: '20px' } }, a.teil >= 0.999 ? '✅' : a.teil > 0 ? '🟡' : '❌'),
-          h('div', { class: 'wachsen' }, mdElement(f.frage), h('div', { class: 'leise klein' }, loesungText(f)),
+          h('div', { class: 'wachsen' }, mdElement(f.frage), mdElement(loesungText(f), 'leise klein'),
             z.einst.erklaerung === 'nie' && f.wissenswert ? h('div', { class: 'klein', style: { marginTop: '4px' } }, mdElement('💡 ' + f.wissenswert)) : null),
           h('span', { class: 'fett' }, a.punkte ? `+${zahlFormat(a.punkte)}` : ''));
       })));

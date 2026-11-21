@@ -1,14 +1,18 @@
 {
   "kennung": "lemma",
   "name": "Lemma",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Beweise selbst führen – Schritt für Schritt",
   "kategorie": "lernen",
   "beschreibung": "Du schreibst den Beweis, Lemma prüft jeden Schritt: richtig, Lücke oder falsch – mit einer kurzen Rückmeldung, was fehlt. Die Lösung verrät Lemma nie von selbst: Tipps gibt es in zwei Stufen, die Musterlösung nur, wenn du ausdrücklich danach fragst. Formeln in LaTeX, Beweise gespeichert und als Markdown exportierbar.",
   "farbe": "#BE123C",
-  "symbol": "M4 4h16v16H4Zm2 2v12h12V6Zm2.3 6.2 1.4-1.4 2.1 2.1 4.5-4.5 1.4 1.4-5.9 5.9Z",
+  "symbol": "<path d='M5 6v10' stroke-width='1.3' opacity='.5'/><circle cx='5' cy='6' r='1.7'/><circle cx='5' cy='11' r='1.7'/><circle cx='5' cy='16' r='1.7'/><path d='M9 6h11M9 11h8M9 16h3.5' stroke-width='2' opacity='.55'/><rect x='15' y='14' width='6' height='6' rx='.9'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["ki", "speicher", "startseite"],
+  "berechtigungen": [
+    "ki",
+    "speicher",
+    "startseite"
+  ],
   "datenhinweis": "die Aussage, die du beweist, und deine Beweisschritte",
   "funktionen": [
     "Jeden Schritt prüfen lassen: richtig, Lücke oder falsch – mit konkreter Rückmeldung",
@@ -17,5 +21,13 @@
     "Formeln in LaTeX mit Live-Vorschau",
     "Übungsaufgaben zum Einstieg (Induktion, Widerspruch, Folgen, Abbildungen)",
     "Beweise gespeichert, offene auf Lyras Startseite, Export als Markdown"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "„Schritt prüfen“ ist beim Tippen sofort klickbar",
+      "Beweise lassen sich löschen",
+      "Neue, aufgeräumte Startseite",
+      "Neues Symbol"
+    ]
+  }
 }

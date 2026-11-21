@@ -113,7 +113,13 @@ Bedeutung der Variablen – oder "".\n\nAntwort als JSON: {"eintraege": [{"art":
         zaehlen: { schluessel: 'bezeichnung', wort: 'Eintrag' },
       }, (e) => { if (e.art === 'hinweis') status(`„${thema}“: ${e.text}`, i, themen.length); });
       if (r && r.lehrer) z.lehrer = r.lehrer;
-      const eintraege = ((r && r.json && r.json.eintraege) || []).map(pruefen).filter(Boolean);
+      const gesehen = new Set();
+      const eintraege = ((r && r.json && r.json.eintraege) || []).map(pruefen).filter(Boolean).filter((e) => {
+        const k = (e.bezeichnung || e.inhalt).toLowerCase().replace(/\s+/g, ' ');
+        if (gesehen.has(k)) return false;
+        gesehen.add(k);
+        return true;
+      });
       if (eintraege.length) blatt.abschnitte.push({ titel: thema, eintraege });
     }
     if (!blatt.abschnitte.length) throw new Error('Dazu kam nichts Brauchbares zurück – versuch ein genaueres Thema.');
@@ -248,31 +254,60 @@ function zeichnen() {
   lyra.titel(z.blatt ? z.blatt.titel : '');
 }
 
+async function einstellungSetzen(schl, w) {
+  z.einst[schl] = w;
+  try { await lyra.speicher.schreiben('einstellungen', z.einst); } catch (_) {}
+  zeichnen();
+}
+
+async function blattLoeschen(b) {
+  if (!(await lyra.bestaetigen({ titel: `„${b.titel}“ löschen?`, text: 'Das Formelblatt wird gelöscht.', ja: 'Löschen', gefahr: true }))) return;
+  try { await lyra.speicher.loeschen('blaetter/' + b.id); } catch (_) {}
+  z.blaetter = z.blaetter.filter((x) => x.id !== b.id);
+  zeichnen();
+}
+
 function start_ansicht() {
-  const eigen = h('textarea', { class: 'eingabe', 'data-feld': 'eigen', rows: 2, placeholder: 'Eigene Themen – eins pro Zeile, z. B. „Eigenwerte und Eigenvektoren“' });
-  eigen.value = z.eigenes;
-  eigen.addEventListener('input', () => { z.eigenes = eigen.value; const k = document.getElementById('los'); if (k) k.disabled = !z.auswahl.size && !eigen.value.trim(); });
+  const n = z.auswahl.size + z.eigenes.split(/[;\n]/).map((t) => t.trim()).filter(Boolean).length;
+  const alleThemen = z.themen.slice(0, z.alleThemen ? 40 : 12);
   return h('div', { class: 'seite' },
-    h('div', { class: 'held' }, h('div', { class: 'logo' }, 'Essenz'), h('div', { class: 'leise' }, 'Das Wichtigste aus deinen Unterlagen – auf einem Blatt.')),
-    h('div', { class: 'flaeche spalte', style: { gap: '12px' } },
-      h('div', { class: 'ueberschrift-klein' }, 'Themen wählen'),
-      z.themen.length ? h('div', { class: 'zeile umbruch', style: { gap: '6px' } }, z.themen.slice(0, 24).map((t) => h('button', {
-        class: 'chip' + (z.auswahl.has(t) ? ' an' : ''),
-        onclick: () => { if (z.auswahl.has(t)) z.auswahl.delete(t); else z.auswahl.add(t); zeichnen(); },
-      }, t))) : h('div', { class: 'leise klein' }, 'Themen aus deinen Unterlagen erscheinen hier, sobald Lyra welche kennt.'),
-      eigen,
-      h('div', { class: 'zeile' },
+    lyra.kopf({ titel: 'Dein Formelblatt', unter: 'Wähle Themen – Essenz zieht Formeln, Definitionen, Sätze und Merksätze aus deinen Unterlagen und setzt sie kompakt auf ein Blatt.' }),
+    z.themen.length ? h('div', { class: 'themenwahl' },
+      h('div', { class: 'zeile', style: { marginBottom: '8px' } },
+        h('div', { class: 'ueberschrift-klein wachsen' }, 'Aus deinen Unterlagen'),
+        z.auswahl.size ? h('button', { class: 'knopf text klein', onclick: () => { z.auswahl = new Set(); zeichnen(); } }, 'Auswahl leeren') : null),
+      h('div', { class: 'zeile umbruch', style: { gap: '6px' } },
+        alleThemen.map((t) => h('button', {
+          class: 'chip' + (z.auswahl.has(t) ? ' an' : ''),
+          onclick: () => { if (z.auswahl.has(t)) z.auswahl.delete(t); else z.auswahl.add(t); zeichnen(); },
+        }, (z.auswahl.has(t) ? '✓ ' : '') + t)),
+        z.themen.length > 12 ? h('button', { class: 'ly-vorschlag mehr', onclick: () => { z.alleThemen = !z.alleThemen; zeichnen(); } }, z.alleThemen ? 'weniger' : `+ ${z.themen.length - 12} mehr`) : null)) : null,
+    lyra.verfasser({
+      wert: z.eigenes,
+      feld: 'eigen',
+      zeilen: 1,
+      platzhalter: z.themen.length ? 'Eigene Themen dazu – mehrere mit Semikolon, z. B. „Eigenwerte; Determinante“' : 'Themen – mehrere mit Semikolon, z. B. „Eigenwerte; Determinante; Taylorreihe“',
+      beiEingabe: (v) => { z.eigenes = v; },
+      leerErlaubt: z.auswahl.size > 0,
+      beiSenden: (v) => { z.eigenes = v; erstellen(); },
+      knopf: n > 1 ? `✨ Blatt aus ${n} Themen` : '✨ Blatt erstellen',
+      deaktiviert: !!z.laeuft,
+      unten: [
         z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf gross', id: 'los', disabled: z.laeuft || (!z.auswahl.size && !z.eigenes.trim()), onclick: erstellen }, '✨ Blatt erstellen')),
-      z.laeuft ? h('div', { class: 'lauf' }, h('div', { class: 'lade' }), h('span', { class: 'wachsen', id: 'status' }, z.status),
-        h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen')) : null,
-      z.fehler ? lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; erstellen(); } : null, () => { z.fehler = null; zeichnen(); }) : null),
-    z.blaetter.length ? h('div', { style: { marginTop: '18px' } },
-      h('div', { class: 'ueberschrift-klein', style: { marginBottom: '8px' } }, 'Deine Blätter'),
-      h('div', { class: 'raster' }, z.blaetter.map((b) => h('div', { class: 'karte klickbar blatt-kachel', onclick: () => { z.blatt = b; zeichnen(); } },
-        h('div', { class: 'fett' }, b.titel),
-        h('div', { class: 'klein leise' }, `${b.abschnitte.reduce((a, x) => a + x.eintraege.length, 0)} Einträge · ${new Date(b.zeit * 1000).toLocaleDateString('de-DE')}`))))) : null);
+        lyra.auswahl({ titel: 'Spalten', wert: z.einst.spalten, beiWahl: (w) => einstellungSetzen('spalten', w), optionen: [[1, '1'], [2, '2'], [3, '3']] }),
+        lyra.auswahl({ titel: 'Je Thema', wert: z.einst.anzahl, beiWahl: (w) => einstellungSetzen('anzahl', w), optionen: [[6, '6 Einträge'], [10, '10 Einträge'], [15, '15 Einträge'], [20, '20 Einträge']] }),
+      ],
+    }),
+    z.laeuft ? h('div', { style: { marginTop: '12px' } }, lyra.arbeit(z.status || 'Essenz arbeitet …')) : null,
+    z.fehler ? h('div', { style: { marginTop: '12px' } }, lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; erstellen(); } : null,
+      () => { z.fehler = null; zeichnen(); }, () => { z.fehler = null; erstellen(); })) : null,
+    z.blaetter.length ? lyra.abschnitt('Deine Blätter', h('div', { class: 'ly-liste' }, z.blaetter.map((b) => lyra.eintrag({
+      symbol: 'Σ',
+      titel: b.titel,
+      unter: `${b.abschnitte.reduce((a, x) => a + x.eintraege.length, 0)} Einträge · ${b.abschnitte.length} Themen · ${lyra.zeitText(b.zeit)}`,
+      beiKlick: () => { z.blatt = b; zeichnen(); },
+      aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => blattLoeschen(b) }],
+    })))) : null);
 }
 
 function blattAnsicht() {
@@ -292,7 +327,7 @@ function blattAnsicht() {
       h('button', { class: 'knopf tonal', onclick: () => exportieren('tex') }, 'LaTeX'),
       h('button', { class: 'knopf tonal', onclick: () => exportieren('md') }, 'Markdown'),
       h('button', { class: 'knopf text', onclick: async () => {
-        if (!window.confirm(`„${b.titel}“ löschen?`)) return;
+        if (!(await lyra.bestaetigen({ titel: `„${b.titel}“ löschen?`, text: ``, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
         try { await lyra.speicher.loeschen('blaetter/' + b.id); } catch (_) {}
         z.blaetter = z.blaetter.filter((x) => x.id !== b.id);
         z.blatt = null;

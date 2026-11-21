@@ -1,0 +1,26 @@
+{
+  "kennung": "justitia",
+  "name": "Justitia",
+  "version": "1.0.0",
+  "untertitel": "Gutachtenstil-Trainer für Jura",
+  "kategorie": "faecher",
+  "beschreibung": "Justitia stellt dir Übungsfälle aus BGB AT, Schuldrecht, Delikts- und Sachenrecht, Strafrecht und öffentlichem Recht – oder übernimmt deinen eigenen Sachverhalt. Du löst ihn im Gutachtenstil, mit Bausteinen für Obersatz, Definition, Subsumtion und Ergebnis und einem Stil-Check, der live mitliest. Danach korrigiert Justitia wie ein Korrektor: Punkte von 0 bis 18, was gelungen ist, was fehlt, Anmerkungen zu Stil und Aufbau. Die Musterlösung gibt es nur auf ausdrücklichen Wunsch.",
+  "farbe": "#7F1D1D",
+  "symbol": "<path d='M12 4.5v15' stroke-width='2'/><path d='M7.5 20.5h9' stroke-width='2.2'/><circle cx='12' cy='3.4' r='1.5'/><path d='M4.5 7h15' stroke-width='2'/><path d='M5.5 7.5l-2.7 6M5.5 7.5l2.7 6M18.5 7.5l-2.7 6M18.5 7.5l2.7 6' stroke-width='1.2' opacity='.75'/><path d='M2.3 13.3h6.4a3.2 3.2 0 0 1-6.4 0z'/><path d='M15.3 13.3h6.4a3.2 3.2 0 0 1-6.4 0z'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "speicher",
+    "startseite"
+  ],
+  "datenhinweis": "das Rechtsgebiet, der Fall und deine Lösung",
+  "funktionen": [
+    "Übungsfälle in acht Rechtsgebieten, auf Einstiegs- oder Klausurniveau – oder dein eigener Sachverhalt",
+    "Bausteine für Obersatz, Voraussetzung, Definition, Subsumtion und Ergebnis",
+    "Stil-Check live: Obersätze, Definitionen, Ergebnisse, Normzitate, Warnung bei Urteilsstil",
+    "Korrektur mit Punkten (0–18), Gelungenem, Fehlendem und Anmerkungen zu Stil, Inhalt, Aufbau",
+    "Erst ein Tipp, Musterlösung nur auf ausdrücklichen Wunsch",
+    "Fortschritt mit Punkteschnitt auf Lyras Startseite"
+  ],
+  "neuerungen": {}
+}

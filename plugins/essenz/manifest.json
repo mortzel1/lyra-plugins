@@ -1,14 +1,18 @@
 {
   "kennung": "essenz",
   "name": "Essenz",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Formelblatt aus deinen Unterlagen",
   "kategorie": "erstellen",
   "beschreibung": "Wähle Themen – Essenz zieht die wichtigsten Formeln, Definitionen, Sätze und Merksätze aus deinen Unterlagen und setzt sie kompakt auf ein Blatt, in einer bis drei Spalten. Alles lässt sich bearbeiten, umsortieren und ergänzen. Sichern als PDF (Druckdialog von macOS), LaTeX oder Markdown.",
   "farbe": "#0891B2",
-  "symbol": "M12 2.5c3 4 6 7.3 6 11a6 6 0 0 1-12 0c0-3.7 3-7 6-11Zm-2.8 11a2.8 2.8 0 0 0 2.8 2.8v1.6a4.4 4.4 0 0 1-4.4-4.4Z",
+  "symbol": "<rect x='4' y='2.5' width='16' height='19' rx='2.4' opacity='.5'/><path d='M15 6.5H9l3.5 4.5L9 15.5h6' stroke-width='2'/><path d='M8.5 18.5h7' stroke-width='1.6' opacity='.85'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["unterlagen", "ki", "speicher"],
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher"
+  ],
   "datenhinweis": "die gewählten Themen und passende Auszüge aus deinen Unterlagen",
   "funktionen": [
     "Formeln, Definitionen, Sätze und Merksätze je Thema – aus deinen Unterlagen",
@@ -17,5 +21,13 @@
     "Als PDF sichern oder drucken (Druckdialog von macOS)",
     "Export als LaTeX (mit multicols) oder Markdown",
     "Alle Blätter gespeichert – jederzeit wieder öffnen"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Neue Startseite: Themen antippen und gleich erstellen",
+      "Doppelte Einträge werden zusammengefasst",
+      "Blätter lassen sich direkt aus der Liste löschen",
+      "Neues Symbol"
+    ]
+  }
 }

@@ -225,37 +225,52 @@ function zeichnen() {
 }
 
 function laufZeile() {
-  return z.laeuft ? h('div', { class: 'lauf' }, h('div', { class: 'lade' }), h('span', { class: 'wachsen', id: 'status' }, z.status),
-    h('button', { class: 'knopf text klein', onclick: () => lyra.abbrechen() }, 'Abbrechen')) : null;
+  return z.laeuft ? h('div', { style: { marginTop: '12px' } }, lyra.arbeit(z.status || 'Lemma denkt nach …')) : null;
 }
 function fehlerZeile() {
   return z.fehler ? lyra.fehlerBox(z.fehler, z.lehrer !== 'lyra' && lyra.istOffline(z.fehler) ? () => { z.lehrer = 'lyra'; z.fehler = null; zeichnen(); } : null, () => { z.fehler = null; zeichnen(); }) : null;
 }
 
+async function beweisLoeschen(b) {
+  if (!(await lyra.bestaetigen({ titel: 'Beweis löschen?', text: 'Alle Schritte und Rückmeldungen dazu werden gelöscht.', ja: 'Löschen', gefahr: true }))) return;
+  try { await lyra.speicher.loeschen('beweise/' + b.id); } catch (_) {}
+  z.beweise = z.beweise.filter((x) => x.id !== b.id);
+  const offen = z.beweise.find((x) => !x.fertig);
+  lyra.startseite(offen ? [{ id: 'offen', titel: `Beweis: ${offen.satz.replace(/\$/g, '').slice(0, 60)}`, untertitel: `${offen.schritte.length} Schritte – weiterbeweisen?`,
+    route: 'beweis/' + offen.id, geaendert: offen.zeit, zeigen_bis: offen.zeit + 7 * 86400 }] : []).catch(() => {});
+  zeichnen();
+}
+
 function startAnsicht() {
-  const feld = h('textarea', { class: 'eingabe', 'data-feld': 'satz', rows: 3, placeholder: 'Was willst du beweisen? Formeln in LaTeX, z. B. „Für alle $n$ gilt $\\sum_{k=1}^n k = \\frac{n(n+1)}{2}$.“' });
-  feld.value = z.satzEntwurf;
   const vorschau = h('div', { class: 'vorschau' });
-  const malen = () => vorschau.replaceChildren(z.satzEntwurf.trim() ? mdElement(z.satzEntwurf) : h('span', { class: 'leise klein' }, 'Vorschau'));
-  feld.addEventListener('input', () => { z.satzEntwurf = feld.value; malen(); });
+  const malen = () => vorschau.replaceChildren(z.satzEntwurf.trim() ? mdElement(z.satzEntwurf) : h('span', { class: 'leise klein' }, 'Hier erscheint dein Satz mit gesetzten Formeln.'));
   malen();
+  const offen = z.beweise.filter((b) => !b.fertig), fertig = z.beweise.filter((b) => b.fertig);
+  const eintrag = (b) => lyra.eintrag({
+    symbol: b.fertig ? '∎' : '✎',
+    farbe: b.fertig ? 'var(--ok)' : '',
+    titel: b.satz.replace(/\$/g, '').slice(0, 120),
+    unter: `${b.schritte.length} Schritt${b.schritte.length === 1 ? '' : 'e'}${b.methode ? ` · ${b.methode}` : ''} · ${lyra.zeitText(b.zeit)}`,
+    beiKlick: () => { z.b = b; zeichnen(); },
+    aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => beweisLoeschen(b) }],
+  });
   return h('div', {},
-    h('div', { class: 'held' }, h('div', { class: 'logo' }, 'Lemma'), h('div', { class: 'leise' }, 'Beweise selbst führen – Schritt für Schritt, mit ehrlichem Feedback.')),
-    h('div', { class: 'flaeche spalte', style: { gap: '10px' } },
-      feld, vorschau,
-      h('div', { class: 'zeile' },
-        z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null,
-        h('span', { class: 'wachsen' }),
-        h('button', { class: 'knopf gross', disabled: z.laeuft, onclick: () => beginnen(z.satzEntwurf) }, 'Beweis beginnen')),
-      laufZeile(), fehlerZeile(),
-      h('div', { class: 'ueberschrift-klein', style: { marginTop: '6px' } }, 'Zum Üben'),
-      h('div', { class: 'spalte', style: { gap: '6px' } }, BEISPIELE.map((b) => h('button', { class: 'beispiel', onclick: () => { z.satzEntwurf = b; zeichnen(); } }, mdElement(b))))),
-    z.beweise.length ? h('div', { style: { marginTop: '18px' } },
-      h('div', { class: 'ueberschrift-klein', style: { marginBottom: '8px' } }, 'Deine Beweise'),
-      z.beweise.map((b) => h('div', { class: 'karte klickbar zeile', style: { marginBottom: '8px' }, onclick: () => { z.b = b; zeichnen(); } },
-        h('span', { class: 'status-punkt' + (b.fertig ? ' fertig' : '') }, b.fertig ? '∎' : '…'),
-        h('div', { class: 'wachsen' }, mdElement(b.satz.length > 140 ? b.satz.slice(0, 140) + '…' : b.satz)),
-        h('span', { class: 'klein leise' }, `${b.schritte.length} Schritte`)))) : null);
+    lyra.kopf({ titel: 'Was willst du beweisen?', unter: 'Du führst den Beweis selbst – Schritt für Schritt. Lemma prüft jeden Schritt ehrlich und verrät nichts, solange du nicht fragst.' }),
+    lyra.verfasser({
+      wert: z.satzEntwurf,
+      feld: 'satz',
+      platzhalter: 'Satz eingeben – Formeln in LaTeX, z. B. „Für alle $n$ gilt $\\sum_{k=1}^n k = \\frac{n(n+1)}{2}$.“',
+      beiEingabe: (v) => { z.satzEntwurf = v; malen(); },
+      beiSenden: (v) => beginnen(v),
+      knopf: 'Beweis beginnen',
+      deaktiviert: !!z.laeuft,
+      unten: [z.info ? lyra.lehrerWahl(z.info, z.lehrer, (l) => { z.lehrer = l; zeichnen(); }) : null],
+    }),
+    vorschau,
+    laufZeile(), fehlerZeile(),
+    offen.length ? lyra.abschnitt('Weiterbeweisen', h('div', { class: 'ly-liste' }, offen.map(eintrag))) : null,
+    lyra.abschnitt('Zum Üben', h('div', { class: 'beispiele' }, BEISPIELE.map((b) => h('button', { class: 'beispiel', onclick: () => { z.satzEntwurf = b; zeichnen(); const f = document.querySelector('[data-feld="satz"]'); if (f) f.focus(); } }, mdElement(b))))),
+    fertig.length ? lyra.abschnitt('Bewiesen ∎', h('div', { class: 'ly-liste' }, fertig.map(eintrag))) : null);
 }
 
 function beweisAnsicht() {
@@ -264,7 +279,7 @@ function beweisAnsicht() {
   feld.value = z.entwurf;
   const vorschau = h('div', { class: 'vorschau' });
   const malen = () => vorschau.replaceChildren(z.entwurf.trim() ? mdElement(z.entwurf) : h('span', { class: 'leise klein' }, 'Vorschau deiner Formeln'));
-  feld.addEventListener('input', () => { z.entwurf = feld.value; malen(); });
+  feld.addEventListener('input', () => { z.entwurf = feld.value; malen(); const k = document.getElementById('pruefen'); if (k) k.disabled = !!z.laeuft || !z.entwurf.trim(); });
   feld.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) pruefen(); });
   malen();
   const tippsBis = (n) => b.tipps.filter((t) => t.nachSchritt === n);
@@ -295,7 +310,7 @@ function beweisAnsicht() {
         h('button', { class: 'knopf text', disabled: z.laeuft, onclick: loesung }, 'Musterlösung …'),
         h('span', { class: 'wachsen' }),
         h('span', { class: 'klein leise' }, '⌘↩'),
-        h('button', { class: 'knopf', disabled: z.laeuft || !z.entwurf.trim(), onclick: pruefen }, 'Schritt prüfen')),
+        h('button', { class: 'knopf', id: 'pruefen', disabled: z.laeuft || !z.entwurf.trim(), onclick: pruefen }, 'Schritt prüfen')),
       laufZeile(), fehlerZeile()),
     b.loesung ? h('details', { class: 'loesung', open: true }, h('summary', {}, 'Musterlösung'), mdElement(b.loesung)) : null);
 }

@@ -1,0 +1,27 @@
+{
+  "kennung": "prisma",
+  "name": "Prisma",
+  "version": "1.0.0",
+  "untertitel": "Datenanalyse für CSV und Excel",
+  "kategorie": "buero",
+  "beschreibung": "Öffne eine CSV- oder Excel-Datei – Prisma zeigt dir die Tabelle, Kennzahlen je Spalte und passende Diagramme. Stell Fragen in Alltagssprache („Welche Filiale hatte im März den meisten Umsatz?“): Die KI schreibt dafür ein kleines Python-Programm, das abgeschottet auf deinem Mac rechnet – exakt statt geschätzt. Die Tabelle selbst verlässt deinen Mac nie.",
+  "farbe": "#2563EB",
+  "symbol": "<rect x='4' y='13' width='3.6' height='7' rx='1' opacity='.5'/><rect x='10.2' y='10' width='3.6' height='10' rx='1' opacity='.5'/><rect x='16.4' y='6.5' width='3.6' height='13.5' rx='1' opacity='.5'/><path d='M3 21h18' stroke-width='1.6'/><path d='M3.5 12l5.5-4.5 4 2.5 7.5-6.5' stroke-width='2'/><path d='M16.8 3.5h3.7v3.7' stroke-width='2'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "dateien",
+    "code",
+    "ki",
+    "speicher"
+  ],
+  "datenhinweis": "Spaltennamen, fünf Beispielzeilen und deine Frage – nie die ganze Tabelle",
+  "funktionen": [
+    "CSV, TSV und Excel (.xlsx) öffnen – Trennzeichen, deutsche Zahlen und Datumsangaben werden erkannt",
+    "Tabelle durchsuchen und nach jeder Spalte sortieren",
+    "Kennzahlen je Spalte: Summe, Mittelwert, Median, Quartile, Ausreißer, häufigste Werte",
+    "Diagramme: Säulen, Verlauf, Anteile, Streuung mit Trendlinie, Verteilung – als PNG oder SVG sichern",
+    "Fragen in Alltagssprache – gerechnet wird exakt mit Python, abgeschottet auf deinem Mac",
+    "Zuletzt geöffnete Tabellen samt Fragen bleiben gespeichert"
+  ],
+  "neuerungen": {}
+}

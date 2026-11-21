@@ -1,14 +1,19 @@
 {
   "kennung": "kompass",
   "name": "Kompass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Lernzeit rückwärts von deinen Fristen planen",
   "kategorie": "planen",
   "beschreibung": "Kompass nimmt deine Abgaben und Klausuren, fragt, wie viel Arbeit jede braucht und wie viel Zeit du an welchem Wochentag hast – und plant daraus rückwärts einen Wochenplan mit Lernblöcken zum Abhaken. Täglich erinnert dich macOS, was dran ist, und am Abend vor jeder Frist. Auf Lyras Startseite steht, was heute ansteht. Alles lokal, ganz ohne KI.",
   "farbe": "#EA580C",
-  "symbol": "M12 2a10 10 0 1 1 0 20a10 10 0 1 1 0-20Zm0 2a8 8 0 1 0 0 16a8 8 0 1 0 0-16Zm3.5 4.5-2 5-5 2 2-5Z",
+  "symbol": "<rect x='3' y='4.5' width='18' height='16.5' rx='3' opacity='.45'/><path d='M3 7.5a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3V9H3z'/><path d='M8 2.5v3.5M16 2.5v3.5' stroke-width='2'/><path d='M12 9.6l2.4 5.4H9.6z' transform='rotate(40 12 15)'/><path d='M9.6 15h4.8L12 20.4z' opacity='.55' transform='rotate(40 12 15)'/><circle class='aus' cx='12' cy='15' r='.9'/>",
   "einstieg": "index.html",
-  "berechtigungen": ["fristen", "speicher", "startseite", "erinnerungen"],
+  "berechtigungen": [
+    "fristen",
+    "speicher",
+    "startseite",
+    "erinnerungen"
+  ],
   "datenhinweis": "",
   "funktionen": [
     "Findet deine Abgaben und Klausuren der nächsten 120 Tage",
@@ -18,5 +23,10 @@
     "Tägliche Erinnerung zur Wunschzeit und am Abend vor jeder Frist (Mitteilung von macOS)",
     "Auf Lyras Startseite: was heute dran ist und die nächste Frist",
     "Komplett lokal – ohne KI, nichts verlässt deinen Mac"
-  ]
+  ],
+  "neuerungen": {
+    "1.0.1": [
+      "Neues Symbol"
+    ]
+  }
 }

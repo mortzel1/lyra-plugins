@@ -749,7 +749,7 @@ async function listeDialog() {
         try { const d = await lyra.speicher.lesen('docs/' + x.id); if (d) { z.docs[z.modus] = d; z.verlauf = []; z.sim = null; z.cyk = null; malen(); } } catch (_) {}
       } }, h('div', { class: 'fett' }, x.name), h('div', { class: 'leise klein' }, new Date(x.zeit * 1000).toLocaleString('de-DE'))),
       h('button', { class: 'knopf text', onclick: async () => {
-        if (!window.confirm(`„${x.name}“ löschen?`)) return;
+        if (!(await lyra.bestaetigen({ titel: `„${x.name}“ löschen?`, text: ``, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
         try { await lyra.speicher.loeschen('docs/' + x.id); } catch (_) {}
         z.liste = z.liste.filter((y) => y.id !== x.id);
         dialogZu();

@@ -1,0 +1,43 @@
+/* Sokrates – Olivgrün wie ein Lorbeerkranz, ein freundliches Gespräch statt eines Lösungsblatts. */
+:root { --farbe: #4d7c0f; --akzent: #4d7c0f; --akzent-weich: rgba(77, 124, 15, 0.11); }
+@media (prefers-color-scheme: dark) { :root { --akzent: #a3e635; --akzent-weich: rgba(163, 230, 53, 0.13); } }
+.knopf { background: var(--akzent); }
+@media (prefers-color-scheme: dark) { .knopf:not(.tonal):not(.text):not(.leise):not(.symbol):not(.rand) { color: #1a2e05; } .chip.an { color: #1a2e05; } }
+.knopf.tonal { background: var(--akzent-weich); color: var(--akzent); }
+.knopf.text { color: var(--akzent); }
+.chip.an { background: var(--akzent); color: #fff; }
+.kopf-eule { display: flex; gap: 14px; align-items: flex-start; }
+.kopf-eule .ly-kopf { flex: 1; }
+.eule { font-size: 40px; line-height: 1; margin-top: 2px; }
+.logo { font: 800 40px/1.15 "New York", "Iowan Old Style", Georgia, serif; background: linear-gradient(120deg, #4d7c0f, #65a30d 50%, #ca8a04); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.faecher { margin-bottom: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.fach { display: flex; align-items: center; gap: 7px; border: 1.5px solid var(--linie); background: var(--flaeche); border-radius: 11px; padding: 7px 10px; cursor: pointer; font: inherit; font-size: 13.5px; color: var(--text); }
+.fach:hover { border-color: color-mix(in srgb, var(--akzent) 40%, transparent); }
+.fach.an { border-color: var(--akzent); background: var(--akzent-weich); font-weight: 650; }
+.fach-symbol { font-size: 16px; }
+.fach-symbol.gross { font-size: 24px; }
+.chip.klasse { min-width: 34px; justify-content: center; }
+.aufgabe-feld { font-size: 15px; }
+.sitzung { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+.eine-zeile { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gruen { color: var(--ok); font-weight: 700; }
+.gespraech { display: flex; flex-direction: column; height: 100vh; max-width: 820px; margin: 0 auto; }
+.kopf { display: flex; align-items: center; gap: 12px; padding: 14px 22px 8px; }
+.verlauf { flex: 1; overflow: auto; padding: 8px 22px 20px; display: flex; flex-direction: column; gap: 12px; }
+.aufgabe-karte { background: var(--flaeche); border-radius: 14px; padding: 12px 16px; border-left: 4px solid var(--akzent); display: flex; flex-direction: column; gap: 6px; }
+.nachricht { display: flex; gap: 10px; align-items: flex-end; }
+.nachricht.ich { justify-content: flex-end; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--akzent-weich); display: flex; align-items: center; justify-content: center; font-size: 18px; flex: none; }
+.blase { max-width: 78%; border-radius: 18px; padding: 10px 14px; line-height: 1.55; font-size: 15px; }
+.sokrates .blase { background: var(--flaeche); border-bottom-left-radius: 6px; }
+.ich .blase { background: var(--akzent); color: #fff; border-bottom-right-radius: 6px; white-space: pre-wrap; }
+@media (prefers-color-scheme: dark) { .ich .blase { color: #1a2e05; } }
+.blase.tippt { display: flex; gap: 5px; padding: 14px 16px; }
+.blase.tippt span { width: 7px; height: 7px; border-radius: 50%; background: var(--leise); animation: tippen 1.2s infinite; }
+.blase.tippt span:nth-child(2) { animation-delay: .15s; } .blase.tippt span:nth-child(3) { animation-delay: .3s; }
+@keyframes tippen { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+.geschafft { align-self: center; text-align: center; background: linear-gradient(135deg, var(--akzent-weich), var(--flaeche)); border-radius: 18px; padding: 16px 24px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.geschafft.leise-rahmen { background: var(--flaeche); }
+.fuss { padding: 10px 22px 18px; border-top: 1px solid var(--linie); display: flex; flex-direction: column; gap: 8px; background: var(--grund); }
+.antwort-feld { flex: 1; resize: none; min-height: 46px; font-size: 15px; }
+.knopf.senden { padding: 12px 18px; }
