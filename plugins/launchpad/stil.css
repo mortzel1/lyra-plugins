@@ -1,0 +1,81 @@
+/* Launchpad – Nachthimmel-Blau mit warmem Raketen-Orange; der nächste Schritt steht immer vorn. */
+:root { --rakete: #ff7a3d; }
+.seite.breit { max-width: 1060px; }
+
+.held { text-align: center; margin: 10px 0 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.held h1 { font-size: 30px; letter-spacing: -0.02em; }
+.held .leise { max-width: 540px; line-height: 1.5; }
+.held-zeichen {
+  width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 4px;
+  background: radial-gradient(circle at 30% 25%, #4a5a78, var(--akzent) 60%, #141b29); box-shadow: 0 10px 26px rgba(39, 52, 73, .35);
+}
+
+.eine-zeile { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projekte { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.projekt-karte { display: flex; gap: 12px; align-items: center; background: var(--flaeche); border-radius: 16px; padding: 12px 12px 12px 14px; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.projekt-karte:hover { transform: translateY(-2px); box-shadow: var(--schatten); }
+.ring { position: relative; flex: none; color: var(--text); }
+.ring svg { display: block; }
+.ring svg circle:last-child { stroke: var(--rakete); }
+.ring > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+.projekt-held .ring > span { font-size: 19px; }
+.projekt-held .ring > span::after { content: '%'; font-size: 11px; margin-left: 1px; }
+
+.frage-karte { background: var(--flaeche); border-radius: 16px; padding: 14px 16px; }
+.chip.an { background: var(--akzent); color: #fff; }
+
+/* Projekt */
+.projekt-held { display: flex; gap: 18px; align-items: center; background: linear-gradient(120deg, #1c2536, var(--akzent) 60%, #3b4c6b); color: #fff; border-radius: 22px; padding: 20px 22px; box-shadow: var(--schatten); }
+.projekt-held h1 { color: #fff; font-size: 26px; }
+.projekt-held .ring { color: #fff; }
+.vision { opacity: .85; margin-top: 4px; line-height: 1.45; }
+.ziel { margin-top: 8px; font-size: 14px; background: rgba(255, 255, 255, .12); border-radius: 10px; padding: 7px 10px; display: inline-block; }
+.hinweis-spaet { margin-top: 12px; border-radius: 12px; padding: 10px 14px; font-size: 13.5px; background: color-mix(in srgb, var(--warnung) 14%, transparent); }
+.naechster { margin-top: 14px; background: var(--flaeche); border-radius: 18px; padding: 14px 16px; border: 2px solid color-mix(in srgb, var(--rakete) 55%, transparent); box-shadow: 0 8px 24px color-mix(in srgb, var(--rakete) 14%, transparent); }
+.naechster .ueberschrift-klein { color: var(--rakete); }
+.naechster-titel { font-size: 18px; font-weight: 750; }
+.naechster.geschafft { text-align: center; font-weight: 650; border-color: color-mix(in srgb, var(--ok) 50%, transparent); }
+.knopf:not(.tonal):not(.text):not(.symbol):not(.leise) { background: var(--rakete); color: #fff; }
+
+.projekt-raster { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; margin-top: 6px; }
+.seitenleiste { position: sticky; top: 12px; }
+ul.liste { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.45; }
+.risiko { background: var(--flaeche); border-radius: 12px; padding: 8px 11px; font-size: 13.5px; }
+
+/* Zeitleiste */
+.zeitleiste { position: relative; display: flex; flex-direction: column; gap: 10px; }
+.zeitleiste::before { content: ''; position: absolute; left: 15px; top: 16px; bottom: 16px; width: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); }
+.meilenstein { position: relative; display: flex; gap: 12px; }
+.meilenstein-punkt { flex: none; z-index: 1; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; background: var(--akzent); border: 3px solid var(--grund); }
+.meilenstein.fertig .meilenstein-punkt { background: var(--ok); }
+.meilenstein-inhalt { flex: 1; min-width: 0; background: var(--flaeche); border-radius: 16px; padding: 12px 14px; }
+.meilenstein-inhalt h3 { font-size: 16px; }
+.meilenstein.fertig .meilenstein-inhalt { opacity: .75; }
+.termin { flex: none; font-size: 12px; font-weight: 650; color: var(--leise); background: var(--karte); border-radius: 999px; padding: 2px 9px; }
+.termin.bald { color: var(--warnung); background: color-mix(in srgb, var(--warnung) 13%, transparent); }
+.termin.spaet { color: var(--falsch); background: color-mix(in srgb, var(--falsch) 12%, transparent); }
+.aufgaben { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+.aufgabe { display: flex; gap: 10px; align-items: center; padding: 7px 6px; border-radius: 10px; }
+.aufgabe:hover { background: var(--karte); }
+.aufgabe input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--ok); flex: none; cursor: pointer; }
+.aufgabe-titel { font-weight: 600; font-size: 14px; }
+.aufgabe.erledigt .aufgabe-titel { text-decoration: line-through; color: var(--leise); }
+
+/* Ergebnis */
+.ergebnis-panel { margin-top: 14px; background: var(--flaeche); border-radius: 18px; padding: 16px 18px; box-shadow: var(--schatten); border-top: 4px solid var(--rakete); animation: ly-auf .2s ease-out; }
+.ergebnis-text { font-size: 14.5px; line-height: 1.65; max-height: 520px; overflow: auto; }
+.live { white-space: pre-wrap; font: 13px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; color: var(--leise); max-height: 260px; overflow: auto; margin-top: 8px; }
+
+/* Coach */
+.coach { margin-top: 16px; background: var(--flaeche); border-radius: 18px; padding: 14px 16px; }
+.coach textarea { margin-top: 8px; }
+.coach-antwort { margin-top: 10px; background: var(--akzent-weich); border-radius: 12px; padding: 10px 13px; font-size: 14px; line-height: 1.55; }
+.vorschlag { display: flex; gap: 8px; align-items: center; border: 1px dashed color-mix(in srgb, var(--rakete) 50%, var(--linie)); border-radius: 12px; padding: 9px 11px; }
+
+@media (max-width: 820px) {
+  .projekt-raster { grid-template-columns: 1fr; }
+  .seitenleiste { position: static; }
+}
+@media (prefers-color-scheme: dark) {
+  .meilenstein-punkt { background: #4a5f86; }
+}

@@ -1,0 +1,28 @@
+{
+  "kennung": "veritas",
+  "name": "Veritas",
+  "version": "1.0.0",
+  "untertitel": "Faktencheck mit Quellen und Prozent-Einschätzung",
+  "kategorie": "recherche",
+  "beschreibung": "Füge eine Behauptung, eine Schlagzeile oder einen ganzen Artikel ein: Veritas zerlegt ihn in prüfbare Aussagen, sucht mit Claude oder ChatGPT im Internet nach seriösen Quellen und schätzt für jede Aussage in Prozent ein, wie wahrscheinlich sie stimmt. Was falsch ist, wird korrigiert; typische Merkmale von Fake News werden benannt und erklärt. Dazu gibt es Anknüpfungspunkte, die dir neues Wissen bringen. Mit Lyra (lokal) bleibt alles auf deinem Mac – dann ohne Internet und deutlich als Einschätzung aus Modellwissen gekennzeichnet.",
+  "farbe": "#7E22CE",
+  "symbol": "<circle cx='10' cy='10' r='7.3' opacity='.35'/><circle cx='10' cy='10' r='7.3' stroke-width='2.2'/><path d='M15.5 15.5l5.4 5.4' stroke-width='3.2'/><path d='M6.5 10.2l2.4 2.5 4.7-5.1' stroke-width='2.3'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "internet",
+    "speicher",
+    "dateien"
+  ],
+  "datenhinweis": "der Text, den du prüfen lässt – Claude bzw. ChatGPT suchen damit im Internet",
+  "funktionen": [
+    "Behauptungen, Schlagzeilen oder ganze Artikel prüfen – eingefügt oder als PDF, Word oder Text geöffnet",
+    "Jede Aussage einzeln: Wahrscheinlichkeit in Prozent, Begründung und Korrektur",
+    "Quellen aus der Websuche (Claude oder ChatGPT) – direkt anklickbar",
+    "Fake-News-Warnsignale: von der KI erklärt und zusätzlich automatisch gezählt (Reizwörter, Großbuchstaben, fehlende Quellen …)",
+    "Gesamturteil mit Glaubwürdigkeit und fehlendem Kontext",
+    "„Weiterdenken“: woher ein Mythos stammt, was die Forschung zeigt – neues Wissen statt nur richtig/falsch",
+    "Verlauf, Markdown-Export, Drucken/PDF; ohne Internet mit Lyra (lokal) als deutlich gekennzeichnete Einschätzung"
+  ],
+  "neuerungen": {}
+}

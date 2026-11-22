@@ -120,3 +120,11 @@ input[type=range] { accent-color: #f472b6; height: 30px; }
 .ly-vorschlag { background: rgba(255,255,255,0.08); }
 .ly-abschnitt-kopf h2 { color: var(--leise); }
 .md.gross-text { font-size: 20px; }
+
+/* Bilderfragen: echtes Foto aus Wikipedia mit Bildnachweis im Kleingedruckten */
+.frage-box.mit-foto { padding-top: 18px; }
+.foto { margin: 4px auto 14px; max-width: 640px; }
+.foto img { display: block; margin: 0 auto; max-width: 100%; max-height: 340px; border-radius: 16px; object-fit: contain; background: #f1eff8; box-shadow: 0 6px 18px rgba(29, 21, 51, 0.18); }
+.foto figcaption { margin-top: 7px; font-size: 11px; font-weight: 500; line-height: 1.4; color: #6b6380; }
+.foto-link { border: none; background: none; padding: 0; font: inherit; color: #7c3aed; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.foto-mini { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; flex: none; }

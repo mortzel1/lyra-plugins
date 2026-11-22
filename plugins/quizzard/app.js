@@ -13,6 +13,7 @@ const TYPEN = {
   reihenfolge: ['Reihenfolge', 'Schritte oder Ereignisse ordnen'],
   zuordnen: ['Zuordnen', 'Paare verbinden'],
   luecke: ['Lückentext', 'das fehlende Wort eintippen'],
+  bild: ['Bilderfrage', 'erkennen, was auf dem Foto zu sehen ist – echte Fotos aus Wikipedia (braucht Internet)'],
 };
 
 const STANDARD = {
@@ -48,6 +49,7 @@ const SCHEMA = {
         type: 'object',
         properties: {
           art: { type: 'string', enum: Object.keys(TYPEN) },
+          bild: { type: 'string' },
           frage: { type: 'string' },
           max: { type: 'number' },
           min: { type: 'number' },
@@ -59,7 +61,7 @@ const SCHEMA = {
           wissenswert: { type: 'string' },
           zahl_einheit: { type: 'string' },
         },
-        required: ['art', 'frage', 'max', 'min', 'optionen', 'paare', 'richtig', 'schwierigkeit', 'wert', 'wissenswert', 'zahl_einheit'],
+        required: ['art', 'bild', 'frage', 'max', 'min', 'optionen', 'paare', 'richtig', 'schwierigkeit', 'wert', 'wissenswert', 'zahl_einheit'],
       },
     },
   },
@@ -87,6 +89,7 @@ const z = {
   zeitRest: 0,
   zeitGesamt: 0,
   fuenfzigWeg: [],
+  bilder: {}, // id → Foto (data:-URL), aus dem Speicher geladen
 };
 const app = document.getElementById('app');
 const online = () => z.lehrer !== 'lyra';
@@ -264,6 +267,7 @@ async function quizSichern(q) {
 async function quizLoeschen(q) {
   if (!(await lyra.bestaetigen({ titel: `Quiz „${q.thema}“ löschen?`, text: `Die ${q.fragen.length} Fragen sind dann weg (dein Rekord bleibt).`, ja: 'Löschen', nein: 'Abbrechen', gefahr: true }))) return;
   try { await lyra.speicher.loeschen('spiele/' + q.id); } catch (_) {}
+  for (const f of q.fragen) if (f.art === 'bild' && f.bild) { try { await lyra.speicher.loeschen('bilder/' + f.bild.id); } catch (_) {} delete z.bilder[f.bild.id]; }
   z.spiele = z.spiele.filter((x) => x.id !== q.id);
   startseite();
   zeichnen();
@@ -281,8 +285,20 @@ function typenText() {
     reihenfolge: '"reihenfolge": 3 bis 5 "optionen" in der RICHTIGEN Reihenfolge (die App mischt sie)',
     zuordnen: '"zuordnen": 3 bis 4 "paare" aus "links" und "rechts", die zusammengehören',
     luecke: '"luecke": "frage" enthält ___ für das fehlende Wort; "optionen" sind die akzeptierten Antworten (Schreibweisen)',
+    bild: '"bild": Bilderfrage – "bild" ist NUR der Titel eines deutschen Wikipedia-Artikels (1–3 Wörter, z. B. „Rotfuchs“, '
+      + '„Kolosseum“, „Mona Lisa“ – keine Bildbeschreibung), dessen Hauptbild das Gesuchte eindeutig zeigt (ein Bauwerk, Tier, '
+      + 'eine Pflanze, ein Kunstwerk, eine Person, ein Gerät, Ort oder Organ); "frage" fragt danach, '
+      + 'ohne es zu verraten (z. B. „Welches Bauwerk ist hier zu sehen?“); genau 4 "optionen", eine richtig ("richtig": [Nummer ab 0]). '
+      + 'Nur, wenn es zum Thema passende, gut erkennbare Motive gibt – höchstens jede dritte Frage',
   };
   return an.map((t) => '- ' + b[t]).join('\n');
+}
+
+/** Schema nur mit den eingeschalteten Fragetypen (sonst greift ein kleines Modell gern zu „auswahl“). */
+function schemaFuer() {
+  const s = structuredClone(SCHEMA);
+  s.properties.fragen.items.properties.art.enum = Object.keys(TYPEN).filter((t) => z.einst.typen[t]);
+  return s;
 }
 
 function schwierigkeitText() {
@@ -335,8 +351,103 @@ function pruefen(f) {
     case 'luecke':
       if (!optionen.length) return null;
       return { ...q, frage: frage.includes('___') ? frage : frage + ' ___', optionen };
+    case 'bild':
+      if (!text(f.bild) || optionen.length < 2 || richtig.length !== 1 || richtig[0] >= optionen.length) return null;
+      return { ...q, optionen: optionen.slice(0, 6), richtig, begriff: text(f.bild).slice(0, 120) };
   }
   return null;
+}
+
+// ================================================================== Bilder (echte Fotos aus Wikipedia)
+
+/** Foto auf höchstens 900 px verkleinern (JPEG) – spart Platz im Speicher. */
+function verkleinern(daten) {
+  return new Promise((fertig) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const f = Math.min(1, 900 / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.naturalWidth * f));
+        c.height = Math.max(1, Math.round(img.naturalHeight * f));
+        const g = c.getContext('2d');
+        g.fillStyle = '#fff';
+        g.fillRect(0, 0, c.width, c.height);
+        g.drawImage(img, 0, 0, c.width, c.height);
+        const klein = c.toDataURL('image/jpeg', 0.84);
+        fertig(klein.length < daten.length ? klein : daten);
+      } catch (_) { fertig(daten); }
+    };
+    img.onerror = () => fertig(null);
+    img.src = daten;
+  });
+}
+
+/** Passt ein Artikeltitel zu einem Begriff? (wie im Kern: einer steckt im anderen und macht den Großteil davon aus) */
+function titelPasst(begriff, titel) {
+  const norm = (t) => String(t || '').split('(')[0].toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 's').replace(/[^a-z0-9]/g, '');
+  const a = norm(begriff), b = norm(titel);
+  const [kurz, lang] = a.length <= b.length ? [a, b] : [b, a];
+  return kurz.length >= 3 && lang.includes(kurz) && kurz.length * 10 >= lang.length * 6;
+}
+
+/** Zeigt das Foto wirklich das Gesuchte? Nein, wenn sein Artikel zu einer falschen Antwort passt. */
+function fotoPasst(f, b) {
+  if (!b || !b.gefunden) return false;
+  const falsche = f.optionen.filter((_, i) => !f.richtig.includes(i));
+  return !falsche.some((o) => titelPasst(o, b.artikel));
+}
+
+/** Holt die Fotos zu den Bilderfragen (Hauptbild des Wikipedia-Artikels) und speichert sie einzeln. Fragen ohne
+ *  passendes Foto fallen weg. → {fragen, meldung} */
+async function bilderHolen(quizId, fragen) {
+  const bild = fragen.filter((f) => f.art === 'bild');
+  if (!bild.length) return { fragen, meldung: '' };
+  z.hinweis = `Hole ${bild.length} Foto${bild.length === 1 ? '' : 's'} aus Wikipedia …`;
+  const el = document.getElementById('hinweis');
+  if (el) el.textContent = z.hinweis;
+  let liste = [];
+  let meldung = '';
+  try {
+    liste = await lyra.bilder(bild.map((f) => f.begriff));
+    // Zweiter Versuch mit der richtigen Antwort als Begriff, wo nichts Passendes kam
+    const nochmal = bild.map((f, i) => (fotoPasst(f, liste[i]) ? null : i)).filter((i) => i !== null);
+    if (nochmal.length) {
+      const zweite = await lyra.bilder(nochmal.map((i) => bild[i].optionen[bild[i].richtig[0]]));
+      nochmal.forEach((i, k) => { if (fotoPasst(bild[i], zweite[k])) liste[i] = zweite[k]; });
+    }
+  } catch (e) { meldung = 'Fotos ließen sich nicht laden (' + String((e && e.message) || e) + ') – die Bilderfragen fallen weg.'; }
+  for (const [i, f] of bild.entries()) {
+    const b = fotoPasst(f, liste[i]) ? liste[i] : null;
+    const daten = b && b.gefunden ? await verkleinern(b.bild) : null;
+    if (!daten) { f.weg = true; continue; }
+    const id = `${quizId}-${i}`;
+    try { await lyra.speicher.schreiben('bilder/' + id, daten); } catch (_) { f.weg = true; continue; }
+    z.bilder[id] = daten;
+    f.bild = { id, urheber: text(b.urheber), lizenz: text(b.lizenz), lizenzUrl: text(b.lizenzUrl), dateiUrl: text(b.dateiUrl), artikel: text(b.artikel), artikelUrl: text(b.artikelUrl) };
+  }
+  const weg = bild.filter((f) => f.weg).length;
+  if (weg && !meldung) meldung = weg === 1 ? 'Zu einer Bilderfrage gab es kein passendes Foto – sie fällt weg.' : `Zu ${weg} Bilderfragen gab es kein passendes Foto – sie fallen weg.`;
+  return { fragen: fragen.filter((f) => !f.weg), meldung };
+}
+
+/** Fotos eines Quiz laden (vor dem Spielen). Fehlt eins, fällt die Frage weg. */
+async function bilderLaden(fragen) {
+  for (const f of fragen) {
+    if (f.art !== 'bild' || !f.bild || z.bilder[f.bild.id]) continue;
+    try { const d = await lyra.speicher.lesen('bilder/' + f.bild.id); if (d) z.bilder[f.bild.id] = d; } catch (_) {}
+  }
+  return fragen.filter((f) => f.art !== 'bild' || (f.bild && z.bilder[f.bild.id]));
+}
+
+function foto(f, fertig) {
+  const b = f.bild;
+  const link = (t, url) => (url ? h('button', { class: 'foto-link', onclick: () => lyra.link(url).catch(() => {}) }, t) : t);
+  return h('figure', { class: 'foto' },
+    h('img', { src: z.bilder[b.id], alt: fertig ? b.artikel : 'Foto zur Frage' }),
+    h('figcaption', {},
+      'Foto: ', b.urheber || 'unbekannt', b.lizenz ? ` · ${b.lizenz}` : '', ' · ', link('Wikimedia Commons', b.dateiUrl),
+      fertig && b.artikelUrl ? [' · Mehr dazu: ', link(`Wikipedia – ${b.artikel}`, b.artikelUrl)] : null));
 }
 
 async function erstellen() {
@@ -345,6 +456,7 @@ async function erstellen() {
   const anzahl = Math.max(3, Math.min(50, z.einst.anzahl));
   z.ansicht = 'zaubern';
   z.fehler = null;
+  z.meldung = '';
   z.hinweis = 'Suche passende Stellen …';
   zeichnen();
   let block = '';
@@ -356,7 +468,7 @@ async function erstellen() {
       return zeichnen();
     }
   }
-  const fragen = [];
+  let fragen = [];
   const proRunde = online() ? 15 : 8;
   let leer = 0;
   while (fragen.length < anzahl && leer < 2) {
@@ -371,10 +483,10 @@ async function erstellen() {
 ${block ? `Auszüge aus meinen Unterlagen (stütze dich darauf${z.einst.quelle === 'beides' ? ', ergänze mit Allgemeinwissen' : ''}):\n\n${block}` : 'Nutze gesichertes Allgemeinwissen.\n\n'}\
 ${schon ? `Diese Fragen gibt es schon – keine davon wiederholen:\n${schon}\n\n` : ''}\
 Erstelle genau ${n} neue Quizfragen. Mische diese Fragetypen möglichst gleichmäßig (nie mehrmals hintereinander derselbe):\n${typenText()}\n\n\
-Alle Felder sind Pflicht – was ein Typ nicht braucht, bleibt leer ("optionen": [], "paare": [], "richtig": [], "wert": 0, "min": 0, "max": 0, "zahl_einheit": ""). \
+Alle Felder sind Pflicht – was ein Typ nicht braucht, bleibt leer ("bild": "", "optionen": [], "paare": [], "richtig": [], "wert": 0, "min": 0, "max": 0, "zahl_einheit": ""). \
 "wissenswert" erklärt in 1 bis 2 Sätzen die Lösung, gern mit einem Aha-Fakt. "schwierigkeit": 1 leicht, 2 mittel, 3 schwer.\n\n\
-Antwort als JSON: {"fragen": [{"art": "auswahl", "frage": "…", "max": 0, "min": 0, "optionen": ["…"], "paare": [], "richtig": [0], "schwierigkeit": 1, "wert": 0, "wissenswert": "…", "zahl_einheit": ""}]}`,
-        schema: SCHEMA,
+Antwort als JSON: {"fragen": [{"art": "auswahl", "bild": "", "frage": "…", "max": 0, "min": 0, "optionen": ["…"], "paare": [], "richtig": [0], "schwierigkeit": 1, "wert": 0, "wissenswert": "…", "zahl_einheit": ""}]}`,
+        schema: schemaFuer(),
         zaehlen: { schluessel: 'frage', wort: 'Frage' },
       }, (e) => {
         if (e.art === 'hinweis') {
@@ -396,14 +508,18 @@ Antwort als JSON: {"fragen": [{"art": "auswahl", "frage": "…", "max": 0, "min"
     leer = neu.length ? 0 : leer + 1;
     fragen.push(...neu.slice(0, anzahl - fragen.length));
   }
+  const id = lyra.neueId();
+  const mitBildern = await bilderHolen(id, fragen);
+  fragen = mitBildern.fragen;
   if (fragen.length < 3) {
-    z.fehler = z.fehler || 'Das Quiz ist nicht gelungen – bitte nochmal versuchen.';
+    z.fehler = z.fehler || mitBildern.meldung || 'Das Quiz ist nicht gelungen – bitte nochmal versuchen.';
     z.ansicht = 'lobby';
     return zeichnen();
   }
   if (z.einst.schwierigkeit === 'steigend') fragen.sort((a, b) => a.schwierigkeit - b.schwierigkeit);
   // Erst sichern, dann fragen: jetzt spielen oder später?
-  const quiz = { id: lyra.neueId(), thema, fragen, zeit: lyra.jetzt(), gespielt: 0 };
+  const quiz = { id, thema, fragen, zeit: lyra.jetzt(), gespielt: 0 };
+  z.meldung = mitBildern.meldung;
   await quizSichern(quiz);
   z.bereit = quiz;
   z.ansicht = 'bereit';
@@ -414,8 +530,9 @@ Antwort als JSON: {"fragen": [{"art": "auswahl", "frage": "…", "max": 0, "min"
 
 // ================================================================== Spielen
 
-function spielStarten(quiz, nurDiese) {
-  const fragen = (nurDiese || quiz.fragen).map((f) => vorbereiten(f));
+async function spielStarten(quiz, nurDiese) {
+  const fragen = (await bilderLaden(nurDiese || quiz.fragen)).map((f) => vorbereiten(f));
+  if (!fragen.length) { z.fehler = 'Die Fotos dieses Quiz fehlen – bitte erstelle es neu.'; z.ansicht = 'lobby'; return zeichnen(); }
   const jk = z.einst.jokerAnzahl;
   z.spiel = {
     quiz,
@@ -434,7 +551,7 @@ function spielStarten(quiz, nurDiese) {
 /** Antworten mischen (die richtigen Nummern merken). */
 function vorbereiten(f) {
   const q = structuredClone(f);
-  if ((q.art === 'auswahl' || q.art === 'mehrfach') && z.einst.mischen) {
+  if ((q.art === 'auswahl' || q.art === 'mehrfach' || q.art === 'bild') && z.einst.mischen) {
     const reihe = lyra.mischen(q.optionen.map((o, i) => ({ o, i })));
     q.optionen = reihe.map((x) => x.o);
     q.richtig = reihe.map((x, neu) => (f.richtig.includes(x.i) ? neu : -1)).filter((x) => x >= 0);
@@ -524,6 +641,7 @@ function abstand(a, b) {
 function bewerten(f, e, zeitAus) {
   switch (f.art) {
     case 'auswahl':
+    case 'bild':
     case 'wahrfalsch':
       return e.length === 1 && f.richtig.includes(e[0]) ? 1 : 0;
     case 'mehrfach': {
@@ -612,7 +730,7 @@ function joker(art) {
   const f = s.fragen[z.pos];
   if (!s.joker[art] || z.ansicht !== 'frage') return;
   if (art === 'fuenfzig') {
-    if (f.art !== 'auswahl' || z.fuenfzigWeg.length) return;
+    if ((f.art !== 'auswahl' && f.art !== 'bild') || z.fuenfzigWeg.length) return;
     const falsche = lyra.mischen(f.optionen.map((_, i) => i).filter((i) => !f.richtig.includes(i)));
     z.fuenfzigWeg = falsche.slice(0, Math.max(1, f.optionen.length - 2));
   } else if (art === 'zeit') {
@@ -795,6 +913,7 @@ function bereitAnsicht() {
     h('div', { class: 'slogan' }, `${q.fragen.length} Fragen zu „${q.thema}“`),
     h('div', { class: 'zeile umbruch', style: { justifyContent: 'center', gap: '6px', margin: '10px 0 18px' } },
       Object.entries(anzahl).map(([a, n]) => h('span', { class: 'pill' }, `${n}× ${TYPEN[a][0]}`))),
+    z.meldung ? h('div', { class: 'meldung', style: { maxWidth: '520px', margin: '0 auto 14px' } }, z.meldung) : null,
     h('div', { class: 'zeile', style: { justifyContent: 'center', marginBottom: '22px' } }, zeitlimitZeile()),
     h('div', { class: 'zeile', style: { justifyContent: 'center', gap: '12px' } },
       h('button', { class: 'knopf riesig', onclick: () => { const x = z.bereit; z.bereit = null; spielStarten(x); } }, 'Jetzt spielen ▶'),
@@ -817,12 +936,13 @@ function frageAnsicht() {
     h('span', { class: 'pill' }, `⭐ ${zahlFormat(s.punkte)}`),
     s.serie >= 2 ? h('span', { class: 'pill serie' }, `🔥 ${s.serie}`) : null,
     h('span', { class: 'wachsen' }),
-    !fertig && j.fuenfzig && f.art === 'auswahl' ? h('button', { class: 'knopf tonal klein', onclick: () => joker('fuenfzig'), title: 'Zwei falsche Antworten weg (halbe Punkte)' }, `50:50 ×${j.fuenfzig}`) : null,
+    !fertig && j.fuenfzig && (f.art === 'auswahl' || f.art === 'bild') ? h('button', { class: 'knopf tonal klein', onclick: () => joker('fuenfzig'), title: 'Zwei falsche Antworten weg (halbe Punkte)' }, `50:50 ×${j.fuenfzig}`) : null,
     !fertig && j.zeit && z.zeitGesamt ? h('button', { class: 'knopf tonal klein', onclick: () => joker('zeit') }, `+10 s ×${j.zeit}`) : null,
     !fertig && j.ueberspringen ? h('button', { class: 'knopf tonal klein', onclick: () => joker('ueberspringen') }, `⏭ ×${j.ueberspringen}`) : null,
     z.zeitGesamt && !fertig ? h('span', { class: 'pill', id: 'sekunden' }, `${Math.ceil(z.zeitRest)} s`) : null);
   const balken = z.zeitGesamt ? h('div', { class: 'zeitbalken' }, h('div', { style: { width: `${fertig ? 0 : (z.zeitRest / z.zeitGesamt) * 100}%` } })) : h('div', { style: { height: '14px' } });
-  const frage = h('div', { class: 'frage-box' }, h('div', { class: 'typ' }, TYPEN[f.art][0]), mdElement(f.frage.replace('___', '＿＿＿')));
+  const frage = h('div', { class: 'frage-box' + (f.art === 'bild' ? ' mit-foto' : '') }, h('div', { class: 'typ' }, TYPEN[f.art][0]),
+    f.art === 'bild' && f.bild && z.bilder[f.bild.id] ? foto(f, fertig) : null, mdElement(f.frage.replace('___', '＿＿＿')));
   return h('div', {}, kopf, balken, frage, antwortBereich(f, fertig), fertig ? feedback(f) : null);
 }
 
@@ -831,6 +951,7 @@ function antwortBereich(f, fertig) {
   const buchstaben = ['A', 'B', 'C', 'D', 'E', 'F'];
   switch (f.art) {
     case 'auswahl':
+    case 'bild':
     case 'mehrfach':
     case 'wahrfalsch': {
       const mehrere = f.art === 'mehrfach';
@@ -961,6 +1082,7 @@ function endeAnsicht() {
         const a = s.antworten[i] || { teil: 0 };
         return h('div', { class: 'zeile-r' },
           h('span', { style: { fontSize: '20px' } }, a.teil >= 0.999 ? '✅' : a.teil > 0 ? '🟡' : '❌'),
+          f.art === 'bild' && f.bild && z.bilder[f.bild.id] ? h('img', { class: 'foto-mini', src: z.bilder[f.bild.id], alt: f.bild.artikel, title: `Foto: ${f.bild.urheber || 'unbekannt'} · ${f.bild.lizenz} · Wikimedia Commons` }) : null,
           h('div', { class: 'wachsen' }, mdElement(f.frage), mdElement(loesungText(f), 'leise klein'),
             z.einst.erklaerung === 'nie' && f.wissenswert ? h('div', { class: 'klein', style: { marginTop: '4px' } }, mdElement('💡 ' + f.wissenswert)) : null),
           h('span', { class: 'fett' }, a.punkte ? `+${zahlFormat(a.punkte)}` : ''));
@@ -969,7 +1091,7 @@ function endeAnsicht() {
 
 function loesungText(f) {
   switch (f.art) {
-    case 'auswahl': case 'mehrfach': case 'wahrfalsch': return 'Richtig: ' + f.richtig.map((i) => f.optionen[i]).join(', ');
+    case 'auswahl': case 'bild': case 'mehrfach': case 'wahrfalsch': return 'Richtig: ' + f.richtig.map((i) => f.optionen[i]).join(', ');
     case 'schaetzen': return `Richtig: ${fmt(f.wert)} ${f.einheit}`;
     case 'reihenfolge': return 'Reihenfolge: ' + f.loesung.join(' → ');
     case 'zuordnen': return f.paare.map((p) => `${p.links} – ${p.rechts}`).join(' · ');

@@ -1,0 +1,28 @@
+{
+  "kennung": "scout",
+  "name": "Scout",
+  "version": "1.0.0",
+  "untertitel": "Recherchiert im Netz und schreibt dir ein Skript",
+  "kategorie": "recherche",
+  "beschreibung": "Nenne ein Thema, wie lange recherchiert werden soll und wie umfangreich das Ergebnis sein soll – auf Wunsch auch, aus welchem Zeitraum die Quellen stammen sollen. Scout plant eine Gliederung, sucht in mehreren Runden mit Claude oder ChatGPT im Internet nach Material (Fakten, Zahlen, Positionen, neueste Entwicklungen, Kontroversen) und schreibt daraus ein Recherche-Skript mit allen wichtigen Infos. Jede Aussage ist mit einer anklickbaren Quelle belegt. Mit Lyra (lokal) bleibt dein Thema auf dem Mac: Scout schlägt dann in Wikipedia & Co. nach – hinaus geht nur eine kurze Suchanfrage.",
+  "farbe": "#65A30D",
+  "symbol": "<rect x='3' y='3.5' width='6.6' height='9.5' rx='2.2' opacity='.55'/><rect x='14.4' y='3.5' width='6.6' height='9.5' rx='2.2' opacity='.55'/><rect x='9' y='6.6' width='6' height='3.6' rx='1.2'/><circle cx='6.4' cy='15.6' r='5.1'/><circle cx='17.6' cy='15.6' r='5.1'/><circle class='aus' cx='6.4' cy='15.6' r='2.7'/><circle class='aus' cx='17.6' cy='15.6' r='2.7'/><circle cx='5.5' cy='14.7' r='.9' opacity='.8'/><circle cx='16.7' cy='14.7' r='.9' opacity='.8'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "internet",
+    "speicher"
+  ],
+  "datenhinweis": "dein Thema und deine Fragen – Claude bzw. ChatGPT suchen damit im Internet",
+  "funktionen": [
+    "Thema, Recherchezeit (2 bis 20 Minuten) und Umfang (kurz bis ausführlich) wählen",
+    "Zeitraum der Quellen: letzte Woche, letzter Monat, letztes Jahr, eigener Zeitraum oder beliebig",
+    "Mehrere Recherche-Runden: Gliederung, Grundlagen, Neuestes, Kontroversen, Vertiefung – live im Recherche-Tagebuch",
+    "„Jetzt schreiben“: jederzeit mit dem bisher Gefundenen das Skript schreiben lassen",
+    "Skript mit Überblick, Kapiteln, Kontroversen, Glossar und anklickbaren Quellenverweisen",
+    "Quellenliste mit Datum – Quellen außerhalb des Zeitraums sind markiert",
+    "Bibliothek deiner Recherchen, Export als Markdown, Drucken/PDF",
+    "Mit Lyra (lokal): Recherche in Wikipedia, Wikibooks und Stack Exchange – nur eine kurze Suchanfrage geht hinaus"
+  ],
+  "neuerungen": {}
+}

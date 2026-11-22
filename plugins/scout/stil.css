@@ -1,0 +1,82 @@
+/* Scout – frisches Grün, Recherche-Tagebuch beim Arbeiten, Skript wie ein gesetztes Dokument. */
+.seite.breit { max-width: 1040px; }
+
+.held { text-align: center; margin: 10px 0 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.held h1 { font-size: 29px; letter-spacing: -0.02em; }
+.held .leise { max-width: 540px; line-height: 1.5; }
+.held-zeichen {
+  width: 54px; height: 54px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-size: 27px; margin-bottom: 4px;
+  background: linear-gradient(140deg, color-mix(in oklab, var(--akzent), #fff 24%), var(--akzent) 55%, color-mix(in oklab, var(--akzent), #000 24%));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--akzent) 30%, transparent);
+}
+.held-zeichen.klein { width: 44px; height: 44px; border-radius: 13px; font-size: 21px; margin: 0; flex: none; }
+
+.plan-zeile { margin-top: 10px; font-size: 12.5px; color: var(--leise); text-align: center; }
+.hinweis-offline { margin-top: 10px; font-size: 13px; line-height: 1.5; border-radius: 12px; padding: 9px 13px; background: var(--akzent-weich); }
+.fusszeile { margin-top: 26px; text-align: center; font-size: 12px; color: var(--leise); }
+input.datum { font: inherit; font-size: 13px; border: 1px solid var(--linie); border-radius: 8px; background: var(--flaeche); color: var(--text); padding: 4px 7px; }
+
+/* Laufende Recherche */
+.lauf-kopf { display: flex; gap: 14px; align-items: center; }
+.lauf-kopf h2 { font-size: 20px; }
+.zahlen { display: flex; gap: 8px; }
+.zahlen > div { display: flex; flex-direction: column; align-items: center; min-width: 70px; background: var(--flaeche); border-radius: 12px; padding: 7px 10px; }
+.zahlen b { font-size: 21px; color: var(--akzent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.zahlen span { font-size: 11px; color: var(--leise); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+.uhr { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.uhr-balken { height: 7px; border-radius: 99px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.uhr-balken > div { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, color-mix(in oklab, var(--akzent), #fff 25%), var(--akzent)); transition: width 1s linear; }
+.tagebuch { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.schritt { display: flex; gap: 10px; align-items: flex-start; background: var(--flaeche); border-radius: 12px; padding: 9px 12px; animation: ly-auf .2s ease-out; }
+.schritt-zeichen { flex: none; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; background: var(--akzent); margin-top: 1px; }
+.schritt.laeuft .schritt-zeichen { background: transparent; color: var(--akzent); border: 2px solid var(--akzent); border-right-color: transparent; animation: drehen 1s linear infinite; font-size: 0; }
+.schritt.fehler .schritt-zeichen { background: var(--warnung); }
+.schritt.stopp .schritt-zeichen { background: var(--leise); }
+.schritt-text { font-weight: 600; font-size: 14px; }
+@keyframes drehen { to { transform: rotate(360deg); } }
+.live { margin-top: 12px; white-space: pre-wrap; font: 13px/1.6 "Iowan Old Style", Georgia, serif; background: var(--flaeche); border-radius: 14px; padding: 14px 16px; max-height: 320px; overflow: auto; color: var(--leise); }
+
+/* Fertiges Skript */
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mini { font-size: 12px; font-weight: 650; border-radius: 999px; padding: 3px 10px; color: var(--akzent); background: var(--akzent-weich); }
+.skript-raster { display: block; }
+.skript-raster.mit-toc { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 22px; align-items: start; }
+.toc { position: sticky; top: 14px; display: flex; flex-direction: column; gap: 2px; max-height: calc(100vh - 30px); overflow: auto; }
+.toc-punkt { text-align: left; border: none; background: transparent; color: var(--leise); font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; cursor: pointer; line-height: 1.35; }
+.toc-punkt:hover { background: var(--akzent-weich); color: var(--akzent); }
+.skript-blatt { background: var(--flaeche); border-radius: 18px; padding: 30px 38px 34px; box-shadow: var(--schatten); }
+.skript.md { font: 15.5px/1.72 "Iowan Old Style", Georgia, serif; }
+/* Lyras Markdown setzt „#“ als h2, „##“ als h3, „###“ als h4 */
+.skript.md h2 { font: 750 27px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; letter-spacing: -0.02em; margin: 0 0 16px; }
+.skript.md h3 { font: 700 19px/1.3 -apple-system, BlinkMacSystemFont, sans-serif; margin: 28px 0 8px; padding-top: 12px; border-top: 1px solid var(--linie); scroll-margin-top: 14px; }
+.skript.md h4 { font: 650 16px/1.3 -apple-system, BlinkMacSystemFont, sans-serif; margin: 18px 0 6px; }
+.skript.md blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 4px solid var(--akzent); background: var(--akzent-weich); border-radius: 0 12px 12px 0; font-size: 16.5px; }
+.skript.md table { font: 13.5px/1.45 -apple-system, BlinkMacSystemFont, sans-serif; }
+.zitate { white-space: nowrap; margin-left: 2px; line-height: 0; vertical-align: 0.45em; }
+.zitat { border: none; background: var(--akzent-weich); color: var(--akzent); font: 700 10.5px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; padding: 1px 4px; border-radius: 5px; margin: 0 1px; cursor: pointer; }
+.zitat:hover { background: var(--akzent); color: #fff; }
+.zitat.alt { background: color-mix(in srgb, var(--warnung) 16%, transparent); color: var(--warnung); }
+.quelle { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: none; background: var(--flaeche); color: var(--text); border-radius: 12px; padding: 9px 12px; font: inherit; cursor: pointer; }
+.quelle:hover { background: var(--akzent-weich); }
+.quelle.alt { box-shadow: inset 3px 0 0 var(--warnung); }
+.quelle-nr { flex: none; min-width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--akzent); background: var(--akzent-weich); }
+.quelle-titel { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.quelle-pfeil { color: var(--akzent); flex: none; }
+ul.material { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 7px; font-size: 14px; line-height: 1.55; }
+.nur-druck { display: none; }
+
+@media (max-width: 760px) {
+  .skript-raster.mit-toc { display: block; }
+  .toc { display: none; }
+  .skript-blatt { padding: 22px 20px; }
+}
+
+@media print {
+  .nur-bildschirm, .knopf, .toc { display: none !important; }
+  .nur-druck { display: block; }
+  .nur-druck ol { font-size: 11px; word-break: break-all; }
+  body { background: #fff !important; }
+  .skript-raster.mit-toc { display: block; }
+  .skript-blatt { box-shadow: none; padding: 0; }
+  .zitat { background: none; padding: 0; color: #555; }
+}

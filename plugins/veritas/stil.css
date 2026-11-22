@@ -1,0 +1,84 @@
+/* Veritas – tiefes Violett, Ergebnis als Ring, jede Aussage mit Farbskala von Rot bis Grün. */
+.seite.breit { max-width: 880px; }
+
+.held { text-align: center; margin: 10px 0 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.held h1 { font-size: 30px; letter-spacing: -0.02em; }
+.held .leise { max-width: 560px; line-height: 1.5; }
+.held-zeichen {
+  width: 54px; height: 54px; border-radius: 17px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 4px;
+  background: linear-gradient(140deg, color-mix(in oklab, var(--akzent), #fff 22%), var(--akzent) 55%, color-mix(in oklab, var(--akzent), #000 25%));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--akzent) 30%, transparent);
+}
+
+.hinweis-offline { margin-top: 10px; font-size: 13px; line-height: 1.5; border-radius: 12px; padding: 9px 13px; background: color-mix(in srgb, var(--warnung) 12%, transparent); }
+.fusszeile { margin-top: 26px; text-align: center; font-size: 12px; color: var(--leise); }
+
+.wert-etikett { font-size: 12.5px; font-weight: 750; color: var(--s); background: color-mix(in srgb, var(--s) 13%, transparent); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+
+/* Gesamturteil */
+.gesamt { display: flex; gap: 22px; align-items: center; padding: 20px 22px; border: 1px solid color-mix(in srgb, var(--s) 25%, var(--linie)); background: linear-gradient(120deg, color-mix(in srgb, var(--s) 7%, var(--flaeche)), var(--flaeche) 60%); }
+.ring { position: relative; flex: none; color: var(--text); }
+.ring svg { display: block; }
+.ring svg circle:last-child { transition: stroke-dasharray .6s ease; }
+.ring-mitte { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-zahl { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; color: var(--s); line-height: 1; }
+.ring-zahl small { font-size: 16px; font-weight: 700; margin-left: 1px; }
+.ring-text { font-size: 11px; color: var(--leise); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; margin-top: 4px; }
+.gesamt-urteil { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--s); }
+.gesamt-thema { margin: 3px 0 6px; font-size: 21px; }
+.gesamt-fazit { line-height: 1.6; font-size: 14.5px; }
+.mini { font-size: 12px; font-weight: 650; border-radius: 999px; padding: 2px 9px; color: var(--s); background: color-mix(in srgb, var(--s) 12%, transparent); }
+.mini.herkunft { --s: var(--akzent); }
+.mini.herkunft.ohne { --s: var(--leise); }
+
+.kontext { margin-top: 12px; display: flex; gap: 10px; font-size: 14px; line-height: 1.55; background: var(--flaeche); border-radius: 14px; padding: 12px 14px; }
+.kontext-titel { font-weight: 700; white-space: nowrap; }
+
+/* Aussagen */
+.aussage { background: var(--flaeche); border-radius: 14px; padding: 14px 16px; border-left: 4px solid var(--s); }
+.aussage-kopf { display: flex; gap: 10px; align-items: flex-start; }
+.aussage-nr { flex: none; width: 22px; height: 22px; border-radius: 7px; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--s); background: color-mix(in srgb, var(--s) 13%, transparent); margin-top: 1px; }
+.aussage-text { line-height: 1.45; }
+.urteil { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.urteil-name { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--s); white-space: nowrap; }
+.urteil-wert { font-size: 18px; font-weight: 800; color: var(--s); line-height: 1.1; }
+.skala { height: 6px; border-radius: 99px; margin: 10px 0 2px 32px; background: color-mix(in srgb, var(--text) 8%, transparent); position: relative; }
+.skala > div { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--s); }
+.begruendung { margin: 9px 0 0 32px; font-size: 14px; line-height: 1.6; }
+.korrektur { margin: 10px 0 0 32px; border-radius: 10px; padding: 9px 12px; font-size: 14px; line-height: 1.55; background: color-mix(in srgb, var(--ok) 11%, transparent); }
+.korrektur-titel { display: block; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ok); margin-bottom: 2px; }
+.quellen { margin: 10px 0 0 32px; display: flex; flex-direction: column; gap: 5px; }
+.quelle { display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left; border: none; background: var(--karte); color: var(--text); border-radius: 9px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.quelle:hover { background: var(--akzent-weich); }
+.quelle-domain { flex: none; font-weight: 700; color: var(--akzent); font-size: 12px; }
+.quelle-titel { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--leise); }
+.quelle-pfeil { flex: none; color: var(--akzent); }
+
+/* Warnsignale */
+.signal { display: flex; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.5; background: var(--flaeche); border-radius: 12px; padding: 9px 12px; }
+.signal-name { flex: none; font-weight: 750; color: var(--falsch); }
+.stil { background: var(--flaeche); border-radius: 12px; padding: 10px 12px; }
+.stil-chip { font-size: 12.5px; border-radius: 999px; padding: 3px 10px; background: color-mix(in srgb, var(--warnung) 13%, transparent); }
+
+/* Weiterdenken */
+.weiter { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.weiter-karte { background: var(--flaeche); border-radius: 14px; padding: 12px 14px; border-top: 3px solid var(--akzent); }
+
+.gepruefter-text { white-space: pre-wrap; font: 13.5px/1.65 "Iowan Old Style", Georgia, serif; background: var(--flaeche); border-radius: 12px; padding: 12px 14px; max-height: 150px; overflow: hidden; position: relative; }
+.gepruefter-text:not(.offen)::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 50px; background: linear-gradient(transparent, var(--flaeche)); }
+.gepruefter-text.offen { max-height: none; }
+
+@media (max-width: 620px) {
+  .gesamt { flex-direction: column; text-align: center; }
+  .gesamt .zeile { justify-content: center; }
+}
+
+@media print {
+  .nur-bildschirm, .knopf, .ly-zurueck { display: none !important; }
+  body { background: #fff !important; }
+  .gepruefter-text { max-height: none; }
+  .gepruefter-text::after { display: none; }
+  .aussage, .signal, .weiter-karte, .kontext { break-inside: avoid; }
+}
+.hinweis-offline.wiki { background: var(--akzent-weich); }

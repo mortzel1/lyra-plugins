@@ -1,0 +1,74 @@
+/* Echo – tiefes Beerenrot, Schallwelle als Motiv, Abschrift wie ein ruhiges Blatt Papier. */
+.seite.breit { max-width: 900px; }
+
+.held { text-align: center; margin: 8px 0 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.held h1 { font-size: 28px; letter-spacing: -0.02em; }
+.held .leise { max-width: 520px; line-height: 1.5; }
+.held-welle { display: flex; align-items: center; gap: 4px; height: 46px; margin-bottom: 6px; }
+.held-welle span { width: 6px; height: 30%; border-radius: 4px; background: linear-gradient(180deg, color-mix(in oklab, var(--akzent), #fff 30%), var(--akzent)); animation: welle 1.3s ease-in-out infinite; }
+.held-welle span:nth-child(odd) { animation-duration: 1.05s; }
+.held-welle.aktiv span { animation-duration: .6s; }
+@keyframes welle { 0%, 100% { height: 22%; } 50% { height: 100%; } }
+
+.hinweis { display: flex; gap: 12px; align-items: center; font-size: 13.5px; line-height: 1.5; border-radius: 14px; padding: 11px 14px; background: var(--akzent-weich); margin-bottom: 12px; }
+.hinweis.warnung { background: color-mix(in srgb, var(--warnung) 13%, transparent); }
+
+.aktionen { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.aktion { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); border-radius: 18px; padding: 18px 18px 16px; font: inherit; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.aktion:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--schatten); border-color: color-mix(in srgb, var(--akzent) 35%, var(--linie)); }
+.aktion:disabled { opacity: .5; cursor: default; }
+.aktion.aufnehmen { background: linear-gradient(140deg, color-mix(in oklab, var(--akzent), #fff 18%), var(--akzent) 60%, color-mix(in oklab, var(--akzent), #000 22%)); color: #fff; border: none; }
+.aktion.aufnehmen .aktion-unter { color: rgba(255, 255, 255, .82); }
+.aktion-symbol { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 21px; background: var(--akzent-weich); margin-bottom: 6px; }
+.aktion.aufnehmen .aktion-symbol { background: rgba(255, 255, 255, .2); }
+.aktion-titel { font-size: 17px; font-weight: 750; }
+.aktion-unter { font-size: 12.5px; color: var(--leise); }
+.rec-punkt { width: 14px; height: 14px; border-radius: 50%; background: #ff3b4e; box-shadow: 0 0 0 4px rgba(255, 59, 78, .25); display: inline-block; }
+.aktion.aufnehmen .rec-punkt { background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .3); }
+
+.optionen { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; background: var(--flaeche); border-radius: 16px; padding: 12px; }
+.etikett-notiz { font-size: 11.5px; font-weight: 700; color: var(--akzent); background: var(--akzent-weich); border-radius: 6px; padding: 2px 8px; }
+
+/* Aufnahme */
+.aufnahme-seite { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 50px; }
+.aufnahme-status { display: inline-flex; align-items: center; gap: 9px; font-weight: 700; font-size: 14px; color: #e5293d; background: rgba(229, 41, 61, .1); border-radius: 999px; padding: 6px 14px; }
+.aufnahme-status .rec-punkt { width: 10px; height: 10px; box-shadow: none; animation: blinken 1.2s ease-in-out infinite; }
+.aufnahme-status.pause { color: var(--leise); background: var(--karte); }
+.aufnahme-status.pause .rec-punkt { background: var(--leise); animation: none; }
+@keyframes blinken { 50% { opacity: .25; } }
+.uhr { font-size: 64px; font-weight: 300; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: 18px 0 14px; }
+.pegel { display: flex; align-items: center; gap: 3px; height: 90px; width: min(560px, 92vw); }
+.pegel span { flex: 1; height: 6%; border-radius: 3px; background: linear-gradient(180deg, #ff6b7d, var(--akzent)); transition: height .1s linear; }
+.knopf.stopp { background: #e5293d; }
+
+/* Mitschreiben */
+.fortschritt { height: 8px; border-radius: 99px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.fortschritt > div { height: 100%; border-radius: 99px; background: linear-gradient(90deg, color-mix(in oklab, var(--akzent), #fff 30%), var(--akzent)); transition: width .3s ease; }
+.live { margin-top: 14px; white-space: pre-wrap; font: 14px/1.65 "Iowan Old Style", Georgia, serif; background: var(--flaeche); border-radius: 14px; padding: 14px 16px; max-height: 360px; overflow: auto; color: var(--leise); min-height: 80px; }
+
+/* Abschrift */
+.titel-feld { width: 100%; border: none; background: transparent; color: var(--text); font: 750 24px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; letter-spacing: -0.01em; padding: 4px 0; border-radius: 8px; outline: none; }
+.titel-feld:focus { background: var(--flaeche); padding: 4px 8px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.mini { font-size: 12px; font-weight: 650; border-radius: 999px; padding: 3px 10px; color: var(--akzent); background: var(--akzent-weich); }
+.blatt { background: var(--flaeche); border-radius: 18px; padding: 26px 32px; box-shadow: var(--schatten); }
+.abschrift p { font: 15.5px/1.75 "Iowan Old Style", Georgia, serif; margin: 0 0 14px; }
+.abschrift p:last-child { margin-bottom: 0; }
+.abschrift mark { background: color-mix(in srgb, #fbbf24 45%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
+.zeitmarke { display: inline-block; font: 700 11.5px/1 -apple-system, BlinkMacSystemFont, sans-serif; color: var(--akzent); background: var(--akzent-weich); border-radius: 6px; padding: 3px 6px; margin-right: 8px; vertical-align: 2px; font-variant-numeric: tabular-nums; }
+.suche { flex: 1; }
+textarea.bearbeiten { min-height: 420px; font: 15px/1.7 "Iowan Old Style", Georgia, serif; }
+.notizen.md { font-size: 15px; line-height: 1.65; }
+.notizen.md h3 { margin: 22px 0 8px; padding-top: 10px; border-top: 1px solid var(--linie); }
+.notizen.md h3:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.notizen-leer { text-align: center; background: var(--flaeche); border-radius: 18px; padding: 30px 24px; }
+.notizen-leer .gross-symbol { font-size: 40px; }
+.notizen-leer h3 { margin: 6px 0; }
+
+@media (max-width: 620px) { .aktionen { grid-template-columns: 1fr; } }
+
+@media print {
+  .nur-bildschirm, .knopf { display: none !important; }
+  body { background: #fff !important; }
+  .blatt { box-shadow: none; padding: 0; }
+}
