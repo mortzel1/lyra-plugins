@@ -1,7 +1,7 @@
 {
   "kennung": "recap",
   "name": "Recap",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Besprechungen → Entscheidungen & To-dos",
   "kategorie": "buero",
   "beschreibung": "Füg Notizen, ein Transkript oder ein Protokoll ein (oder öffne eine Datei) – Recap macht daraus eine Kurzfassung, die Entscheidungen, To-dos mit Verantwortlichen und Terminen und die offenen Fragen. Alles bleibt bearbeitbar; To-dos hakst du ab, und an fälligen Terminen erinnert dich eine Mitteilung. Mit einem Klick als Follow-up-Mail, Markdown oder PDF.",
@@ -22,7 +22,28 @@
     "Termine wie „bis nächsten Freitag“ werden in echte Daten umgerechnet",
     "To-dos abhaken – alle offenen aus allen Besprechungen auf einen Blick und auf Lyras Startseite",
     "Erinnerung als Mitteilung, wenn ein To-do fällig ist",
-    "Fertige Follow-up-Mail, Export als Markdown oder PDF"
+    "Fertige Follow-up-Mail, Export als Markdown oder PDF",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "auswerten",
+        "titel": "Auswerten: Entscheidungen & To-dos",
+        "beschreibung": "Zieht aus einem Transkript oder Protokoll die Kurzfassung, Entscheidungen, To-dos mit Fristen und offene Fragen",
+        "nimmt": [
+          "transkript",
+          "text",
+          "dokument"
+        ],
+        "liefert": "dokument",
+        "dauer": "1–2 Min."
+      }
+    ]
+  }
 }

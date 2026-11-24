@@ -1,7 +1,7 @@
 {
   "kennung": "quizzard",
   "name": "Quizzard",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "untertitel": "Das Quiz zu jedem Thema – schnell, bunt, mit Punkten",
   "kategorie": "lernen",
   "beschreibung": "Nenn ein Thema aus deinen Unterlagen oder irgendein anderes – Quizzard zaubert daraus ein Quiz zum Spielen: Multiple Choice, Wahr/Falsch, Schätzfragen, Reihenfolgen, Zuordnen, Lückentexte und Bilderfragen mit echten Fotos aus Wikipedia, mit Countdown, Zeitbonus, Serien, Jokern und Highscores. In den Einstellungen bestimmst du alles selbst.",
@@ -24,9 +24,13 @@
     "Spielgefühl mit Countdown, Zeitbonus, Serien-Bonus, Jokern (50:50, +10 s, Überspringen), Tönen und Konfetti",
     "Highscores je Thema, Rückblick am Ende und „Nur die Falschen nochmal“",
     "Alles einstellbar: Anzahl, Zeitlimit (oder keins), Schwierigkeit (auch steigend), Fragetypen, Punkte, Joker, Erklärungen, Sprache",
-    "Revanche direkt von Lyras Startseite"
+    "Revanche direkt von Lyras Startseite",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
   "neuerungen": {
+    "1.3.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ],
     "1.2.0": [
       "Neu: Bilderfragen – erkenne, was auf dem Foto zu sehen ist",
       "Echte Fotos aus Wikipedia/Wikimedia Commons, keine KI-Bilder – mit Bildnachweis (Urheber, Lizenz) unter dem Bild",
@@ -47,6 +51,25 @@
       "„Deine Quizze“: alle Quizze mit Spielen- und Löschen-Knopf, neue sind markiert",
       "Fertige Quizze warten auf Lyras Startseite",
       "Zeitlimit pro Frage gut sichtbar wählbar – oder ganz aus"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "quiz",
+        "titel": "Quiz erstellen",
+        "beschreibung": "Macht aus Material oder einem Thema ein spielbares Quiz mit abwechslungsreichen Fragetypen (auch Bilderfragen)",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "faktencheck",
+          "transkript",
+          "karten",
+          "text"
+        ],
+        "liefert": "quiz",
+        "dauer": "1–3 Min."
+      }
     ]
   }
 }

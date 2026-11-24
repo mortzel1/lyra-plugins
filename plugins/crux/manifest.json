@@ -1,7 +1,7 @@
 {
   "kennung": "crux",
   "name": "Crux",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Kreuzworträtsel aus deinem Lernstoff",
   "kategorie": "lernen",
   "beschreibung": "Lernen, das sich wie Rätseln anfühlt: Crux baut dir ein Kreuzworträtsel zu jedem Thema – aus deinen Unterlagen oder ganz frei. Tippen, kreuzen, knobeln: mit Uhr, Punkten, Jokern (Buchstabe oder Wort aufdecken, prüfen), Rekorden und Konfetti. Rätsel bleiben gespeichert, du kannst jederzeit weiterspielen.",
@@ -21,7 +21,30 @@
     "Tippen wie auf Papier: Pfeiltasten, Leertaste wechselt die Richtung, Tab springt zur nächsten Frage",
     "Joker: Buchstabe oder Wort aufdecken, Prüfen – mit Punktabzug",
     "Uhr, Punkte, Sterne, Rekorde je Rätsel und Konfetti beim Lösen",
-    "Rätsel speichern und später weiterspielen – auch von Lyras Startseite"
+    "Rätsel speichern und später weiterspielen – auch von Lyras Startseite",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "raetsel",
+        "titel": "Kreuzworträtsel bauen",
+        "beschreibung": "Baut aus Material (Notizen, Recherche, Karteikarten …) oder einem Thema ein spielbares Kreuzworträtsel",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "karten",
+          "transkript",
+          "text"
+        ],
+        "liefert": "raetsel",
+        "dauer": "1–2 Min."
+      }
+    ]
+  }
 }

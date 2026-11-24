@@ -1,7 +1,7 @@
 {
   "kennung": "veritas",
   "name": "Veritas",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Faktencheck mit Quellen und Prozent-Einschätzung",
   "kategorie": "recherche",
   "beschreibung": "Füge eine Behauptung, eine Schlagzeile oder einen ganzen Artikel ein: Veritas zerlegt ihn in prüfbare Aussagen, sucht mit Claude oder ChatGPT im Internet nach seriösen Quellen und schätzt für jede Aussage in Prozent ein, wie wahrscheinlich sie stimmt. Was falsch ist, wird korrigiert; typische Merkmale von Fake News werden benannt und erklärt. Dazu gibt es Anknüpfungspunkte, die dir neues Wissen bringen. Mit Lyra (lokal) bleibt alles auf deinem Mac – dann ohne Internet und deutlich als Einschätzung aus Modellwissen gekennzeichnet.",
@@ -22,7 +22,28 @@
     "Fake-News-Warnsignale: von der KI erklärt und zusätzlich automatisch gezählt (Reizwörter, Großbuchstaben, fehlende Quellen …)",
     "Gesamturteil mit Glaubwürdigkeit und fehlendem Kontext",
     "„Weiterdenken“: woher ein Mythos stammt, was die Forschung zeigt – neues Wissen statt nur richtig/falsch",
-    "Verlauf, Markdown-Export, Drucken/PDF; ohne Internet mit Lyra (lokal) als deutlich gekennzeichnete Einschätzung"
+    "Verlauf, Markdown-Export, Drucken/PDF; ohne Internet mit Lyra (lokal) als deutlich gekennzeichnete Einschätzung",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "pruefen",
+        "titel": "Fakten prüfen",
+        "beschreibung": "Prüft die Kernaussagen eines Textes (z. B. einer Recherche), schätzt in Prozent ein, wie wahrscheinlich sie stimmen, korrigiert Falsches und nennt Quellen",
+        "nimmt": [
+          "text",
+          "dokument",
+          "transkript"
+        ],
+        "liefert": "faktencheck",
+        "dauer": "1–3 Min."
+      }
+    ]
+  }
 }

@@ -280,7 +280,7 @@ async function oeffnen(id) {
 }
 
 /** Karten erstellen – in Runden (bei vielen Karten), ohne Doppelte. Mit `stapel` kommen sie zu einem bestehenden dazu. */
-async function erstellen(stapel, wunsch, thema, anzahl) {
+async function erstellen(stapel, wunsch, thema, anzahl, material = '') {
   wunsch = wunsch.trim();
   thema = thema.trim();
   if ((!wunsch && !thema) || z.laeuft) return null;
@@ -290,7 +290,8 @@ async function erstellen(stapel, wunsch, thema, anzahl) {
   z.hinweis = 'Suche passende Stellen in deinen Unterlagen …';
   z.fehler = null;
   zeichnen();
-  const { block, quellen } = await stellen(`${thema} ${wunsch}`, online() ? 16 : 8);
+  // In einer Fusion kommt das Material von anderen Plugins statt aus den Unterlagen
+  const { block, quellen } = material ? { block: material, quellen: [] } : await stellen(`${thema} ${wunsch}`, online() ? 16 : 8);
   if (!block && !z.mitWissen) {
     z.laeuft = null;
     z.fehler = 'Dazu habe ich in deinen Unterlagen nichts gefunden – erlaube „Auch Wissen über meine Unterlagen hinaus“ oder gib ein anderes Thema an.';
@@ -867,4 +868,28 @@ function fertigAnsicht() {
         faellig ? h('button', { class: 'knopf rand', onclick: () => lernen(false) }, `Weiter lernen · ${faellig} fällig`) : null)));
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+const anzahlAus = (a, std, max) => { const m = /(\d+)\s*(Karte|Frage|Begriff|Wort|Wörter|Eintr)/i.exec(String(a.anweisung || '')); const n = Number((a.optionen && a.optionen.anzahl) || (m && m[1]) || std); return Math.max(3, Math.min(max, n || std)); };
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    karten: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, z.lehrer === 'lyra' ? 9000 : 16000);
+      z.lehrer = a.lehrer || z.lehrer;
+      z.mitWissen = true;
+      const uhr = setInterval(() => { if (z.hinweis) status(z.hinweis); }, 1200);
+      let s = null;
+      try { s = await erstellen(null, String(a.anweisung || ''), lyra.fusion.kurzthema(a), anzahlAus(a, 20, 60), material); } finally { clearInterval(uhr); }
+      if (!s) throw new Error(z.fehler || 'Flip konnte keine Karten erstellen.');
+      return {
+        art: 'karten',
+        titel: s.titel,
+        markdown: `# ${s.titel}\n\n` + s.karten.map((k, i) => `**${i + 1}. ${k.vorne}**  \n${k.hinten}`).join('\n\n'),
+        daten: { karten: s.karten.map((k) => ({ vorne: k.vorne, hinten: k.hinten })) },
+        oeffnen: 'stapel/' + s.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

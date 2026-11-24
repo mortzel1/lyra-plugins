@@ -42,6 +42,8 @@ const abgebrochen = (e) => /ABGEBROCHEN|Abgebrochen/.test(String((e && e.message
 // ================================================================== Töne und Konfetti
 
 let audio = null;
+// In einer Fusion: Material von anderen Plugins statt Auszügen aus den Unterlagen
+let fusionMaterial = '';
 function ton(art) {
   if (!z.einst.toene) return;
   try {
@@ -262,8 +264,8 @@ async function erstellen() {
   status('Crux sucht passende Begriffe …');
   zeichnen();
   try {
-    let block = '';
-    if (z.einst.quelle !== 'wissen') {
+    let block = fusionMaterial;
+    if (!block && z.einst.quelle !== 'wissen') {
       try { block = (await lyra.suchen(thema, z.lehrer === 'lyra' ? 6 : 10)).block || ''; } catch (_) {}
       if (!block && z.einst.quelle === 'unterlagen') throw new Error('Dazu habe ich in deinen Unterlagen nichts gefunden – wähl „Unterlagen + Wissen“ oder „Allgemeinwissen“.');
     }
@@ -634,4 +636,32 @@ async function einstellungen() {
 
 window.addEventListener('resize', () => { if (z.ansicht === 'spiel' && z.r) gitterMalen(); });
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    raetsel: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, z.lehrer === 'lyra' ? 7000 : 12000);
+      z.lehrer = a.lehrer || z.lehrer;
+      fusionMaterial = material;
+      z.thema = lyra.fusion.kurzthema(a) || String(a.anweisung || '').slice(0, 80);
+      if (/klein|kurz|8\s*W/i.test(a.anweisung || '')) z.einst.groesse = 'klein';
+      else if (/groß|gross|16\s*W/i.test(a.anweisung || '')) z.einst.groesse = 'gross';
+      const vorher = z.r;
+      const uhr = setInterval(() => { if (z.status) status(z.status); }, 1200);
+      try { await erstellen(); } finally { clearInterval(uhr); fusionMaterial = ''; uhrStopp(); }
+      const r = z.r;
+      if (!r || r === vorher) throw new Error(z.fehler || 'Crux konnte kein Rätsel bauen.');
+      const liste = (dir) => [...r.woerter].filter((w) => w.dir === dir).sort((x, y) => x.nr - y.nr).map((w) => `${w.nr}. ${w.hinweis} (${w.wort.length})`).join('\n');
+      return {
+        art: 'raetsel',
+        titel: `Kreuzworträtsel: ${r.titel}`,
+        markdown: `# ${r.titel}\n\n**Waagerecht**\n${liste('h')}\n\n**Senkrecht**\n${liste('v')}\n\n_Lösungen: ${r.woerter.map((w) => `${w.nr}${w.dir === 'h' ? '→' : '↓'} ${w.wort}`).join(', ')}_`,
+        daten: { woerter: r.woerter.map((w) => ({ wort: w.wort, hinweis: w.hinweis, nr: w.nr, richtung: w.dir })) },
+        oeffnen: 'raetsel/' + r.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

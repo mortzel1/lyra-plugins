@@ -619,4 +619,28 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    pruefen: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, 12000) || lyra.fusion.thema(a);
+      z.lehrer = a.lehrer || z.lehrer;
+      const vorher = z.p;
+      const uhr = setInterval(() => { if (z.status) status(z.status); }, 1200);
+      try { await pruefen(material); } finally { clearInterval(uhr); }
+      const p = z.p;
+      if (!p || p === vorher) throw new Error(z.fehler || 'Veritas konnte nichts prüfen.');
+      return {
+        art: 'faktencheck',
+        titel: `Faktencheck: ${p.thema}`,
+        markdown: markdown(p),
+        quellen: p.aussagen.flatMap((x) => x.quellen).map((q) => ({ titel: q.titel, url: q.url })),
+        daten: { glaubwuerdigkeit: p.wert, herkunft: p.herkunft, fazit: p.fazit, kontext: p.kontext, aussagen: p.aussagen, warnsignale: p.warnsignale, weiterdenken: p.weiterdenken },
+        oeffnen: 'pruefung/' + p.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

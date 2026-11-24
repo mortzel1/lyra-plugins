@@ -1,10 +1,10 @@
 {
   "kennung": "launchpad",
   "name": "Launchpad",
-  "version": "1.0.0",
-  "untertitel": "Von der Idee zum Plan – und Schritt für Schritt umgesetzt",
+  "version": "2.0.0",
+  "untertitel": "Dein KI-Mitarbeiter: plant Projekte und erledigt die Aufgaben – mit Code, Tests und Daten",
   "kategorie": "planen",
-  "beschreibung": "Erzähl Launchpad von einer Idee oder einem Vorhaben – einem Projekt, einer Gründung, einer Lerngruppe, einem Ziel bis zur Klausur. Nach ein paar kurzen Rückfragen entsteht ein Plan mit Meilensteinen, Terminen und konkreten Aufgaben. Dann packt Launchpad mit an: Es schreibt Entwürfe, Konzepte und Checklisten, recherchiert, erklärt Schritt für Schritt und übergibt an passende Plugins wie Scout, Tinte oder Kompass. Immer im Blick: der nächste Schritt. Ein Coach-Check-in passt den Plan an – Änderungen übernimmst nur du.",
+  "beschreibung": "Erzähl Launchpad von einem Vorhaben – einem Programm, einem Datensatz, einer Marktanalyse, einer Website, einem Businessplan. Nach kurzen Rückfragen entsteht ein Projektplan mit Phasen, Arbeitspaketen und Abnahmekriterien. Dann arbeitet Launchpad wie ein Mitarbeiter: Es legt Dateien an, schreibt Code in Python, Java, C, C++, Swift oder Ruby, erzeugt große Datensätze per Skript, führt Programme und Unit-Tests in Lyras abgeschotteter Sandbox aus (ohne Internet, ohne Zugriff auf deine Dateien), recherchiert und lässt andere Plugins mitarbeiten. Jeder Schritt steht im Protokoll, jedes Ergebnis legt es dir zur Abnahme vor. Mit Kanban-Board, Arbeitsbereich mit Code-Ansicht und Editor, Statusberichten, README auf Knopfdruck und Export als Ordner.",
   "farbe": "#273449",
   "symbol": "<circle cx='4.5' cy='5' r='.9' opacity='.7'/><circle cx='19.5' cy='19' r='.8' opacity='.6'/><circle cx='20' cy='4.5' r='.6' opacity='.6'/><g/><path d='M12 2.4c2.9 2 4.3 5.2 4.3 8.9v4.3H7.7v-4.3c0-3.7 1.4-6.9 4.3-8.9z' transform='rotate(40 12 12)'/><circle class='aus' cx='12' cy='9.2' r='1.95' transform='rotate(40 12 12)'/><path d='M7.7 11.6l-2.9 2.6v3.4l2.9-1.6zM16.3 11.6l2.9 2.6v3.4l-2.9-1.6z' opacity='.65' transform='rotate(40 12 12)'/><path d='M10.1 16.8h3.8L12 21.4z' opacity='.85' transform='rotate(40 12 12)'/>",
   "einstieg": "index.html",
@@ -14,18 +14,68 @@
     "startseite",
     "erinnerungen",
     "fristen",
-    "internet"
+    "internet",
+    "code",
+    "werkzeuge",
+    "dateien"
   ],
-  "datenhinweis": "deine Idee, deine Antworten und den Stand deines Plans",
+  "datenhinweis": "dein Vorhaben, den Plan, die Dateien im Arbeitsbereich und das Protokoll",
   "funktionen": [
-    "Idee rein – Rückfragen mit Antwortvorschlägen, dann ein Plan mit Meilensteinen, Terminen und Aufgaben",
-    "Berücksichtigt deine Abgaben und Klausuren beim Planen",
-    "„Machen lassen“: Entwürfe, Konzepte, Checklisten und Texte direkt fertig – kopieren oder sichern",
-    "Recherche mit Websuche (Claude/ChatGPT) oder Wikipedia & Co. (Lyra lokal)",
-    "Übergibt an passende Plugins: Scout, Tinte, Kompass, Flow, Prisma, Zaster und mehr",
-    "Immer klar: der nächste Schritt – auch auf Lyras Startseite",
-    "Coach-Check-in: Feedback und neue Vorschläge, die du einzeln übernimmst",
-    "Erinnerungen an Meilensteine, Fortschritt, Export als Markdown"
+    "KI-Mitarbeiter, der Aufgaben wirklich erledigt: Dateien anlegen, Code schreiben, ausführen, testen, recherchieren",
+    "Projekte in Python, Java, C, C++, Swift und Ruby – mit Unit-Tests, die Launchpad selbst schreibt und ausführt",
+    "Große Datensätze: erzeugt CSV und JSON per Skript in der abgeschotteten Sandbox und prüft sie",
+    "Arbeitsbereich je Projekt: Dateibaum, Code-Ansicht mit Zeilennummern, CSV-Vorschau, Editor, Ausführen-Knopf",
+    "Projektplan mit Phasen, Prioritäten und Abnahmekriterien – als Kanban-Board oder Liste, per Drag & Drop",
+    "Lückenloses Protokoll: jede Überlegung, jede Datei, jeder Programm- und Testlauf",
+    "Abnahme: Ergebnisse prüfst du – Nacharbeit mit einem Satz; Qualitätssicherung lässt alle Tests vor der Abnahme laufen",
+    "Rückfragen statt Raten, wenn eine Angabe fehlt",
+    "Autopilot: erledigt mehrere Aufgaben nacheinander – nach deiner Bestätigung",
+    "Statusbericht mit Ampel und Projektdokumentation (README) auf Knopfdruck",
+    "Export des ganzen Projekts als Ordner auf deinen Mac; Import von CSV, Excel, Text und JSON",
+    "Setzt andere Plugins ein (z. B. Scout für Recherchen, Graphit für Schaubilder)",
+    "Coach-Check-in, Erinnerungen an Phasen-Termine, berücksichtigt deine Abgaben",
+    "Macht bei Fusion mit: plant große Aufgaben und setzt Teile davon um – mit Code, Tests und Dateien"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "2.0.0": [
+      "Launchpad ist jetzt ein KI-Mitarbeiter: Es erledigt Aufgaben selbst – mit Dateien, Code, Tests, Recherche und anderen Plugins",
+      "Code in Python, Java, C, C++, Swift und Ruby, ausgeführt und getestet in Lyras Sandbox",
+      "Neue Oberfläche: Projektleiste, Kennzahlen, Kanban-Board, Arbeitsbereich mit Editor, Protokoll und Berichte",
+      "Abnahme mit Nacharbeit, Rückfragen, Autopilot, Statusbericht, README und Export als Ordner",
+      "Fusion: neue Fähigkeit „Umsetzen“"
+    ],
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "planen",
+        "titel": "Projektplan erstellen",
+        "beschreibung": "Macht aus einem Ziel und dem Material der anderen Plugins einen Projektplan mit Phasen, Arbeitspaketen und Abnahmekriterien (berücksichtigt deine Abgaben)",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "text"
+        ],
+        "liefert": "plan",
+        "dauer": "1–2 Min."
+      },
+      {
+        "kennung": "umsetzen",
+        "titel": "Umsetzen wie ein Mitarbeiter",
+        "beschreibung": "Setzt eine Aufgabe wirklich um – schreibt Code mit Unit-Tests, erzeugt Datensätze per Skript, legt Dokumente an, führt alles in der Sandbox aus und dokumentiert es. Liefert Bericht und Dateien",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "text",
+          "plan",
+          "faktencheck"
+        ],
+        "liefert": "dokument",
+        "dauer": "3–10 Min."
+      }
+    ]
+  }
 }

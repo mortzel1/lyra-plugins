@@ -1,7 +1,7 @@
 {
   "kennung": "scout",
   "name": "Scout",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Recherchiert im Netz und schreibt dir ein Skript",
   "kategorie": "recherche",
   "beschreibung": "Nenne ein Thema, wie lange recherchiert werden soll und wie umfangreich das Ergebnis sein soll – auf Wunsch auch, aus welchem Zeitraum die Quellen stammen sollen. Scout plant eine Gliederung, sucht in mehreren Runden mit Claude oder ChatGPT im Internet nach Material (Fakten, Zahlen, Positionen, neueste Entwicklungen, Kontroversen) und schreibt daraus ein Recherche-Skript mit allen wichtigen Infos. Jede Aussage ist mit einer anklickbaren Quelle belegt. Mit Lyra (lokal) bleibt dein Thema auf dem Mac: Scout schlägt dann in Wikipedia & Co. nach – hinaus geht nur eine kurze Suchanfrage.",
@@ -22,7 +22,28 @@
     "Skript mit Überblick, Kapiteln, Kontroversen, Glossar und anklickbaren Quellenverweisen",
     "Quellenliste mit Datum – Quellen außerhalb des Zeitraums sind markiert",
     "Bibliothek deiner Recherchen, Export als Markdown, Drucken/PDF",
-    "Mit Lyra (lokal): Recherche in Wikipedia, Wikibooks und Stack Exchange – nur eine kurze Suchanfrage geht hinaus"
+    "Mit Lyra (lokal): Recherche in Wikipedia, Wikibooks und Stack Exchange – nur eine kurze Suchanfrage geht hinaus",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "recherchieren",
+        "titel": "Im Internet recherchieren",
+        "beschreibung": "Recherchiert ein Thema in mehreren Runden (Websuche mit Claude/ChatGPT, sonst Wikipedia & Co.) und schreibt ein Skript mit belegten Fakten und Quellen",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "transkript"
+        ],
+        "liefert": "dokument",
+        "dauer": "3–5 Min."
+      }
+    ]
+  }
 }

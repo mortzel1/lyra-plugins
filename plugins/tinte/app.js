@@ -375,4 +375,33 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    schreiben: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, 5000);
+      const auftrag = String(a.anweisung || lyra.fusion.thema(a));
+      z.lehrer = a.lehrer || z.lehrer;
+      z.offen = {
+        id: lyra.neueId(), art: /\bbrief\b/i.test(auftrag) ? 'brief' : 'mail', anlass: 'frei',
+        anliegen: `${auftrag}${material ? `\n\nHintergrund (aus anderen Plugins – nutze nur, was für den Text wichtig ist):\n${material}` : ''}`,
+        empfaenger: '', ton: /locker|du\b|duz/i.test(auftrag) ? 'locker' : z.einst.ton, sie: !/\bdu\b|duz|locker/i.test(auftrag), laenge: 'mittel',
+        betreff: '', anrede: '', text: '', gruss: '', zeit: lyra.jetzt(), datum: '',
+      };
+      const e = z.offen;
+      const uhr = setInterval(() => { if (z.status) status(z.status); }, 1200);
+      try { await schreiben(); } finally { clearInterval(uhr); }
+      if (!text(e.text)) throw new Error(z.fehler || 'Tinte konnte keinen Text schreiben.');
+      return {
+        art: 'dokument',
+        titel: `${e.art === 'brief' ? 'Brief' : 'E-Mail'}: ${e.betreff || 'Entwurf'}`,
+        markdown: `**Betreff:** ${e.betreff}\n\n${ganzerText(e)}`,
+        daten: { art: e.art, betreff: e.betreff, anrede: e.anrede, text: e.text, gruss: e.gruss },
+        oeffnen: 'entwurf/' + e.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

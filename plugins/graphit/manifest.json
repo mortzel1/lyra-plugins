@@ -1,7 +1,7 @@
 {
   "kennung": "graphit",
   "name": "Graphit",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "untertitel": "Schaubilder zeichnen – direkt in der Eingabezeile",
   "kategorie": "erstellen",
   "beschreibung": "Beschreib, was du sehen möchtest – „Aufbau des Herzens“, „Schaltung eines UND-Gatters“, „Körperteile beschriften“ – und Graphit zeichnet dir ein sauberes, beschriftetes Schaubild. Graphit hat kein eigenes Fenster: Du startest es mit dem Stift-Symbol neben Lyras Eingabefeld, das Bild erscheint direkt in der Antwort und lässt sich als PNG oder SVG herunterladen.",
@@ -22,19 +22,39 @@
     "Weiterbearbeiten im Gespräch: „beschrifte auch die Aorta“, „färbe die Venen blau“",
     "Herunterladen als PNG oder verlustfrei als SVG",
     "Alle Bilder gesammelt in der Graphit-Galerie (Plugins → Graphit)",
-    "Lokal mit Lyra oder – noch genauer – mit Claude, ChatGPT oder Gemini"
+    "Lokal mit Lyra oder – noch genauer – mit Claude, ChatGPT oder Gemini",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
   "chat": {
     "titel": "Schaubild zeichnen",
     "platzhalter": "Was soll Graphit zeichnen? z. B. Aufbau des Herzens"
   },
   "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ],
     "1.0.2": [
       "Texte im Bild überlappen sich nicht mehr",
       "Neues Symbol"
     ],
     "1.0.1": [
       "Einstellungen: gewählte Optionen sind wieder gut lesbar"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "schaubild",
+        "titel": "Schaubild zeichnen",
+        "beschreibung": "Zeichnet ein beschriftetes Schaubild (Aufbau, Ablauf, Zusammenhang) – mit den Fachbegriffen aus dem Material",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "text"
+        ],
+        "liefert": "schaubild",
+        "dauer": "1–2 Min."
+      }
     ]
   }
 }

@@ -102,6 +102,8 @@ const zahlFormat = (n) => Math.round(n).toLocaleString('de-DE');
 // gemeinsamen Regler mit Begrenzer (überlagerte Töne übersteuern nicht). WebKit erlaubt Ton erst nach einem Klick oder
 // Tastendruck – vorher wird nichts gespielt und auch nichts gesammelt, das später auf einmal losplärrt.
 let audio = null;
+// In einer Fusion: Material von anderen Plugins statt Auszügen aus den Unterlagen
+let fusionMaterial = '';
 let summe = null;
 function audioBereit() {
   if (!audio) {
@@ -459,8 +461,8 @@ async function erstellen() {
   z.meldung = '';
   z.hinweis = 'Suche passende Stellen …';
   zeichnen();
-  let block = '';
-  if (z.einst.quelle !== 'wissen') {
+  let block = fusionMaterial;
+  if (!block && z.einst.quelle !== 'wissen') {
     try { block = (await lyra.suchen(thema, online() ? 12 : 7)).block || ''; } catch (_) {}
     if (!block && z.einst.quelle === 'unterlagen') {
       z.fehler = 'Dazu habe ich in deinen Unterlagen nichts gefunden – wähle „Beides“ oder „Allgemeinwissen“ und versuch es nochmal.';
@@ -1100,4 +1102,31 @@ function loesungText(f) {
   return '';
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+const anzahlAus = (a, std, max) => { const m = /(\d+)\s*(Karte|Frage|Begriff|Wort|Wörter|Eintr)/i.exec(String(a.anweisung || '')); const n = Number((a.optionen && a.optionen.anzahl) || (m && m[1]) || std); return Math.max(3, Math.min(max, n || std)); };
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    quiz: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, online() ? 14000 : 8000);
+      z.lehrer = a.lehrer || z.lehrer;
+      fusionMaterial = material ? `Auftrag: ${a.anweisung || ''}\n\n${material}` : '';
+      z.thema = lyra.fusion.kurzthema(a) || String(a.anweisung || '').slice(0, 80);
+      z.einst.anzahl = anzahlAus(a, 10, 25);
+      const vorher = z.bereit;
+      const uhr = setInterval(() => { if (z.hinweis) status(z.hinweis); }, 1200);
+      try { await erstellen(); } finally { clearInterval(uhr); fusionMaterial = ''; }
+      const q = z.bereit;
+      if (!q || q === vorher) throw new Error(z.fehler || 'Das Quiz ist nicht gelungen.');
+      return {
+        art: 'quiz',
+        titel: `Quiz: ${q.thema}`,
+        markdown: `# Quiz: ${q.thema}\n\n` + q.fragen.map((f, i) => `**${i + 1}. ${f.frage}** _(${TYPEN[f.art][0]})_  \n${loesungText(f)}${f.wissenswert ? `  \n💡 ${f.wissenswert}` : ''}`).join('\n\n'),
+        daten: { fragen: q.fragen.map((f) => ({ art: f.art, frage: f.frage, optionen: f.optionen, richtig: f.richtig, wert: f.wert, einheit: f.einheit, paare: f.paare, wissenswert: f.wissenswert })) },
+        oeffnen: 'spiel/' + q.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

@@ -1087,4 +1087,29 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    schaubild: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, 2500);
+      const wunsch = `${a.anweisung || lyra.fusion.thema(a)}${material ? `\n\nInhalt, der im Bild stecken soll (Auszug – nimm die wichtigsten Begriffe):\n${material}` : ''}`;
+      const lehrer = a.lehrer || z.lehrer;
+      const { spec, lehrer: wer } = await entwerfen({ wunsch, vorher: null, lehrer }, status);
+      status('Graphit setzt die Beschriftungen …');
+      const L = aufbauen(spec);
+      const bild = { id: lyra.neueId(), zeit: lyra.jetzt(), anfrage: String(a.anweisung || '').slice(0, 300), vorher: null, spec, lehrer: wer };
+      await bildSichern(bild);
+      return {
+        art: 'schaubild',
+        titel: spec.bildtitel,
+        markdown: `**${spec.bildtitel}**\n\n${spec.zusammenfassung || ''}`,
+        bild: 'data:image/png;base64,' + alsPng(L),
+        daten: { svg: alsSvg(L, spec.bildtitel), spec },
+        oeffnen: 'bild/' + bild.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

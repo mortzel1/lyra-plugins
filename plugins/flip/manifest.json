@@ -1,7 +1,7 @@
 {
   "kennung": "flip",
   "name": "Flip",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "untertitel": "Karteikarten, die sitzen",
   "kategorie": "lernen",
   "beschreibung": "Schreib, was du lernen willst – die KI macht daraus Karteikarten aus deinen Unterlagen (5 bis 150 Stück). Gelernt wird mit Wiederholung im passenden Abstand; auf der Antwortseite kannst du dir die Karte genauer erklären lassen. Mit dem Konnektor Anki überträgst du Stapel in deine Anki-App oder holst sie von dort.",
@@ -22,9 +22,13 @@
     "Karte umdrehen per Klick oder Leertaste – mit weicher Animation",
     "Auf der Antwortseite: die Karte von der KI genauer erklären lassen",
     "Formeln werden sauber gesetzt (LaTeX)",
-    "Stapel nach Anki übertragen oder aus Anki holen (mit dem Konnektor Anki)"
+    "Stapel nach Anki übertragen oder aus Anki holen (mit dem Konnektor Anki)",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
   "neuerungen": {
+    "1.2.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ],
     "1.1.1": [
       "Aufgeräumte Startseite mit „Heute dran“ und nur einem Eingabefeld",
       "Stapel mit Kennzahlen, Suche bei großen Stapeln und Zurück-Knopf",
@@ -34,6 +38,24 @@
     "1.1.0": [
       "Anki: Stapel nach Anki übertragen oder von dort holen (mit dem Konnektor Anki)",
       "Lyra zeigt vor Claude & Co. genau, welche Daten hinausgehen"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "karten",
+        "titel": "Karteikarten erstellen",
+        "beschreibung": "Macht aus Material (Recherche, Notizen, Faktencheck …) oder einem Thema Karteikarten zum Lernen mit Wiederholung",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "faktencheck",
+          "transkript",
+          "text"
+        ],
+        "liefert": "karten",
+        "dauer": "1–3 Min."
+      }
     ]
   }
 }

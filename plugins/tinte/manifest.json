@@ -1,7 +1,7 @@
 {
   "kennung": "tinte",
   "name": "Tinte",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Briefe & E-Mails, die sitzen",
   "kategorie": "buero",
   "beschreibung": "Sag in Stichpunkten, worum es geht – Tinte schreibt den Brief oder die E-Mail im passenden Ton: Kündigung, Widerspruch, Beschwerde, Krankmeldung, Antrag, Dank und mehr. Briefe setzt Tinte nach DIN 5008 mit deinem Absender, fertig zum Drucken oder als PDF. Vorhandene Texte überarbeitet Tinte auf Knopfdruck: kürzer, freundlicher, bestimmter, fehlerfrei oder auf Englisch.",
@@ -19,7 +19,29 @@
     "Brief nach DIN 5008 (Form B) mit Absender, Anschriftfeld, Falzmarken – drucken oder als PDF",
     "Umformulieren auf Knopfdruck: kürzer, freundlicher, bestimmter, Fehler korrigieren, auf Englisch",
     "Platzhalter wie [Kundennummer] statt erfundener Angaben",
-    "Alle Entwürfe bleiben gespeichert"
+    "Alle Entwürfe bleiben gespeichert",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "schreiben",
+        "titel": "E-Mail oder Brief schreiben",
+        "beschreibung": "Schreibt eine E-Mail oder einen Brief (DIN 5008) im passenden Ton – mit den Inhalten aus den anderen Plugins",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "plan",
+          "text"
+        ],
+        "liefert": "dokument",
+        "dauer": "unter 1 Min."
+      }
+    ]
+  }
 }

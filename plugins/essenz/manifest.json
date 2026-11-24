@@ -1,7 +1,7 @@
 {
   "kennung": "essenz",
   "name": "Essenz",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "untertitel": "Formelblatt aus deinen Unterlagen",
   "kategorie": "erstellen",
   "beschreibung": "Wähle Themen – Essenz zieht die wichtigsten Formeln, Definitionen, Sätze und Merksätze aus deinen Unterlagen und setzt sie kompakt auf ein Blatt, in einer bis drei Spalten. Alles lässt sich bearbeiten, umsortieren und ergänzen. Sichern als PDF (Druckdialog von macOS), LaTeX oder Markdown.",
@@ -20,14 +20,35 @@
     "Jeder Eintrag bearbeitbar, verschiebbar, löschbar – eigene Einträge dazu",
     "Als PDF sichern oder drucken (Druckdialog von macOS)",
     "Export als LaTeX (mit multicols) oder Markdown",
-    "Alle Blätter gespeichert – jederzeit wieder öffnen"
+    "Alle Blätter gespeichert – jederzeit wieder öffnen",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
   "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ],
     "1.0.1": [
       "Neue Startseite: Themen antippen und gleich erstellen",
       "Doppelte Einträge werden zusammengefasst",
       "Blätter lassen sich direkt aus der Liste löschen",
       "Neues Symbol"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "formelblatt",
+        "titel": "Formelblatt erstellen",
+        "beschreibung": "Destilliert Formeln, Definitionen, Sätze und Merksätze zu einem Spickzettel – aus dem Material oder zum Thema",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "transkript",
+          "text"
+        ],
+        "liefert": "dokument",
+        "dauer": "1–2 Min."
+      }
     ]
   }
 }

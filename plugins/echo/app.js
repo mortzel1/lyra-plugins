@@ -22,12 +22,20 @@ Formeln – korrigiere das nur, wenn Zusammenhang oder mitgelieferte Fachbegriff
 es zu erwähnen. Die mitgelieferten Fachbegriffe sind richtig geschrieben: Klingt ein Wort im Transkript ähnlich (z. B. \
 „KOG-Diagramm“ oder „Kano-Diagramm“, wenn „Karnaugh-Diagramm“ angegeben ist), ist der Fachbegriff gemeint. Schreib in der Sprache der Aufnahme mit korrekter Rechtschreibung.
 
-Gliederung (Abschnitte ohne Inhalt weglassen):
-## Überblick – zwei bis drei Sätze
-## Inhalte – nach Themen mit ###-Überschriften: Definitionen, Ergebnisse, Zusammenhänge, hilfreiche Beispiele
-## Wichtig für die Klausur – nur, was ausdrücklich als wichtig oder klausurrelevant genannt wurde
-## Organisatorisches – Termine, Übungen, Abgaben, Hinweise der Lehrperson
+Verwende genau diese Überschriften (Abschnitte ohne Inhalt weglassen): „## Überblick“, „## Inhalte“, „## Wichtig für \
+die Klausur“, „## Organisatorisches“. Unter Überblick zwei bis drei Sätze. Unter Inhalte die Themen mit ###-Überschriften: \
+Definitionen, Ergebnisse, Zusammenhänge, hilfreiche Beispiele. Unter Wichtig für die Klausur nur, was ausdrücklich als \
+wichtig oder klausurrelevant genannt wurde. Unter Organisatorisches Termine, Übungen, Abgaben und Hinweise der Lehrperson. \
 Formeln mit $…$ bzw. $$…$$. Keine Überschrift der Ebene #.`;
+
+/** Überschriften aufräumen, falls ein kleines Modell die Erklärung mitkopiert („## Überblick – zwei bis drei Sätze“). */
+const UEBERSCHRIFTEN = ['Überblick', 'Inhalte', 'Wichtig für die Klausur', 'Organisatorisches'];
+function ueberschriftenGlaetten(md) {
+  return md.replace(/^##\s+(.+)$/gm, (zeile, t) => {
+    const h = UEBERSCHRIFTEN.find((u) => t.trim().toLowerCase().startsWith(u.toLowerCase()));
+    return h ? `## ${h}` : zeile;
+  });
+}
 
 const z = {
   info: null,
@@ -306,6 +314,34 @@ function laufMalen() {
 
 // ================================================================== Lernnotizen
 
+/** Lernnotizen aus einem Text (Transkript) – {notizen, titel, lehrer}. Lange Texte verdichtet Lyra (lokal) erst in Teilen. */
+async function notizenText(quelle, kopfzeilen, lehrer, melden) {
+  let material = quelle;
+  if (lehrer === 'lyra' && material.length > 9000) {
+    const teile = [];
+    for (let i = 0; i < material.length; i += 7000) teile.push(material.slice(i, i + 7500));
+    const stichpunkte = [];
+    for (const [i, t] of teile.entries()) {
+      melden({ art: 'hinweis', text: `Teil ${i + 1} von ${teile.length} …` });
+      const r = await lyra.ki({ lehrer: 'lyra', system: NOTIZEN_SYSTEM, prompt: `Fasse diesen Teil ${i + 1} von ${teile.length} eines Transkripts in knappen Stichpunkten zusammen – alle Inhalte, Definitionen, Beispiele, Hinweise auf Klausur und Organisatorisches. Ohne „Titel:“-Zeile.\n\n=== TRANSKRIPT (Teil ${i + 1}) ===\n${t}\n=== ENDE ===` }, melden);
+      stichpunkte.push(text(r && r.text));
+    }
+    material = stichpunkte.join('\n\n');
+    melden({ art: 'hinweis', text: 'Echo ordnet die Notizen …' });
+  }
+  const r = await lyra.ki({
+    lehrer,
+    system: NOTIZEN_SYSTEM,
+    prompt: `${kopfzeilen}\n=== ${material === quelle ? 'TRANSKRIPT' : 'STICHPUNKTE AUS DEM TRANSKRIPT'} ===\n${material}\n=== ENDE ===\n\nSchreib jetzt die Lernnotizen.`,
+  }, melden);
+  let notizen = ueberschriftenGlaetten(text(r && r.text));
+  let titel = '';
+  const m = /^Titel:\s*(.+)\n/i.exec(notizen);
+  if (m) { titel = text(m[1]).slice(0, 90); notizen = notizen.slice(m[0].length).trim(); }
+  if (!notizen) throw new Error('Die Lernnotizen kamen leer zurück – bitte noch einmal versuchen.');
+  return { notizen, titel, lehrer: (r && r.lehrer) || lehrer };
+}
+
 async function notizenErstellen() {
   const a = z.a;
   if (!a || z.notizenLaufen) return;
@@ -316,36 +352,10 @@ async function notizenErstellen() {
   const kopfzeilen = `Datum: ${new Date(a.zeit * 1000).toLocaleDateString('de-DE')}\n${a.titelAutomatisch ? '' : `Titel: ${a.titel}\n`}${a.begriffe.length ? `Fachbegriffe: ${a.begriffe.join(', ')}\n` : ''}`;
   const melden = (x) => { if (x.art === 'hinweis') { z.notizStatus = x.text; const s = document.getElementById('status'); if (s) s.textContent = x.text; } };
   try {
-    let material = a.text;
-    // Lyra (lokal) hat wenig Platz: lange Transkripte erst in Teilen verdichten
-    if (z.lehrer === 'lyra' && material.length > 9000) {
-      const teile = [];
-      for (let i = 0; i < material.length; i += 7000) teile.push(material.slice(i, i + 7500));
-      const stichpunkte = [];
-      for (const [i, t] of teile.entries()) {
-        z.notizStatus = `Teil ${i + 1} von ${teile.length} …`;
-        const s = document.getElementById('status');
-        if (s) s.textContent = z.notizStatus;
-        const r = await lyra.ki({ lehrer: 'lyra', system: NOTIZEN_SYSTEM, prompt: `Fasse diesen Teil ${i + 1} von ${teile.length} eines Transkripts in knappen Stichpunkten zusammen – alle Inhalte, Definitionen, Beispiele, Hinweise auf Klausur und Organisatorisches. Ohne „Titel:“-Zeile.\n\n=== TRANSKRIPT (Teil ${i + 1}) ===\n${t}\n=== ENDE ===` }, melden);
-        stichpunkte.push(text(r && r.text));
-      }
-      material = stichpunkte.join('\n\n');
-      z.notizStatus = 'Echo ordnet die Notizen …';
-    }
-    const r = await lyra.ki({
-      lehrer: z.lehrer,
-      system: NOTIZEN_SYSTEM,
-      prompt: `${kopfzeilen}\n=== ${material === a.text ? 'TRANSKRIPT' : 'STICHPUNKTE AUS DEM TRANSKRIPT'} ===\n${material}\n=== ENDE ===\n\nSchreib jetzt die Lernnotizen.`,
-    }, melden);
-    if (r && r.lehrer) z.lehrer = r.lehrer;
-    let notizen = text(r && r.text);
-    const m = /^Titel:\s*(.+)\n/i.exec(notizen);
-    if (m) {
-      if (a.titelAutomatisch) { a.titel = text(m[1]).slice(0, 90); a.titelAutomatisch = false; }
-      notizen = notizen.slice(m[0].length).trim();
-    }
-    if (!notizen) throw new Error('Die Lernnotizen kamen leer zurück – bitte noch einmal versuchen.');
-    a.notizen = notizen;
+    const n = await notizenText(a.text, kopfzeilen, z.lehrer, melden);
+    z.lehrer = n.lehrer;
+    if (n.titel && a.titelAutomatisch) { a.titel = n.titel; a.titelAutomatisch = false; }
+    a.notizen = n.notizen;
     a.notizenVon = (z.info.lehrer || []).find((l) => l.kennung === z.lehrer)?.name || z.lehrer;
     await sichern(a);
     z.reiter = 'notizen';
@@ -579,4 +589,38 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    abschrift: async (a) => {
+      if (!z.liste.length) throw new Error('In Echo gibt es noch keine Abschrift – nimm zuerst etwas auf oder öffne eine Datei in Echo.');
+      const woerter = `${a.anweisung || ''} ${lyra.fusion.thema(a)}`.toLowerCase().split(/[^a-zäöüß0-9]+/).filter((w) => w.length > 3);
+      const passt = (x) => woerter.filter((w) => String(x.titel || '').toLowerCase().includes(w)).length;
+      const beste = [...z.liste].sort((x, y) => passt(y) - passt(x) || y.zeit - x.zeit)[0];
+      const ab = await lyra.speicher.lesen('abschriften/' + beste.id);
+      if (!ab || !text(ab.text)) throw new Error('Die Abschrift ließ sich nicht laden.');
+      return { art: 'transkript', titel: ab.titel, markdown: ab.text, daten: { id: ab.id, dauer: ab.dauer, sprache: ab.sprache, begriffe: ab.begriffe, absaetze: ab.absaetze, notizen: ab.notizen || '' }, oeffnen: 'abschrift/' + ab.id };
+    },
+    lernnotizen: async (a, { status }) => {
+      const tr = lyra.fusion.eingaben(a, 'transkript')[0];
+      const quelle = tr ? tr.markdown : lyra.fusion.materialOhneAufgabe(a, 60000);
+      if (!text(quelle)) throw new Error('Echo braucht ein Transkript oder einen Text.');
+      const begriffe = (tr && tr.daten && tr.daten.begriffe) || [];
+      const kopf = `${tr ? `Titel: ${tr.titel}\n` : ''}${begriffe.length ? `Fachbegriffe: ${begriffe.join(', ')}\n` : ''}${a.anweisung ? `Wunsch: ${a.anweisung}\n` : ''}`;
+      const n = await notizenText(quelle, kopf, a.lehrer || z.lehrer, (x) => { if (x.art === 'hinweis') status(x.text); });
+      let oeffnen = '';
+      // Stammt das Transkript aus Echo, landen die Notizen auch dort
+      const id = tr && tr.daten && tr.daten.id;
+      if (id) {
+        try {
+          const ab = await lyra.speicher.lesen('abschriften/' + id);
+          if (ab) { ab.notizen = n.notizen; ab.notizenVon = n.lehrer; await sichern(ab); oeffnen = 'abschrift/' + id; }
+        } catch (_) {}
+      }
+      return { art: 'dokument', titel: `Lernnotizen: ${n.titel || (tr && tr.titel) || 'Aufnahme'}`, markdown: n.notizen, daten: { notizen: n.notizen }, oeffnen };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

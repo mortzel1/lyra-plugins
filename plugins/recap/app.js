@@ -469,4 +469,29 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    auswerten: async (a, { status }) => {
+      const quellen = lyra.fusion.eingaben(a).filter((e) => e.art !== 'thema');
+      const quelle = quellen.length ? quellen.map((e) => e.markdown).join('\n\n') : lyra.fusion.thema(a);
+      z.lehrer = a.lehrer || z.lehrer;
+      z.eingabe = { text: quelle, titel: (quellen[0] && quellen[0].titel) || '', datum: heuteIso(), teilnehmer: '', datei: '' };
+      const vorher = z.offen;
+      const uhr = setInterval(() => { if (z.status) status(z.status); }, 1200);
+      try { await auswerten(); } finally { clearInterval(uhr); }
+      const t = z.offen;
+      if (!t || t === vorher) throw new Error(z.fehler || 'Recap konnte daraus nichts auswerten.');
+      return {
+        art: 'dokument',
+        titel: `Entscheidungen & To-dos: ${t.titel}`,
+        markdown: alsMarkdown(t),
+        daten: { abriss: t.abriss, entscheidungen: t.entscheidungen, aufgaben: t.aufgaben, offeneFragen: t.offeneFragen },
+        oeffnen: 'treffen/' + t.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

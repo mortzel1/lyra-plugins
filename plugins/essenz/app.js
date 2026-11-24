@@ -48,6 +48,8 @@ const z = {
   meldung: '',
 };
 const app = document.getElementById('app');
+// In einer Fusion: Material von anderen Plugins statt Auszügen aus den Unterlagen
+let fusionMaterial = '';
 const text = (v) => (typeof v === 'string' ? v.trim() : '');
 
 async function start() {
@@ -98,8 +100,8 @@ async function erstellen() {
   try {
     for (const [i, thema] of themen.entries()) {
       status(`Suche „${thema}“ in deinen Unterlagen …`, i, themen.length);
-      let block = '';
-      try { block = ((await lyra.suchen(thema, z.lehrer === 'lyra' ? 6 : 10)).block || '').slice(0, z.lehrer === 'lyra' ? 6000 : 14000); } catch (_) {}
+      let block = fusionMaterial.slice(0, z.lehrer === 'lyra' ? 6000 : 14000);
+      if (!block) try { block = ((await lyra.suchen(thema, z.lehrer === 'lyra' ? 6 : 10)).block || '').slice(0, z.lehrer === 'lyra' ? 6000 : 14000); } catch (_) {}
       status(`Destilliere „${thema}“ …`, i, themen.length);
       const r = await lyra.ki({
         lehrer: z.lehrer,
@@ -377,4 +379,23 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    formelblatt: async (a, { status }) => {
+      z.lehrer = a.lehrer || z.lehrer;
+      fusionMaterial = lyra.fusion.materialOhneAufgabe(a, 14000);
+      z.auswahl = new Set();
+      z.eigenes = lyra.fusion.kurzthema(a) || String(a.anweisung || '').slice(0, 80);
+      const vorher = z.blatt;
+      const uhr = setInterval(() => { if (z.status) status(z.status); }, 1200);
+      try { await erstellen(); } finally { clearInterval(uhr); fusionMaterial = ''; }
+      const b = z.blatt;
+      if (!b || b === vorher) throw new Error(z.fehler || 'Essenz konnte kein Formelblatt erstellen.');
+      return { art: 'dokument', titel: `Formelblatt: ${b.titel}`, markdown: alsMarkdown(b), daten: { abschnitte: b.abschnitte }, oeffnen: 'blatt/' + b.id };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

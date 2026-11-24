@@ -710,4 +710,37 @@ async function einstellungen() {
   zeichnen();
 }
 
-start();
+// ================================================================== Fusion (mehrere Plugins, eine Aufgabe)
+
+function fusionAnbieten() {
+  lyra.fusion.anbieten({
+    recherchieren: async (a, { status }) => {
+      const material = lyra.fusion.materialOhneAufgabe(a, 2500);
+      z.lehrer = a.lehrer || z.lehrer;
+      z.form = {
+        ...z.form,
+        thema: String(a.anweisung || lyra.fusion.thema(a)).slice(0, 300),
+        fokus: [a.aufgabe && a.aufgabe !== a.anweisung ? `Teil dieser Gesamtaufgabe: ${a.aufgabe}` : '', material ? `Berücksichtige dieses Material aus anderen Plugins:\n${material}` : '']
+          .filter(Boolean).join('\n').slice(0, 3500),
+        zeitraum: 'alles',
+        dauer: String((a.optionen && a.optionen.dauer) || '2'),
+        umfang: (a.optionen && a.optionen.umfang) || 'mittel',
+      };
+      const vorher = z.s;
+      const uhr = setInterval(() => { if (z.lauf) status(z.lauf.hinweis || ((z.lauf.schritte[z.lauf.schritte.length - 1] || {}).text) || 'Scout recherchiert …'); }, 1200);
+      try { await recherchieren(); } finally { clearInterval(uhr); }
+      const s = z.s;
+      if (!s || s === vorher) throw new Error(z.fehler || 'Die Recherche hat kein Skript ergeben.');
+      return {
+        art: 'dokument',
+        titel: s.titel,
+        markdown: exportMarkdown(s),
+        quellen: s.quellen.filter((q) => q.zitiert || s.quellen.length <= 20).map((q) => ({ titel: q.titel, url: q.url })),
+        daten: { gliederung: s.gliederung, fakten: s.fakten, quellen: s.quellen, herkunft: s.herkunft },
+        oeffnen: 'skript/' + s.id,
+      };
+    },
+  });
+}
+
+start().catch(() => {}).then(fusionAnbieten);

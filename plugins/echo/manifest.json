@@ -1,7 +1,7 @@
 {
   "kennung": "echo",
   "name": "Echo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Vorlesungen aufnehmen und mitschreiben – auf deinem Mac",
   "kategorie": "recherche",
   "beschreibung": "Nimm eine Vorlesung, Besprechung oder deine Gedanken auf – oder öffne eine Audio- oder Videodatei: Echo schreibt alles mit der Spracherkennung von macOS mit, komplett auf deinem Mac. Du siehst den Text live entstehen, kannst darin suchen, ihn bearbeiten und als Text oder Markdown sichern. Auf Wunsch macht Echo daraus Lernnotizen mit Überblick, Inhalten, Klausurhinweisen und Organisatorischem – mit Lyra (lokal) oder, nach deiner Zustimmung, mit Claude oder ChatGPT. Die Aufnahme wird nach dem Mitschreiben gelöscht.",
@@ -21,7 +21,37 @@
     "Text live mitlesen, durchsuchen, bearbeiten, mit Zeitmarken ansehen",
     "Lernnotizen: Überblick, Inhalte, Wichtig für die Klausur, Organisatorisches",
     "Als .txt oder .md sichern, kopieren, drucken; Aufnahmen werden nach dem Mitschreiben gelöscht",
-    "Deutsch und Englisch"
+    "Deutsch und Englisch",
+    "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
-  "neuerungen": {}
+  "neuerungen": {
+    "1.1.0": [
+      "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "abschrift",
+        "titel": "Abschrift holen",
+        "beschreibung": "Holt eine deiner gespeicherten Echo-Abschriften (z. B. die letzte Vorlesung) – die zum Thema passendste, sonst die neueste",
+        "nimmt": [
+          "thema"
+        ],
+        "liefert": "transkript",
+        "dauer": "sofort"
+      },
+      {
+        "kennung": "lernnotizen",
+        "titel": "Lernnotizen schreiben",
+        "beschreibung": "Macht aus einem Transkript Lernnotizen: Überblick, Inhalte, Wichtig für die Klausur, Organisatorisches",
+        "nimmt": [
+          "transkript",
+          "text"
+        ],
+        "liefert": "dokument",
+        "dauer": "1–2 Min."
+      }
+    ]
+  }
 }
