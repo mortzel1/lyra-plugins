@@ -335,3 +335,103 @@ body { background: var(--grund); color: var(--lp-text); font-size: 14px; }
   .lp-kopf { flex-direction: column; }
   .lp-kopf-aktionen { padding-top: 0; }
 }
+
+/* ---------------------------------------------------------------- Testräume */
+.lp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+.lp-testraeume { display: flex; flex-direction: column; gap: 10px; }
+.lp-testraum { background: var(--lp-flaeche); border: 1px solid var(--lp-rand); border-left: 4px solid var(--lp-rand-stark); border-radius: 12px; overflow: hidden; }
+.lp-testraum.gut { border-left-color: var(--lp-gruen); }
+.lp-testraum.schlecht { border-left-color: var(--lp-rot); }
+.lp-test-kopf { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.lp-test-kopf:hover { background: var(--lp-tief); }
+.lp-test-status { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex: none; background: var(--lp-tief); color: var(--lp-leise); }
+.lp-testraum.gut .lp-test-status { color: var(--lp-gruen); background: color-mix(in srgb, var(--lp-gruen) 12%, transparent); }
+.lp-testraum.schlecht .lp-test-status { color: var(--lp-rot); background: color-mix(in srgb, var(--lp-rot) 11%, transparent); }
+.lp-spark { display: flex; gap: 2px; align-items: flex-end; height: 18px; }
+.lp-spark span { width: 5px; height: 14px; border-radius: 2px; background: var(--lp-rand-stark); }
+.lp-spark span.gut { background: var(--lp-gruen); }
+.lp-spark span.schlecht { background: var(--lp-rot); height: 9px; }
+.lp-test-details { border-top: 1px solid var(--lp-rand); padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--lp-tief); }
+.lp-fall { background: var(--lp-flaeche); border: 1px solid var(--lp-rand); border-radius: 9px; padding: 8px 10px; font-size: 13px; }
+.lp-fall.schlecht { border-color: color-mix(in srgb, var(--lp-rot) 35%, var(--lp-rand)); }
+.lp-fall-vergleich { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.lp-terminal.klein { max-height: 160px; font-size: 11.5px; margin-top: 4px; }
+.lp-test-ausgabe { margin-top: 6px; }
+.lp-test-ausgabe summary { cursor: pointer; }
+.lp-testform { width: min(640px, 84vw); max-height: 70vh; overflow: auto; }
+.lp-fall-form { border: 1px solid var(--lp-rand); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; background: var(--lp-tief); }
+.lp-fall-form .eingabe { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+
+/* ---------------------------------------------------------------- Werkstatt */
+.lp-unterreiter { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--lp-tief); border: 1px solid var(--lp-rand); margin-bottom: 14px; flex-wrap: wrap; }
+.lp-unterreiter button { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; border: none; background: none; color: var(--lp-leise); padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+.lp-unterreiter button.an { background: var(--lp-flaeche); color: var(--lp-text); font-weight: 650; box-shadow: var(--lp-schatten); }
+.lp-spiel-editor { min-height: 280px; border: 1px solid var(--lp-rand); border-radius: 10px; }
+.lp-syntax { font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--lp-tief); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+.lp-import { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 5px 0; }
+.lp-import + .lp-import { border-top: 1px solid var(--lp-rand); }
+.lp-import-ziel { padding: 2px 8px; border-radius: 6px; background: var(--lp-tief); border: 1px solid var(--lp-rand); }
+.lp-profil + .lp-profil { margin-top: 16px; }
+.lp-profil .lp-tabelle td, .lp-profil .lp-tabelle th { white-space: nowrap; }
+.lp-fund { background: var(--lp-flaeche); border: 1px solid var(--lp-rand); border-left: 4px solid var(--lp-grau); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.lp-fund-kritisch { border-left-color: var(--lp-rot); }
+.lp-fund-hoch { border-left-color: var(--lp-orange); }
+.lp-fund-mittel { border-left-color: #d4a017; }
+.lp-fund .lp-text { font-size: 13.5px; line-height: 1.5; }
+.lp-schwere { font-size: 10.5px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; flex: none; color: var(--lp-grau); background: color-mix(in srgb, var(--lp-grau) 12%, transparent); }
+.lp-schwere-kritisch { color: var(--lp-rot); background: color-mix(in srgb, var(--lp-rot) 12%, transparent); }
+.lp-schwere-hoch { color: var(--lp-orange); background: color-mix(in srgb, var(--lp-orange) 12%, transparent); }
+.lp-schwere-mittel { color: #a16207; background: color-mix(in srgb, #ca8a04 13%, transparent); }
+.lp-vorschlag { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: var(--lp-tief); font-size: 13px; }
+.lp-version { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+.lp-version + .lp-version { border-top: 1px solid var(--lp-rand); }
+.lp-version.an { background: var(--akzent-weich); border-radius: 8px; margin: 0 -8px; padding: 9px 8px; }
+.lp-version-punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--akzent); flex: none; }
+.lp-version-punkt.auto { background: transparent; border: 2px solid var(--lp-rand-stark); }
+.lp-vergleich { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 12px; }
+.lp-vergleich-liste { display: flex; flex-direction: column; gap: 2px; max-height: 460px; overflow: auto; }
+.lp-vergleich-datei { display: flex; align-items: center; gap: 7px; font: inherit; text-align: left; background: none; border: none; border-radius: 7px; padding: 6px 8px; cursor: pointer; color: var(--lp-text); min-width: 0; }
+.lp-vergleich-datei:hover { background: var(--lp-tief); }
+.lp-vergleich-datei.an { background: var(--akzent-weich); }
+.lp-vz { font-size: 10px; font-weight: 750; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; flex: none; }
+.lp-vz-neu { color: var(--lp-gruen); background: color-mix(in srgb, var(--lp-gruen) 12%, transparent); }
+.lp-vz-geloescht { color: var(--lp-rot); background: color-mix(in srgb, var(--lp-rot) 11%, transparent); }
+.lp-vz-geaendert { color: var(--lp-blau); background: color-mix(in srgb, var(--lp-blau) 11%, transparent); }
+.lp-vergleich-inhalt { min-width: 0; }
+.lp-diff { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; border: 1px solid var(--lp-rand); border-radius: 8px; overflow: auto; max-height: 520px; background: var(--lp-code); }
+.lp-diff-zeile { display: grid; grid-template-columns: 38px 38px 16px minmax(0, 1fr); white-space: pre; }
+.lp-diff-zeile.plus { background: color-mix(in srgb, var(--lp-gruen) 13%, transparent); }
+.lp-diff-zeile.minus { background: color-mix(in srgb, var(--lp-rot) 12%, transparent); }
+.lp-diff-nr { color: var(--lp-leise); opacity: .6; text-align: right; padding-right: 6px; user-select: none; -webkit-user-select: none; }
+.lp-diff-zeichen { color: var(--lp-leise); user-select: none; -webkit-user-select: none; }
+.lp-diff-text { overflow: hidden; text-overflow: ellipsis; }
+.lp-diff-luecke { padding: 3px 10px; color: var(--lp-leise); background: var(--lp-tief); font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11.5px; }
+@media (max-width: 900px) {
+  .lp-vergleich, .lp-fall-vergleich { grid-template-columns: 1fr; }
+}
+.lp-syntax > div { display: block; }
+
+/* ---------------------------------------------------------------- Gründungs-Lotse */
+.lp-g-angebot { display: flex; align-items: center; gap: 14px; border-color: color-mix(in srgb, var(--akzent) 30%, var(--lp-rand)); background: linear-gradient(120deg, var(--akzent-weich), var(--lp-flaeche)); }
+.lp-g-symbol { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--akzent); color: #fff; flex: none; }
+.lp-g-steckbrief { max-width: 760px; }
+.lp-g-hinweis { display: flex; gap: 7px; align-items: flex-start; margin-top: 16px; padding: 10px 12px; border-radius: 10px; background: var(--lp-tief); border: 1px solid var(--lp-rand); }
+.lp-g-hinweis .ic { margin-top: 2px; color: var(--lp-orange); }
+.lp-g-kopf { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.lp-g-balken { width: 100%; height: 6px; margin-bottom: 18px; }
+.lp-g-gruppe { margin-bottom: 18px; }
+.lp-g-gruppe > .lp-label { margin-bottom: 8px; }
+.lp-g-schritt { background: var(--lp-flaeche); border: 1px solid var(--lp-rand); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+.lp-g-schritt.erledigt, .lp-g-schritt.entfaellt { opacity: .7; }
+.lp-g-schritt.vorbereitet { border-color: color-mix(in srgb, var(--lp-blau) 30%, var(--lp-rand)); }
+.lp-g-schritt-kopf { display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; }
+.lp-g-schritt-kopf:hover { background: var(--lp-tief); }
+.lp-g-haken { width: 22px; height: 22px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; border: 1.6px solid var(--lp-rand-stark); color: #fff; }
+.lp-g-schritt.erledigt .lp-g-haken { background: var(--lp-gruen); border-color: var(--lp-gruen); }
+.lp-g-schritt.eingereicht .lp-g-haken { background: var(--lp-lila); border-color: var(--lp-lila); }
+.lp-g-details { border-top: 1px solid var(--lp-rand); padding: 12px 14px 14px 46px; display: flex; flex-direction: column; gap: 6px; background: var(--lp-tief); }
+.lp-g-details .lp-text { font-size: 13.5px; line-height: 1.55; }
+.lp-g-tipp { display: flex; gap: 7px; align-items: flex-start; font-size: 13px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--lp-blau) 8%, var(--lp-flaeche)); }
+.lp-g-tipp .ic { margin-top: 2px; color: var(--lp-blau); }
+.lp-g-unterlage { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 2px 0; }
+.lp-g-aktionen { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px; }

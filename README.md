@@ -11,7 +11,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
-| **Deep Dive** | 1.0.2 | Ein Thema in kleinen Schritten meistern |
+| **Deep Dive** | 2.0.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |
 | **Echo** | 1.1.0 | Vorlesungen aufnehmen und mitschreiben – auf deinem Mac |
 | **Essenz** | 1.1.0 | Formelblatt aus deinen Unterlagen |
@@ -20,7 +20,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Graphit** | 1.1.0 | Schaubilder zeichnen – direkt in der Eingabezeile |
 | **Justitia** | 1.0.0 | Gutachtenstil-Trainer für Jura |
 | **Kompass** | 1.0.1 | Lernzeit rückwärts von deinen Fristen planen |
-| **Launchpad** | 2.0.0 | Dein KI-Mitarbeiter: plant Projekte und erledigt die Aufgaben – mit Code, Tests und Daten |
+| **Launchpad** | 2.1.0 | Dein KI-Mitarbeiter: plant Projekte und erledigt die Aufgaben – mit Code, Tests und Daten |
 | **Lemma** | 1.0.1 | Beweise selbst führen – Schritt für Schritt |
 | **Mindmap** | 1.0.1 | Begriffe und Querbezüge deiner Fächer |
 | **Oase** | 1.0.1 | Dein Ruhepol – Stress, Kopf und Motivation |

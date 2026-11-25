@@ -18,6 +18,7 @@ const VORLAGEN = [
   ['dokument', 'Website', 'Eine einseitige Portfolio-Website (HTML und CSS) mit Projekten, Lebenslauf und Kontaktbereich – responsiv und ohne externe Abhängigkeiten'],
   ['code', 'Java-Projekt', 'Eine kleine Bibliotheksverwaltung in Java (Bücher, Mitglieder, Ausleihen, Rückgaben, Mahnungen) mit Testprogramm und Dokumentation'],
   ['analyse', 'Businessplan', 'Einen Businessplan für ein Startup, das gebrauchte Uni-Bücher vermittelt: Geschäftsmodell, Zielgruppe, Finanzplan für 3 Jahre als Tabelle (per Skript berechnet), Marketing und Risiken'],
+  ['dokument', 'Unternehmen gründen', 'Ich will mich mit Webdesign für kleine Unternehmen selbstständig machen: Rechtsform klären, alle Behördengänge vorbereiten, Rechnungsvorlage und Impressum erstellen, Preise kalkulieren und erste Kunden gewinnen'],
 ];
 
 const STATUS = {
@@ -130,7 +131,7 @@ const PLAN_SCHEMA = {
   },
   required: ['abschnitte', 'aufgaben', 'erfolg', 'name', 'risiken', 'vision', 'ziel'],
 };
-const AKTIONEN = ['datei_schreiben', 'datei_lesen', 'code_ausfuehren', 'tests_ausfuehren', 'recherchieren', 'plugin_nutzen', 'frage_an_nutzer', 'fertig'];
+const AKTIONEN = ['datei_schreiben', 'datei_lesen', 'code_ausfuehren', 'tests_ausfuehren', 'testraeume_ausfuehren', 'recherchieren', 'plugin_nutzen', 'frage_an_nutzer', 'fertig'];
 const SCHRITT_SCHEMA = {
   type: 'object',
   properties: {
@@ -309,7 +310,7 @@ function migrieren(p) {
   if (p.v === 2) {
     p.einstellungen = { ...EINSTELLUNGEN, ...(p.einstellungen || {}) };
     p.berichte = p.berichte || [];
-    return { p, dateien: null };
+    return { p: werkstattFelder(p), dateien: null };
   }
   // Version 1: Meilensteine mit Aufgaben → Phasen und eine Aufgabenliste; Ergebnisse werden Dateien
   const dateien = {};
@@ -348,6 +349,7 @@ function migrieren(p) {
 
 async function sichern(p = z.p) {
   if (!p) return;
+  werkstattFelder(p);
   p.geaendert = lyra.jetzt();
   try { await lyra.speicher.schreiben('projekte/' + p.id, p); } catch (e) { lyra.toast(meldung(e), 'fehler'); }
   const n = naechste(p)[0];
@@ -408,6 +410,7 @@ async function oeffnen(id) {
 async function entfernen(id) {
   const ok = await lyra.bestaetigen({ titel: 'Projekt löschen?', text: 'Plan, Arbeitsbereich mit allen Dateien, Protokoll und Berichte dieses Projekts werden gelöscht. Exportierte Ordner auf deinem Mac bleiben.', ja: 'Löschen', gefahr: true });
   if (!ok) return;
+  try { const alt = await lyra.speicher.lesen('projekte/' + id); for (const v of (alt && alt.versionen) || []) lyra.speicher.loeschen(`versionen/${id}/${v.id}`).catch(() => {}); } catch (_) {}
   for (const k of ['projekte/', 'dateien/', 'protokoll/']) { try { await lyra.speicher.loeschen(k + id); } catch (_) {} }
   z.liste = z.liste.filter((x) => x.id !== id);
   try { await lyra.speicher.schreiben('index', z.liste); } catch (_) {}
@@ -444,6 +447,7 @@ async function erinnerungenSetzen() {
       if (d.getTime() < Date.now()) return;
       liste.push({ id: `${p.id}-${s.id}`, titel: `Morgen fällig: ${s.titel}`.slice(0, 120), text: `${p.name} · ${offen} Aufgaben offen`, zeit: Math.round(d.getTime() / 1000) });
     });
+    liste.push(...gruendungErinnerungen(p));
   }
   try { return await lyra.erinnern(liste.slice(0, 60)); } catch (_) { return false; }
 }
@@ -515,7 +519,9 @@ function tracebackSaeubern(t) {
     weg = false;
     aus.push(z1);
   }
-  return aus.join('\n');
+  // Absolute Pfade des Sandbox-Ordners → Pfad im Arbeitsbereich
+  const dateien = Object.keys(z.dateien).sort((x, y) => y.length - x.length);
+  return aus.join('\n').replace(/(\/(?:private|var|tmp|Users)\/[^\s"':]+)/g, (m) => { const rel = dateien.find((x) => m.endsWith('/' + x)); return rel || m; });
 }
 
 function codeZusammenfassung(r, neu) {
@@ -728,7 +734,7 @@ Datei der Klasse mit main), "eingabe" = optionale Standardeingabe. Alle Dateien 
 Dateien, die das Programm schreibt (z. B. eine große CSV), landen automatisch im Arbeitsbereich. Kein Internet, höchstens 40 s.
 - "tests_ausfuehren": führt die Tests aus. Python: alle Dateien test_*.py im Hauptordner mit unittest ("start" leer). Andere \
 Sprachen: "start" = Testprogramm, das bei einem Fehler mit Exit-Code ungleich 0 endet.
-- "recherchieren": "anweisung" = konkrete Recherchefrage. Das Ergebnis landet als Notiz mit Quellen im Arbeitsbereich.
+${z.p && z.p.testraeume && z.p.testraeume.length ? `- "testraeume_ausfuehren": führt alle Testräume des Projekts aus (${z.p.testraeume.map((t) => `${t.name} – ${TESTARTEN[t.art][0]}`).join('; ')}) und zeigt genau, was fehlschlägt (erwartete vs. erhaltene Ausgabe). Vor "fertig" sollten sie grün sein.\n` : ''}- "recherchieren": "anweisung" = konkrete Recherchefrage. Das Ergebnis landet als Notiz mit Quellen im Arbeitsbereich.
 - "plugin_nutzen": lässt ein anderes Lyra-Plugin arbeiten: "plugin", "faehigkeit" und "anweisung". Verfügbar:\n${z.p && z.p.einstellungen.plugins ? faehigkeitenListe() : '(abgeschaltet)'}
 ${ohneRueckfragen ? '- Rückfragen sind hier nicht möglich: Triff sinnvolle Annahmen und nenne sie im Abschlussbericht.' : '- "frage_an_nutzer": nur, wenn es ohne eine Angabe von mir wirklich nicht sinnvoll weitergeht ("frage" = kurze, klare Frage).'}
 - "fertig": Die Aufgabe ist erledigt und geprüft. "text" = Abschlussbericht in Markdown: Was du gemacht hast, welche Dateien \
@@ -893,6 +899,7 @@ async function erledigen(id, opt = {}) {
   protokollieren('start', nacharbeit ? `Nacharbeit: ${a.titel}` : `Beginnt: ${a.titel}`, nacharbeit || a.beschreibung, { aufgabe: a.id });
   await sichern(p);
   zeichnen();
+  await versionSichern(`Vor: ${a.titel}`, { auto: true });
   const verlauf = [];
   const beruehrt = new Set(a.dateien || []);
   let lief = false, testsGruen = null, ablehnungen = 0, hinweis = '';
@@ -1021,6 +1028,14 @@ async function erledigen(id, opt = {}) {
           protokollieren('fehler', `Plugin: ${meldung(e)}`, '', { aufgabe: a.id, ok: false });
           verlauf.push({ aktion: 'plugin_nutzen', ziel: s.plugin, ergebnis: 'Fehler: ' + meldung(e) });
         }
+      } else if (s.aktion === 'testraeume_ausfuehren') {
+        if (!p.testraeume.length) { korrigieren('Es gibt keine Testräume – nutze "tests_ausfuehren".'); continue; }
+        status('Führt alle Testräume aus …');
+        const e = await alleTestraeume({ aufgabe: a.id });
+        testsGruen = e.ok;
+        lief = lief || e.gruen > 0;
+        verlauf.push({ aktion: 'testraeume_ausfuehren', ziel: `${e.gruen}/${e.gesamt} grün`, ergebnis: e.text });
+        hinweis = e.ok ? 'Alle Testräume sind grün. Prüfe die Abnahmekriterien und melde dann "fertig".' : 'Einige Testräume sind rot. Lies, was erwartet und was erhalten wurde, und korrigiere den Code.';
       } else if (s.aktion === 'frage_an_nutzer') {
         const frage = text(s.frage) || text(s.text);
         if (opt.ohneRueckfragen || !frage) {
@@ -1089,6 +1104,16 @@ async function abschliessen(p, a, ergebnis, verlauf, beruehrt, opt) {
       protokollieren('test', `QS: Tests ${testErgebnis.ok ? 'bestanden' : 'fehlgeschlagen'}${testErgebnis.gesamt !== null ? ` (${testErgebnis.gesamt - (testErgebnis.fehlgeschlagen || 0)}/${testErgebnis.gesamt})` : ''}`, codeZusammenfassung(r, []), { aufgabe: a.id, ok: testErgebnis.ok });
     } catch (e) { if (abgebrochen(e)) throw e; }
   }
+  let qsRaeume = '';
+  if (p.einstellungen.tests && p.testraeume.length) {
+    status('Qualitätssicherung: Alle Testräume laufen …');
+    try {
+      const e = await alleTestraeume({ aufgabe: a.id });
+      a.testraeume = { gruen: e.gruen, gesamt: e.gesamt, zeit: lyra.jetzt() };
+      const rot = p.testraeume.filter((t) => t.letzte && !t.letzte.ok).map((t) => t.name);
+      qsRaeume = `**Testräume (automatisch gemessen):** ${e.ok ? '✓' : '✗'} ${e.gruen} von ${e.gesamt} grün${rot.length ? ` – rot: ${rot.join(', ')}` : ''}.`;
+    } catch (e) { if (abgebrochen(e)) throw e; }
+  }
   if (ergebnis === 'limit') {
     status('Schreibt den Zwischenbericht …');
     try {
@@ -1101,10 +1126,10 @@ async function abschliessen(p, a, ergebnis, verlauf, beruehrt, opt) {
     a.bericht = '> Zwischenstand – die Schrittzahl war aufgebraucht. „Nacharbeiten lassen“ setzt die Arbeit fort.\n\n' + a.bericht;
   }
   // Gemessenes zuerst – unabhängig davon, was das Modell schreibt
-  if (qs) a.bericht = `${qs}\n\n${a.bericht}`;
+  if (qs || qsRaeume) a.bericht = `${[qs, qsRaeume].filter(Boolean).join('\n\n')}\n\n${a.bericht}`;
   const dateien = [...beruehrt].filter((x) => z.dateien[x] !== undefined);
   if (dateien.length) a.bericht += `\n\n**Dateien:** ${dateien.map((x) => '`' + x + '`').join(', ')}`;
-  const auto = (opt.fusion || p.einstellungen.autoAbnahme) && ergebnis === 'fertig' && (!a.tests || a.tests.ok);
+  const auto = (opt.fusion || p.einstellungen.autoAbnahme) && ergebnis === 'fertig' && (!a.tests || a.tests.ok) && (!a.testraeume || a.testraeume.gruen === a.testraeume.gesamt);
   a.status = auto ? 'erledigt' : 'pruefung';
   if (auto) a.erledigtAm = lyra.jetzt();
   protokollieren('fertig', auto ? `Erledigt: ${a.titel}` : `Zur Abnahme: ${a.titel}`, a.bericht, { aufgabe: a.id, ok: true });
@@ -1392,6 +1417,7 @@ async function exportieren() {
   const dateien = { ...z.dateien };
   dateien['LAUNCHPAD-PROJEKT.md'] = projektMarkdown(p);
   dateien['LAUNCHPAD-PROTOKOLL.md'] = protokollMarkdown(p);
+  if (p.gruendung && p.gruendung.schritte.length) dateien['LAUNCHPAD-GRUENDUNG.md'] = gruendungMarkdown(p);
   (p.berichte || []).forEach((b) => { dateien[`berichte/${slug(b.titel)}-${b.id.slice(-4)}.md`] = b.markdown; });
   try {
     const ort = await lyra.ordnerSichern(dateiname(p.name), dateien);
@@ -1587,7 +1613,7 @@ function fragenAnsicht() {
 function projektAnsicht(p) {
   const anteil = fortschritt(p);
   const w = wartend(p).length;
-  const reiter = [['uebersicht', 'Übersicht'], ['aufgaben', 'Aufgaben', p.aufgaben.filter((a) => a.status !== 'erledigt').length], ['dateien', 'Dateien', Object.keys(z.dateien).length], ['protokoll', 'Protokoll'], ['berichte', 'Berichte', (p.berichte || []).length]];
+  const reiter = [['uebersicht', 'Übersicht'], ['aufgaben', 'Aufgaben', p.aufgaben.filter((a) => a.status !== 'erledigt').length], ['dateien', 'Dateien', Object.keys(z.dateien).length], ['tests', 'Tests', p.testraeume.filter((t) => t.letzte && !t.letzte.ok).length || null], ['werkstatt', 'Werkstatt'], ...(p.gruendung ? [['gruendung', 'Gründung', p.gruendung.schritte.filter((x) => x.status === 'offen' || x.status === 'vorbereitet').length || null]] : []), ['protokoll', 'Protokoll'], ['berichte', 'Berichte', (p.berichte || []).length]];
   const laeuftAgent = z.laeuft && z.laeuft.art === 'agent';
   return h('div', { class: 'lp-projekt-seite' },
     h('header', { class: 'lp-kopf' },
@@ -1598,6 +1624,7 @@ function projektAnsicht(p) {
           h('span', { class: 'lp-fortschritt' }, h('span', { class: 'lp-fortschritt-balken' }, h('span', { style: { width: `${Math.round(anteil * 100)}%` } })), `${Math.round(anteil * 100)} %`),
           h('span', {}, `${p.aufgaben.filter((a) => a.status === 'erledigt').length}/${p.aufgaben.length} Aufgaben`),
           w ? h('span', { class: 'lp-hinweis-marke' }, `${w} warte${w === 1 ? 't' : 'n'} auf dich`) : null,
+          p.testraeume.some((t) => t.letzte) ? h('span', { class: p.testraeume.every((t) => !t.letzte || t.letzte.ok) ? 'lp-gut' : 'lp-schlecht', style: { cursor: 'pointer' }, onclick: () => { z.reiter = 'tests'; zeichnen(); } }, ic('labor', 13), `Testräume ${p.testraeume.filter((t) => t.letzte && t.letzte.ok).length}/${p.testraeume.length}`) : null,
           laeuftAgent ? h('span', { class: 'lp-live-marke' }, h('span', { class: 'lp-puls' }), z.autopilot ? `Autopilot ${z.autopilot.i}/${z.autopilot.liste.length}` : 'Arbeitet') : null)),
       h('div', { class: 'lp-kopf-aktionen' },
         laeuftAgent ? h('button', { class: 'knopf rand klein', onclick: anhalten }, ic('stop', 14), 'Anhalten')
@@ -1607,8 +1634,11 @@ function projektAnsicht(p) {
     h('nav', { class: 'lp-reiter' }, reiter.map(([k, n, zahl]) =>
       h('button', { class: z.reiter === k ? 'an' : '', onclick: () => { z.reiter = k; zeichnen(); } }, n, zahl ? h('span', { class: 'lp-reiter-zahl' }, String(zahl)) : null))),
     z.fehler && !z.auswahl ? h('div', { style: { marginBottom: '12px' } }, lyra.fehlerBox(z.fehler, null, () => { z.fehler = null; zeichnen(); })) : null,
-    z.laeuft && !laeuftAgent && z.laeuft.art !== 'code' && z.laeuft.art !== 'anleitung' ? h('div', { style: { marginBottom: '12px' } }, lyra.arbeit(z.status)) : null,
-    z.reiter === 'aufgaben' ? aufgabenReiter(p)
+    z.laeuft && !laeuftAgent && !['code', 'anleitung', 'tests', 'spiel', 'review', 'syntax'].includes(z.laeuft.art) ? h('div', { style: { marginBottom: '12px' } }, lyra.arbeit(z.status)) : null,
+    z.reiter === 'gruendung' ? gruendungReiter(p)
+      : z.reiter === 'tests' ? testsReiter(p)
+      : z.reiter === 'werkstatt' ? werkstattReiter(p)
+      : z.reiter === 'aufgaben' ? aufgabenReiter(p)
       : z.reiter === 'dateien' ? dateienReiter(p)
         : z.reiter === 'protokoll' ? protokollReiter(p)
           : z.reiter === 'berichte' ? berichteReiter(p)
@@ -1634,6 +1664,7 @@ function uebersichtReiter(p) {
         kpi(String(Object.keys(z.dateien).length), 'Dateien', codeZeilen ? `${codeZeilen.toLocaleString('de-DE')} Zeilen Code` : groesse(arbeitsbereichGroesse())),
         kpi(mitTests.length ? `${testsGruen}/${mitTests.length}` : '–', 'Tests grün', mitTests.length ? 'je Aufgabe, letzter Lauf' : 'noch keine', mitTests.length && testsGruen < mitTests.length ? 'rot' : ''),
         kpi(String(schritte), 'Arbeitsschritte', 'Dateien, Läufe, Recherchen')),
+      gruendungsHinweis(p),
       laeuft ? h('div', { class: 'lp-karte lp-karte-live', onclick: () => { z.auswahl = laeuft.id; zeichnen(); } },
         h('div', { class: 'lp-karte-kopf' }, h('span', { class: 'lp-puls' }), h('span', { class: 'fett wachsen' }, `Arbeitet an: ${laeuft.titel}`), h('button', { class: 'knopf text klein' }, 'Live ansehen')),
         h('div', { class: 'lp-mini', 'data-status': '' }, z.status)) : null,

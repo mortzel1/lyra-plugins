@@ -1,10 +1,10 @@
 {
   "kennung": "deepdive",
   "name": "Deep Dive",
-  "version": "1.0.2",
-  "untertitel": "Ein Thema in kleinen Schritten meistern",
+  "version": "2.0.0",
+  "untertitel": "Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung",
   "kategorie": "lernen",
-  "beschreibung": "Du nennst ein Thema aus deinen Unterlagen – Lyra baut einen Lernpfad von den Grundlagen bis zum Schweren und bringt ihn dir in kleinen Häppchen bei: kurz erklären, gleich eine Frage zum Anklicken, dann weiter. Am Ende jedes Kapitels ein kurzer Check (erklären, lösen, beweisen). Tempo und Erklärlänge stellst du selbst ein; Lyra merkt sich, wo es hakt.",
+  "beschreibung": "Deep Dive begleitet dich wie eine sehr gute Lehrkraft durch ein Thema aus deinen Unterlagen – von den Grundlagen bis zur Prüfung. Ein Einstufungstest prüft dein Vorwissen und ergänzt fehlende Grundlagen. Der Lernpfad hat Lernziele je Kapitel; jedes wird erklärt, abgefragt und geprüft – ein Kapitel gilt erst als gemeistert, wenn kein Lernziel mehr eine Lücke hat. Zu jedem Häppchen gibt es Merksatz, Verständnisfrage, Tutor-Chat und Lehrer-Werkzeuge (Beispiel durchrechnen, einfacher, tiefer, Analogie, typische Fehler, Schaubild). Im Kapitel-Check helfen gestufte Hinweise; danach sorgt ein Wiederholungsplan dafür, dass es bleibt. Mit Probeklausur samt Note und Prüfungsbericht, Skript zum Drucken, Glossar und Lernzeit. Lehrstil (Nachhilfelehrer, Professorin, sokratisch) und Niveau (Schule, Bachelor, Master) wählst du selbst.",
   "farbe": "#0EA5E9",
   "symbol": "<path d='M2.5 5.2c1.6-1.4 3.2-1.4 4.8 0s3.2 1.4 4.7 0 3.2-1.4 4.7 0 3.2 1.4 4.8 0' stroke-width='2'/><path d='M7 9.2l5 3.3 5-3.3' stroke-width='2.2' opacity='.35'/><path d='M7 13.2l5 3.3 5-3.3' stroke-width='2.2' opacity='.65'/><path d='M7 17.2l5 3.3 5-3.3' stroke-width='2.4'/>",
   "einstieg": "index.html",
@@ -12,19 +12,36 @@
     "unterlagen",
     "ki",
     "speicher",
-    "startseite"
+    "startseite",
+    "erinnerungen",
+    "werkzeuge"
   ],
-  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen sowie deine Antworten und Rückfragen in Deep Dive",
+  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen sowie deine Antworten, Lösungen und Rückfragen in Deep Dive",
   "funktionen": [
-    "Baut aus einem Thema deiner Unterlagen einen Lernpfad – von den Grundlagen bis zum Schweren",
-    "Bringt dir jedes Kapitel in kleinen Häppchen bei: kurz erklären, gleich eine Frage zum Anklicken, weiter",
-    "Kapitel-Check am Ende: erklären, Aufgaben lösen, beweisen – mit ehrlicher Bewertung und Musterlösung auf Nachfrage",
-    "Tempo, Erklärlänge und Strenge stellst du selbst ein – alle Inhalte werden trotzdem gründlich durchgenommen",
-    "Merkt sich, wo es hakt, und wiederholt das gezielt",
-    "Deine Lernmodule stehen auf Lyras Startseite – ein Klick und es geht weiter",
-    "Übergibt ein Thema auf Wunsch an Flip, um daraus Karteikarten zu machen"
+    "Einstufungstest: prüft dein Vorwissen und ergänzt fehlende Grundlagen als eigenes Kapitel",
+    "Lückenloser Lernpfad mit Lernzielen je Kapitel – jedes wird erklärt, abgefragt und geprüft",
+    "Gemeistert erst, wenn kein Lernziel mehr eine Lücke hat; Lücken werden gezielt neu erklärt",
+    "Häppchen mit Merksatz, Verständnisfrage (Tasten 1–4, Enter) und Quellen aus deinen Unterlagen",
+    "Lehrer-Werkzeuge: Beispiel durchrechnen, einfacher, tiefer (Herleitung), Analogie, typische Fehler, Anwendung, Schaubild mit Graphit",
+    "Tutor-Chat zu jedem Häppchen mit Vorschlägen für gute Rückfragen",
+    "Kapitel-Check (erklären, lösen, beweisen) mit gestuften Hinweisen, ehrlicher Bewertung und Musterlösung auf Wunsch",
+    "Wiederholungsplan nach 1, 3, 7, 16 und 35 Tagen – auf der Startseite und auf Wunsch als Erinnerung",
+    "Probeklausur mit Zeitlimit, Note, Auswertung je Kapitel und Prüfungsbericht",
+    "Skript mit Merksätzen und Zusammenfassungen – kopieren, sichern, drucken oder als PDF",
+    "Glossar der Fachbegriffe, das mit jedem Kapitel wächst",
+    "Kompetenz-Übersicht, Schwachstellen mit „Gezielt üben“, Lernzeit und Serie",
+    "Lehrstil (Nachhilfelehrer, Professorin, sokratisch) und Niveau (Schule, Bachelor, Master) wählbar",
+    "Macht bei Fusion mit: legt Lernkurse an und schreibt Lektionen aus dem Material anderer Plugins"
   ],
   "neuerungen": {
+    "2.0.0": [
+      "Deep Dive ist jetzt dein persönlicher Professor: Einstufung, Lernziele und eine Lückenlos-Garantie",
+      "Lehrer-Werkzeuge zu jedem Häppchen: Beispiel, einfacher, tiefer, Analogie, typische Fehler, Schaubild",
+      "Gestufte Hinweise im Check, Wiederholungsplan mit Erinnerungen, Probeklausur mit Note und Bericht",
+      "Skript zum Drucken, Glossar, Kompetenz-Übersicht, Lernzeit und Serie",
+      "Neue, hochwertige Oberfläche – Lehrstil und Niveau wählbar",
+      "Fusion: legt Lernkurse an und schreibt Lektionen"
+    ],
     "1.0.2": [
       "Neue Startseite: ein Eingabefeld, Tempo und Erklärlänge direkt wählbar, „Weiterlernen“ auf einen Blick",
       "Lernpfade bleiben streng beim gewählten Thema",
@@ -35,6 +52,38 @@
       "Lernt in kleinen Häppchen: kurz erklären, gleich eine Frage zum Anklicken, dann weiter",
       "Tempo und Erklärlänge stellst du selbst ein – alle Inhalte werden trotzdem gründlich durchgenommen",
       "Lyra zeigt vor Claude & Co. genau, welche Daten hinausgehen"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "kurs",
+        "titel": "Lernkurs anlegen",
+        "beschreibung": "Macht aus einem Thema und dem Material der anderen Plugins einen lückenlosen Lernkurs mit Kapiteln und Lernzielen – zum Durcharbeiten in Deep Dive mit Fragen, Checks, Wiederholungen und Probeklausur",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "text",
+          "transkript",
+          "faktencheck"
+        ],
+        "liefert": "plan",
+        "dauer": "1–2 Min."
+      },
+      {
+        "kennung": "lektion",
+        "titel": "Lektion schreiben",
+        "beschreibung": "Schreibt eine vollständige Lektion wie ein Lehrbuchkapitel: Grundbegriffe, Kernideen, durchgerechnetes Beispiel, typische Fehler, Merksätze und Selbsttest",
+        "nimmt": [
+          "thema",
+          "dokument",
+          "text",
+          "transkript",
+          "faktencheck"
+        ],
+        "liefert": "dokument",
+        "dauer": "1–3 Min."
+      }
     ]
   }
 }

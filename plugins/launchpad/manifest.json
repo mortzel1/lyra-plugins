@@ -1,10 +1,10 @@
 {
   "kennung": "launchpad",
   "name": "Launchpad",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "untertitel": "Dein KI-Mitarbeiter: plant Projekte und erledigt die Aufgaben – mit Code, Tests und Daten",
   "kategorie": "planen",
-  "beschreibung": "Erzähl Launchpad von einem Vorhaben – einem Programm, einem Datensatz, einer Marktanalyse, einer Website, einem Businessplan. Nach kurzen Rückfragen entsteht ein Projektplan mit Phasen, Arbeitspaketen und Abnahmekriterien. Dann arbeitet Launchpad wie ein Mitarbeiter: Es legt Dateien an, schreibt Code in Python, Java, C, C++, Swift oder Ruby, erzeugt große Datensätze per Skript, führt Programme und Unit-Tests in Lyras abgeschotteter Sandbox aus (ohne Internet, ohne Zugriff auf deine Dateien), recherchiert und lässt andere Plugins mitarbeiten. Jeder Schritt steht im Protokoll, jedes Ergebnis legt es dir zur Abnahme vor. Mit Kanban-Board, Arbeitsbereich mit Code-Ansicht und Editor, Statusberichten, README auf Knopfdruck und Export als Ordner.",
+  "beschreibung": "Erzähl Launchpad von einem Vorhaben – einem Programm, einem Datensatz, einer Marktanalyse, einer Website, einem Businessplan. Nach kurzen Rückfragen entsteht ein Projektplan mit Phasen, Arbeitspaketen und Abnahmekriterien. Dann arbeitet Launchpad wie ein Mitarbeiter: Es legt Dateien an, schreibt Code in Python, Java, C, C++, Swift oder Ruby, erzeugt große Datensätze per Skript, führt Programme und Unit-Tests in Lyras abgeschotteter Sandbox aus (ohne Internet, ohne Zugriff auf deine Dateien), recherchiert und lässt andere Plugins mitarbeiten. Jeder Schritt steht im Protokoll, jedes Ergebnis legt es dir zur Abnahme vor. Mit Testräumen (Unit, Szenario, Leistung, Daten), Werkstatt (Spielwiese, Analyse, Code-Review, Versionen), Kanban-Board, Arbeitsbereich mit Code-Ansicht und Editor, Statusberichten, README auf Knopfdruck und Export als Ordner.",
   "farbe": "#273449",
   "symbol": "<circle cx='4.5' cy='5' r='.9' opacity='.7'/><circle cx='19.5' cy='19' r='.8' opacity='.6'/><circle cx='20' cy='4.5' r='.6' opacity='.6'/><g/><path d='M12 2.4c2.9 2 4.3 5.2 4.3 8.9v4.3H7.7v-4.3c0-3.7 1.4-6.9 4.3-8.9z' transform='rotate(40 12 12)'/><circle class='aus' cx='12' cy='9.2' r='1.95' transform='rotate(40 12 12)'/><path d='M7.7 11.6l-2.9 2.6v3.4l2.9-1.6zM16.3 11.6l2.9 2.6v3.4l-2.9-1.6z' opacity='.65' transform='rotate(40 12 12)'/><path d='M10.1 16.8h3.8L12 21.4z' opacity='.85' transform='rotate(40 12 12)'/>",
   "einstieg": "index.html",
@@ -26,6 +26,11 @@
     "Große Datensätze: erzeugt CSV und JSON per Skript in der abgeschotteten Sandbox und prüft sie",
     "Arbeitsbereich je Projekt: Dateibaum, Code-Ansicht mit Zeilennummern, CSV-Vorschau, Editor, Ausführen-Knopf",
     "Projektplan mit Phasen, Prioritäten und Abnahmekriterien – als Kanban-Board oder Liste, per Drag & Drop",
+    "Gründungs-Lotse: Fahrplan aller Behördengänge mit Fristen, Kosten und Portalen – Ausfüllhilfen und Entwürfe macht Launchpad, einreichen tust du",
+    "Testräume: Unit-Tests, Szenarien (Eingabe → erwartete Ausgabe), Leistungstests und Datenprüfungen – mit Verlauf, KI-Fallvorschlägen und „Alle ausführen“",
+    "Werkstatt: Spielwiese zum Ausprobieren in der Sandbox, Code- und Datenanalyse (Kennzahlen, Abhängigkeiten, Datenprofil, Syntaxcheck)",
+    "KI-Code-Review mit Datei, Zeile, Schwere und Vorschlag – Funde übernimmst du einzeln als Aufgabe",
+    "Versionen: automatische Sicherung vor jedem Lauf, Zeilenvergleich und Wiederherstellen",
     "Lückenloses Protokoll: jede Überlegung, jede Datei, jeder Programm- und Testlauf",
     "Abnahme: Ergebnisse prüfst du – Nacharbeit mit einem Satz; Qualitätssicherung lässt alle Tests vor der Abnahme laufen",
     "Rückfragen statt Raten, wenn eine Angabe fehlt",
@@ -37,6 +42,12 @@
     "Macht bei Fusion mit: plant große Aufgaben und setzt Teile davon um – mit Code, Tests und Dateien"
   ],
   "neuerungen": {
+    "2.1.0": [
+      "Gründungs-Lotse: Fahrplan aller Behördengänge mit Fristen, Kosten und Portalen – Ausfüllhilfen und Entwürfe macht Launchpad, einreichen tust du",
+      "Testräume: Unit-Tests, Szenarien, Leistung und Datenprüfung – der Mitarbeiter führt sie aus, die Qualitätssicherung vor jeder Abnahme",
+      "Werkstatt: Spielwiese, Code- und Datenanalyse, KI-Code-Review und Versionen mit Vergleich und Wiederherstellen",
+      "Vor jedem Lauf des Mitarbeiters wird der Arbeitsbereich automatisch gesichert"
+    ],
     "2.0.0": [
       "Launchpad ist jetzt ein KI-Mitarbeiter: Es erledigt Aufgaben selbst – mit Dateien, Code, Tests, Recherche und anderen Plugins",
       "Code in Python, Java, C, C++, Swift und Ruby, ausgeführt und getestet in Lyras Sandbox",
