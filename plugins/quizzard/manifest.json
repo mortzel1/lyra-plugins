@@ -1,7 +1,7 @@
 {
   "kennung": "quizzard",
   "name": "Quizzard",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "untertitel": "Das Quiz zu jedem Thema – schnell, bunt, mit Punkten",
   "kategorie": "lernen",
   "beschreibung": "Nenn ein Thema aus deinen Unterlagen oder irgendein anderes – Quizzard zaubert daraus ein Quiz zum Spielen: Multiple Choice, Wahr/Falsch, Schätzfragen, Reihenfolgen, Zuordnen, Lückentexte und Bilderfragen mit echten Fotos aus Wikipedia, mit Countdown, Zeitbonus, Serien, Jokern und Highscores. In den Einstellungen bestimmst du alles selbst.",
@@ -13,12 +13,14 @@
     "ki",
     "speicher",
     "startseite",
-    "internet"
+    "internet",
+    "campus"
   ],
-  "datenhinweis": "dein Quiz-Thema und die passenden Auszüge aus deinen Unterlagen (wenn du „Aus meinen Unterlagen“ wählst); für Bilderfragen nur die gesuchten Begriffe an Wikipedia",
+  "datenhinweis": "dein Quiz-Thema und die passenden Auszüge aus deinen Unterlagen (wenn du „Aus meinen Unterlagen“ wählst); für Bilderfragen nur die gesuchten Begriffe an Wikipedia; in Lyra Campus nur, was du teilst bzw. dein Ergebnis an den Host – Ende-zu-Ende-verschlüsselt, Lyra fragt vorher",
   "funktionen": [
     "Macht aus jedem Thema ein Quiz – aus deinen Unterlagen oder ganz beliebig",
     "Quiz erstellen und speichern – jetzt spielen oder später, so oft du willst (auch von Lyras Startseite)",
+    "Mit Lyra Campus: Quiz in einen Raum teilen – als Aufgabe (Ergebnisse verschlüsselt nur an dich) oder als Live-Runde mit Rangliste nach jeder Frage",
     "Abwechslungsreiche Fragen: Multiple Choice, mehrere richtig, Wahr/Falsch, Schätzen, Reihenfolge, Zuordnen, Lückentext – und Bilderfragen",
     "Bilderfragen mit echten Fotos aus Wikipedia (keine KI-Bilder) – Urheber und Lizenz stehen klein unter dem Bild",
     "Spielgefühl mit Countdown, Zeitbonus, Serien-Bonus, Jokern (50:50, +10 s, Überspringen), Tönen und Konfetti",
@@ -28,6 +30,11 @@
     "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
   ],
   "neuerungen": {
+    "1.4.0": [
+      "Online mit Lyra Campus: Teile ein Quiz in einen Raum – als Aufgabe für alle oder als Live-Runde, die du steuerst",
+      "Als Host siehst du alle Ergebnisse, welche Fragen schwer waren, und sicherst sie als CSV",
+      "Live-Runde: alle antworten gleichzeitig, nach jeder Frage gibt es Auflösung und Rangliste"
+    ],
     "1.3.0": [
       "Macht bei Fusion mit: arbeitet mit anderen Plugins an einer großen Aufgabe – Ergebnisse fließen verlustfrei weiter"
     ],

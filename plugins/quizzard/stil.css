@@ -128,3 +128,15 @@ input[type=range] { accent-color: #f472b6; height: 30px; }
 .foto figcaption { margin-top: 7px; font-size: 11px; font-weight: 500; line-height: 1.4; color: #6b6380; }
 .foto-link { border: none; background: none; padding: 0; font: inherit; color: #7c3aed; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .foto-mini { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; flex: none; }
+
+/* Quizzard online (Lyra Campus) */
+.meldung.ok { background: rgba(34, 195, 166, 0.22); }
+.tabelle { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.tabelle th { text-align: left; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; padding: 6px 10px; }
+.tabelle td { padding: 9px 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+.frage-statistik { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 14px; }
+.frage-statistik .md { font-size: 14px; }
+.rangliste .rang { padding: 8px 6px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 16px; }
+.rangliste .rang:first-of-type { border-top: none; }
+.rangliste .rang.ich { background: rgba(124,58,237,0.25); border-radius: 12px; }
+.rangliste .platz { width: 38px; text-align: center; font-size: 19px; }

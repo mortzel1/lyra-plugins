@@ -26,7 +26,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Oase** | 1.0.1 | Dein Ruhepol – Stress, Kopf und Motivation |
 | **Omega** | 1.0.1 | Kellerautomaten, Turingmaschinen, Grammatiken & CYK |
 | **Prisma** | 1.0.0 | Datenanalyse für CSV und Excel |
-| **Quizzard** | 1.3.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
+| **Quizzard** | 1.4.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
 | **Recap** | 1.1.0 | Besprechungen → Entscheidungen & To-dos |
 | **Regie** | 1.0.1 | Vom Thema zum Erklärvideo |
 | **Scout** | 1.1.0 | Recherchiert im Netz und schreibt dir ein Skript |

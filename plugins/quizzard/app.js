@@ -214,6 +214,8 @@ async function start() {
     z.bereit = q;
     z.ansicht = 'bereit';
   }
+  // Aus einem Raum von Lyra Campus geöffnet: geteiltes Quiz als Aufgabe oder Live-Runde
+  if (route === 'campus') await campusStarten();
   zeichnen();
   if (route === 'einstellungen') einstellungen();
   lyra.themen().then((t) => { z.themen = t || []; if (z.ansicht === 'lobby') zeichnen(); }).catch(() => {});
@@ -222,12 +224,14 @@ async function start() {
 
 async function zurueck() {
   if (document.querySelector('.dialog-grund')) return;
-  if (z.ansicht === 'lobby') return lyra.zurueck();
+  if (z.ansicht === 'lobby' || istCampusAnsicht(z.ansicht)) return lyra.zurueck();
   if (z.ansicht === 'bereit') z.meldung = '';
   if (z.ansicht === 'zaubern') lyra.abbrechen();
   if ((z.ansicht === 'frage' || z.ansicht === 'feedback') && !(await lyra.bestaetigen({ titel: 'Quiz abbrechen?', text: 'Dein Spielstand geht verloren.', ja: 'Quiz abbrechen', nein: 'Weiterspielen', gefahr: true }))) return;
   stoppeTimer();
-  z.ansicht = 'lobby';
+  // Aus einem Raum: zurück zur Aufgabe bzw. den Ergebnissen statt in die eigene Lobby
+  const k = online2.kontext;
+  z.ansicht = k ? (k.host ? (k.inhalt.modus === 'live' ? 'liveHost' : 'campusHost') : (k.inhalt.modus === 'live' ? 'liveWarten' : 'campusAufgabe')) : 'lobby';
   zeichnen();
 }
 
@@ -694,6 +698,8 @@ function abgeben(zeitAus = false) {
   s.punkte += punkte;
   s.antworten.push({ teil, punkte, eingabe: structuredClone(z.eingabe), zeitAus });
   z.ergebnis = { teil, punkte, zeitAus };
+  // Live-Runde: Antwort an den Host, aufgelöst wird für alle gemeinsam
+  if (s.live) return liveAbgegeben(teil, punkte);
   z.ansicht = 'feedback';
   ton(teil >= 0.999 ? 'richtig' : teil > 0 ? 'teils' : 'falsch');
   if (teil >= 0.999 && s.serie >= 3) konfetti(40);
@@ -725,6 +731,7 @@ async function ende() {
   ton('ende');
   konfetti(s.neuerRekord ? 160 : 70);
   zeichnen();
+  if (s.campus) campusAbgeben(s);
 }
 
 function joker(art) {
@@ -834,6 +841,7 @@ function zeichnen() {
 }
 
 function ansicht() {
+  if (istCampusAnsicht(z.ansicht) || z.ansicht === 'liveAbgelehnt') return campusAnsicht();
   switch (z.ansicht) {
     case 'zaubern':
       return h('div', { class: 'zaubern' }, h('div', { class: 'hut' }, '🧙'), h('h2', { style: { marginTop: '14px' } }, 'Der Quizzard zaubert dein Quiz …'),
@@ -891,7 +899,7 @@ function lobby() {
         unter: `${q.fragen.length} Fragen · ${neu ? 'noch nicht gespielt' : `${q.gespielt}× gespielt`}${r ? ` · Rekord ${zahlFormat(r.punkte)}` : ''} · ${datum(q.zeit)}`,
         beiKlick: () => { z.meldung = ''; spielStarten(q); },
         rechts: h('button', { class: neu ? 'knopf klein' : 'knopf tonal klein', onclick: (e) => { e.stopPropagation(); z.meldung = ''; spielStarten(q); } }, neu ? 'Spielen ▶' : 'Nochmal ▶'),
-        aktionen: [{ symbol: '🗑', titel: 'Löschen', bei: () => quizLoeschen(q) }],
+        aktionen: [{ symbol: '👥', titel: 'In einen Raum teilen – als Aufgabe oder Live-Runde (Lyra Campus)', bei: () => raumTeilen(q) }, { symbol: '🗑', titel: 'Löschen', bei: () => quizLoeschen(q) }],
       });
     }))) : null);
 }
@@ -924,7 +932,8 @@ function bereitAnsicht() {
         z.ansicht = 'lobby';
         z.meldung = `💾 Gespeichert – „${q.thema}“ wartet unter „Deine Quizze“ (und auf Lyras Startseite).`;
         zeichnen();
-      } }, 'Später spielen 💾')),
+      } }, 'Später spielen 💾'),
+      h('button', { class: 'knopf tonal riesig', title: 'Als Aufgabe oder Live-Runde in einen Raum von Lyra Campus', onclick: () => raumTeilen(q) }, 'In Raum teilen 👥')),
     h('div', { class: 'leise klein', style: { marginTop: '16px' } }, 'Das Quiz ist schon gesichert – du kannst es jederzeit spielen, auch mehrmals.'));
 }
 
@@ -1065,6 +1074,7 @@ function endeAnsicht() {
   const quote = Math.round((richtig / s.fragen.length) * 100);
   const falsche = s.fragen.map((f, i) => (s.antworten[i] && s.antworten[i].teil < 0.999 ? s.quiz.fragen.find((q) => q.frage === f.frage) : null)).filter(Boolean);
   return h('div', { class: 'podest' },
+    s.campus ? campusStatusBox() : null,
     h('div', { style: { fontSize: '70px' } }, quote >= 80 ? '🏆' : quote >= 50 ? '🥈' : '🌱'),
     s.neuerRekord && richtig > 0 ? h('div', { class: 'pill', style: { display: 'inline-block', marginBottom: '8px' } }, '✨ Neuer Rekord!') : null,
     h('div', { class: 'punkte-gross' }, zahlFormat(s.punkte)),
@@ -1075,7 +1085,7 @@ function endeAnsicht() {
       h('div', { class: 'wert' }, h('b', {}, `🔥 ${s.besteSerie}`), 'beste Serie'),
       h('div', { class: 'wert' }, h('b', {}, `${Math.floor(dauer / 60)}:${String(dauer % 60).padStart(2, '0')}`), 'Zeit')),
     h('div', { class: 'zeile', style: { justifyContent: 'center', margin: '8px 0 20px' } },
-      h('button', { class: 'knopf', onclick: () => spielStarten(s.quiz) }, '🔁 Nochmal'),
+      h('button', { class: 'knopf', onclick: () => (s.campus ? aufgabeStarten() : spielStarten(s.quiz)) }, '🔁 Nochmal'),
       falsche.length ? h('button', { class: 'knopf tonal', onclick: () => spielStarten(s.quiz, falsche) }, `Nur die ${falsche.length} Falschen`) : null,
       h('button', { class: 'knopf tonal', onclick: () => { z.ansicht = 'lobby'; z.thema = ''; zeichnen(); } }, 'Neues Quiz')),
     h('div', { class: 'panel rueckblick', style: { textAlign: 'left' } },
