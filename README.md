@@ -34,6 +34,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Sprungbrett** | 1.0.0 | Dein Bewerbungscoach |
 | **Tinte** | 1.1.0 | Briefe & E-Mails, die sitzen |
 | **Veritas** | 1.1.0 | Faktencheck mit Quellen und Prozent-Einschätzung |
+| **Vertex** | 1.0.0 | Grafikrechner – Funktionen zeichnen, untersuchen, modellieren |
 | **Zaster** | 1.0.0 | Haushaltsbuch mit Abo-Radar |
 
 ## Sicherheit

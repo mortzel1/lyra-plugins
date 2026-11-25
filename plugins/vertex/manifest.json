@@ -1,0 +1,67 @@
+{
+  "kennung": "vertex",
+  "name": "Vertex",
+  "version": "1.0.0",
+  "untertitel": "Grafikrechner – Funktionen zeichnen, untersuchen, modellieren",
+  "kategorie": "informatik",
+  "beschreibung": "Tipp eine Funktion ein, wie du sie auch auf Papier schreibst – f(x) = 2x² − 4, √x, |x − 1|, sin x –, und Vertex zeichnet den Graphen sofort. Mit Schiebereglern für Parameter, Punkten, Ungleichungen, Kreisen und Kurven. Vertex rechnet die ganze Kurvendiskussion exakt aus (Nullstellen als √2 oder 3/4 statt Kommazahlen), löst Steckbriefaufgaben mit Rechenweg und findet Ausgleichsfunktionen zu Messwerten – alles auf deinem Mac, ohne KI. Die KI hilft nur, wenn du willst: eine Aufgabe in Funktionen übersetzen oder dir die Kurvendiskussion erklären.",
+  "farbe": "#7C3AED",
+  "symbol": "<path d='M6.5 3v18' stroke-width='1.5' opacity='.55'/><path d='M3 17.5h18' stroke-width='1.5' opacity='.55'/><path d='M7.2 3.6Q13 27.6 18.8 3.6' stroke-width='2.2'/><circle class='aus' cx='13' cy='15.6' r='3.6'/><circle cx='13' cy='15.6' r='2.3'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "ki",
+    "speicher",
+    "dateien"
+  ],
+  "datenhinweis": "nur, wenn du die KI nutzt: deine Beschreibung bzw. Aufgabe und die berechneten Werte zum Erklären",
+  "funktionen": [
+    "Schreiben wie auf Papier: 2x², √x, |x|, sin x, e^-x, f'(x), log_2(x), Dezimalkomma – mit Symbolleiste für π, √, Betrag und Co.",
+    "Funktionen, Punkte P(1|2), Gleichungen (Kreis x² + y² = 4), Ungleichungen (y < x² wird schraffiert), Parameter- und Polarkurven, Bereiche wie {0 < x < 2}",
+    "Parameter als Schieberegler – mit Abspielen, um zu sehen, wie sich der Graph verändert",
+    "Kurvendiskussion auf Knopfdruck: Definitionsbereich, Symmetrie, Nullstellen, Extrem- und Wendepunkte, Monotonie, Krümmung, Grenzverhalten, Asymptoten – exakt (√2, π/3, 3/4)",
+    "Ableitungen symbolisch (f′, f″), Integral und Fläche – auch zwischen zwei Graphen –, Tangente und Normale, Schnittpunkte, Wertetabelle",
+    "Steckbriefaufgaben: Bedingungen eintragen (oder die KI aus dem Aufgabentext übersetzen lassen), Vertex löst exakt mit Ansatz, Gleichungssystem und Probe",
+    "Regression: Messwerte eintippen, einfügen oder aus CSV/Excel laden – linear, quadratisch, kubisch, exponentiell, Potenz, logarithmisch, mit R²",
+    "Zeichnen per KI: „Parabel mit Scheitel (2|1) durch den Ursprung“ – Vertex prüft die Vorschläge, du übernimmst",
+    "Mehrere Blätter, Rückgängig, Export als PNG, SVG oder pgfplots-Code für LaTeX",
+    "Direkt in Lyras Eingabezeile: Funktion eintippen, Graph und Kurvendiskussion erscheinen in der Antwort",
+    "Macht bei Fusion mit: zeichnet Graphen und liefert exakte Kurvendiskussionen für andere Plugins"
+  ],
+  "chat": {
+    "titel": "Graph zeichnen",
+    "platzhalter": "Funktion, z. B. f(x) = x² − 4"
+  },
+  "neuerungen": {
+    "1.0.0": [
+      "Neu: Vertex, der Grafikrechner von Lyra"
+    ]
+  },
+  "fusion": {
+    "faehigkeiten": [
+      {
+        "kennung": "graph",
+        "titel": "Graph zeichnen",
+        "beschreibung": "Zeichnet die Graphen der Funktionen aus der Aufgabe oder dem Material – mit den wichtigsten Punkten",
+        "nimmt": [
+          "thema",
+          "text",
+          "dokument"
+        ],
+        "liefert": "schaubild",
+        "dauer": "unter 1 Min."
+      },
+      {
+        "kennung": "kurvendiskussion",
+        "titel": "Kurvendiskussion",
+        "beschreibung": "Untersucht Funktionen vollständig und exakt: Nullstellen, Extrema, Wendepunkte, Asymptoten, Monotonie, Krümmung",
+        "nimmt": [
+          "thema",
+          "text",
+          "dokument"
+        ],
+        "liefert": "dokument",
+        "dauer": "unter 1 Min."
+      }
+    ]
+  }
+}
