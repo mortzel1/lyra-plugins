@@ -159,9 +159,21 @@ async function start() {
       .map((b) => ({ id: b.id, name: b.name, zeit: b.zeit, n: b.eintraege.filter((e) => e.text || e.art).length })).sort((a, b) => b.zeit - a.zeit);
   } catch (_) {}
   let b = null;
+  // Aus einem Raum von Lyra Campus: das geteilte Blatt als eigene Kopie öffnen
+  const ck = route === 'campus' ? await Campus.kontext('blatt') : null;
+  if (ck && ck.inhalt.daten && ck.inhalt.daten.blatt) {
+    const id = 'campus-' + ck.inhalt.id;
+    try { b = await lyra.speicher.lesen('blaetter/' + id); } catch (_) {}
+    if (!b || !Array.isArray(b.eintraege)) {
+      const q = ck.inhalt.daten.blatt;
+      b = { id, name: q.name || ck.inhalt.titel, zeit: lyra.jetzt(), eintraege: (q.eintraege || []).map((e) => ({ ...e })), ansicht: q.ansicht || null, campus: { raum: ck.raum.name, von: ck.inhalt.name } };
+      try { await lyra.speicher.schreiben('blaetter/' + id, b); } catch (_) {}
+      setTimeout(() => lyra.toast(`📈 „${b.name}“ von ${ck.inhalt.name} ist jetzt in deinen Blättern`, 'ok'), 300);
+    }
+  }
   try {
     const id = route.startsWith('bild/') ? route.slice(5) : await lyra.speicher.lesen('zuletzt');
-    if (id) b = await lyra.speicher.lesen('blaetter/' + id);
+    if (!b && id) b = await lyra.speicher.lesen('blaetter/' + id);
   } catch (_) {}
   z.blatt = b && Array.isArray(b.eintraege) ? b : erstesBlatt();
   leereZeileAmEnde();
@@ -617,6 +629,7 @@ function blaetterMenue(anker) {
   if (!z.liste.some((b) => b.id === z.blatt.id)) teile.splice(1, 0, h('button', { class: 'vx-pop-knopf an' }, h('span', { class: 'wachsen' }, z.blatt.name), h('span', { class: 'leise klein' }, 'offen')));
   teile.push(h('div', { class: 'vx-pop-trenner' }),
     popKnopf('Neues Blatt', () => { const b = neuesBlatt('Neues Blatt', ['']); wechseln(b); }, { symbolName: 'plus' }),
+    popKnopf('In einen Raum teilen …', () => Campus.teilen({ titel: z.blatt.name, typ: 'blatt', daten: { blatt: { name: z.blatt.name, eintraege: z.blatt.eintraege.filter((e) => e.text || e.art), ansicht: z.blatt.ansicht } }, beschreibung: 'Grafik / Graphen aus Vertex', arten: ['material', 'aufgabe'] }), { symbolName: 'plus' }),
     popKnopf('Umbenennen …', umbenennen, { symbolName: 'stift' }),
     popKnopf('Blatt löschen …', blattLoeschen, { gefahr: true, symbolName: 'x' }));
   pop(anker, teile);

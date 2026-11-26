@@ -1,0 +1,34 @@
+{
+  "kennung": "quizzardonline",
+  "name": "Quizzard Online",
+  "version": "1.0.0",
+  "untertitel": "Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt",
+  "kategorie": "lernen",
+  "beschreibung": "Du bist Host, alle anderen spielen auf ihrem Handy, Tablet oder Laptop mit: Die Fragen erscheinen bei allen gleichzeitig, wer richtig und schnell antwortet, bekommt mehr Punkte. Nach jeder Frage gibt es Auflösung und Rangliste, am Ende das Siegertreppchen. Das Quiz zaubert die KI vorher aus einem Thema – gern aus deinen Unterlagen – oder du schreibst es selbst. Mitspielen geht per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, von überall – und in Lyra Campus mit der eigenen Lyra.",
+  "farbe": "#D946EF",
+  "symbol": "<path d='M4.5 15.5L11 3.5c1.2 1.1 2.7 1.8 4.5 2.1-1.3.4-2.1 1.1-2.4 2L15.5 15.5z'/><ellipse class='aus' cx='10' cy='16.5' rx='8.6' ry='2.9'/><ellipse cx='10' cy='16.5' rx='7.9' ry='2.2'/><path d='M17.6 8.2a4.6 4.6 0 0 1 0 6.4' stroke-width='1.7'/><path d='M20.2 5.8a8.2 8.2 0 0 1 0 11.2' stroke-width='1.7' opacity='.7'/><circle cx='5' cy='4.5' r='1.1' opacity='.75'/><circle cx='9' cy='20.6' r='0.9' opacity='.6'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "campus",
+    "gaeste"
+  ],
+  "datenhinweis": "dein Quiz-Thema und passende Auszüge aus deinen Unterlagen an die KI (wenn du „Unterlagen“ wählst); im Spiel nur die Fragen, Namen und Punkte – über die Spielseite (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen",
+  "funktionen": [
+    "Live-Quiz für viele gleichzeitig: Fragen erscheinen bei allen zur selben Zeit",
+    "Schnell und richtig bringt mehr Punkte (bis 1000 je Frage) – dazu ein Bonus für Serien",
+    "Nach jeder Frage Auflösung mit Antwortverteilung und Rangliste, am Ende Siegertreppchen und Gewinner",
+    "Du bist Host und spielst nicht mit – dein Bildschirm ist die Leinwand",
+    "Mitspielen per Link oder QR-Code im Browser – ohne Lyra, ohne Konto, von überall, Ende-zu-Ende-verschlüsselt",
+    "Mitspielen in Lyra Campus mit der eigenen Lyra – Antworten gehen verschlüsselt nur an dich",
+    "Quiz per KI aus einem Thema oder deinen Unterlagen – vorher ansehen und anpassen, oder selbst schreiben",
+    "Ergebnisse als CSV sichern, gleiche Runde nochmal spielen"
+  ],
+  "neuerungen": {
+    "1.0.0": [
+      "Das erste Live-Quiz von Lyra: Host, Lobby mit QR-Code, gleichzeitige Fragen, Punkte nach Tempo, Rangliste und Siegertreppchen"
+    ]
+  }
+}

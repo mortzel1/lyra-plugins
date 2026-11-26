@@ -1,0 +1,138 @@
+/* Quizzard Online – Host-Bildschirm: Spielshow, groß und gut lesbar (auch an der Leinwand). Immer dunkel. */
+:root {
+  --farbe: #f0abfc; --akzent: #d946ef; --akzent-weich: rgba(217, 70, 239, 0.22);
+  --grund: #140c2a; --flaeche: rgba(255, 255, 255, 0.07); --karte: rgba(255, 255, 255, 0.07); --karte-hover: rgba(255, 255, 255, 0.12);
+  --linie: rgba(255, 255, 255, 0.12); --text: #fbf8ff; --leise: #bcb2dc;
+  --rot: #ef4565; --blau: #3d7bfd; --gelb: #f5a524; --gruen: #1fb978;
+  color-scheme: dark;
+}
+html, body { background: var(--grund); color: var(--text); font-family: ui-rounded, "SF Pro Rounded", -apple-system, sans-serif; overflow: hidden; margin: 0; }
+body::before { content: ''; position: fixed; inset: -20%; z-index: 0; pointer-events: none;
+  background: radial-gradient(40% 40% at 18% 18%, rgba(217, 70, 239, 0.40), transparent 70%),
+              radial-gradient(35% 35% at 85% 28%, rgba(99, 102, 241, 0.35), transparent 70%),
+              radial-gradient(40% 40% at 50% 95%, rgba(34, 211, 238, 0.24), transparent 70%);
+  animation: drehen 34s linear infinite; }
+@keyframes drehen { to { transform: rotate(360deg); } }
+#app { position: relative; z-index: 1; height: 100vh; overflow: auto; }
+.buehne { max-width: 980px; margin: 0 auto; padding: 26px 28px 44px; }
+.buehne.im-spiel { max-width: 1180px; }
+.zeile { display: flex; align-items: center; }
+.spalte { display: flex; flex-direction: column; }
+.umbruch { flex-wrap: wrap; }
+.wachsen { flex: 1; min-width: 0; }
+.mitte { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.leise { color: var(--leise); }
+.klein { font-size: 13px; }
+.fett { font-weight: 800; }
+h1, h2 { margin: 0; }
+h2 { font-size: 17px; font-weight: 850; margin-bottom: 10px; }
+h2.zwischen { margin: 26px 0 10px; }
+
+.knopf { border: 0; border-radius: 16px; padding: 12px 22px; font: inherit; font-size: 15.5px; font-weight: 850; color: white; cursor: pointer;
+  background: linear-gradient(135deg, #a855f7, #ec4899); box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28); transition: transform 0.1s, box-shadow 0.1s, filter 0.15s; }
+.knopf:hover { filter: brightness(1.08); }
+.knopf:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28); }
+.knopf:disabled { opacity: 0.45; cursor: default; filter: none; }
+.knopf.tonal { background: rgba(255, 255, 255, 0.1); color: var(--text); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22); }
+.knopf.text { background: none; box-shadow: none; color: var(--farbe); padding: 8px 10px; }
+.knopf.riesig { font-size: 22px; padding: 18px 42px; border-radius: 22px; }
+.knopf.klein { font-size: 13px; padding: 8px 12px; }
+.knopf.symbol { padding: 6px 9px; font-size: 13px; background: rgba(255, 255, 255, 0.08); box-shadow: none; }
+.eingabe { border: 0; border-radius: 16px; padding: 13px 16px; font: inherit; font-size: 16px; background: rgba(255, 255, 255, 0.09); color: var(--text); outline: none; }
+.eingabe:focus { background: rgba(255, 255, 255, 0.13); box-shadow: 0 0 0 2px rgba(217, 70, 239, 0.55); }
+textarea.eingabe { resize: vertical; }
+
+.logo { font-size: 58px; font-weight: 950; letter-spacing: -0.03em; text-align: center; line-height: 1.05;
+  background: linear-gradient(90deg, #f0abfc, #a5b4fc, #67e8f9, #fde68a, #f0abfc); background-size: 300% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: schimmern 7s linear infinite; }
+.logo.klein { font-size: 26px; }
+@keyframes schimmern { to { background-position: 300% 0; } }
+.slogan { text-align: center; color: var(--leise); margin: 8px 0 24px; font-size: 16.5px; }
+.panel { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; backdrop-filter: blur(10px); }
+.hinweis-band { background: rgba(217, 70, 239, 0.18); border-radius: 16px; padding: 12px 16px; margin-bottom: 16px; font-weight: 650; }
+.fehler-text { color: #fda4af; font-weight: 650; }
+
+.liste { display: flex; flex-direction: column; gap: 8px; }
+.quiz-zeile { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 18px; padding: 12px 14px; }
+.quiz-zeile > .wachsen { cursor: pointer; }
+.quiz-titel { font-weight: 850; font-size: 16px; }
+
+.zauber { font-size: 84px; animation: schweben 2.2s ease-in-out infinite; margin-top: 60px; }
+@keyframes schweben { 50% { transform: translateY(-12px) rotate(-8deg); } }
+
+.titel-eingabe { font-size: 20px; font-weight: 850; }
+.frage-karte { background: rgba(255, 255, 255, 0.06); border-radius: 18px; padding: 12px 14px; cursor: pointer; }
+.frage-karte:hover { background: rgba(255, 255, 255, 0.1); }
+.nr { width: 28px; height: 28px; border-radius: 9px; background: rgba(255, 255, 255, 0.12); display: inline-flex; align-items: center; justify-content: center; font-weight: 900; flex: none; }
+.optionen-mini { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.opt { border-radius: 9px; padding: 4px 9px; font-size: 13px; font-weight: 700; opacity: 0.55; }
+.opt.richtig { opacity: 1; box-shadow: 0 0 0 2px white inset; }
+.rot { background: var(--rot); } .blau { background: var(--blau); } .gelb { background: var(--gelb); } .gruen { background: var(--gruen); }
+.richtig-wahl { border: 0; width: 42px; height: 42px; border-radius: 12px; color: white; font-size: 18px; font-weight: 900; cursor: pointer; opacity: 0.5; flex: none; }
+.richtig-wahl.an { opacity: 1; box-shadow: 0 0 0 3px white; }
+
+/* Lobby */
+.spiel-titel { font-size: 30px; font-weight: 950; letter-spacing: -0.02em; }
+.lobby-raster { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+@media (max-width: 760px) { .lobby-raster { grid-template-columns: 1fr; } }
+.qr-box { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
+.qr { width: 240px; height: 240px; image-rendering: pixelated; background: white; padding: 12px; border-radius: 18px; }
+.link-zeile { display: flex; align-items: center; gap: 8px; max-width: 100%; }
+.link { font-size: 12.5px; background: rgba(0, 0, 0, 0.25); padding: 6px 10px; border-radius: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.spieler-chip { border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-weight: 800; color: var(--text); background: rgba(255, 255, 255, 0.12); cursor: pointer; animation: rein 0.35s ease-out; }
+.spieler-chip:hover { background: rgba(239, 69, 101, 0.4); }
+@keyframes rein { from { transform: scale(0.6); opacity: 0; } }
+.warte-text { animation: pulsieren 1.6s ease-in-out infinite; }
+@keyframes pulsieren { 50% { opacity: 0.45; } }
+.lade { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid rgba(255, 255, 255, 0.3); border-top-color: white; animation: drehen 0.8s linear infinite; vertical-align: -3px; }
+
+/* Spiel */
+.leiste-oben { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-weight: 800; }
+.pill { background: rgba(255, 255, 255, 0.1); border-radius: 999px; padding: 7px 14px; font-size: 14px; white-space: nowrap; }
+.frage-gross { font-size: clamp(26px, 3.4vw, 42px); font-weight: 900; text-align: center; line-height: 1.25; margin: 12px auto 6px; max-width: 1000px; }
+.frage-gross.klein { font-size: 22px; color: var(--leise); }
+.zeitring { --anteil: 1; width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 950;
+  background: radial-gradient(closest-side, var(--grund) 78%, transparent 80% 100%), conic-gradient(#d946ef calc(var(--anteil) * 360deg), rgba(255, 255, 255, 0.12) 0); }
+.host-kacheln { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.host-kachel { border-radius: 22px; min-height: 110px; padding: 18px 22px; display: flex; align-items: center; gap: 18px; font-size: clamp(18px, 2vw, 26px); font-weight: 850; color: white; box-shadow: 0 7px 0 rgba(0, 0, 0, 0.28); }
+.host-kachel .form { font-size: 36px; }
+.verteilung { display: flex; align-items: flex-end; justify-content: center; gap: 18px; margin: 18px 0 12px; }
+.saeule { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 180px; background: none !important; }
+.saeule-zahl { font-size: 26px; font-weight: 950; }
+.saeule-balken { width: 100%; border-radius: 14px 14px 4px 4px; transition: height 0.6s ease-out; }
+.saeule.rot .saeule-balken { background: var(--rot); } .saeule.blau .saeule-balken { background: var(--blau); }
+.saeule.gelb .saeule-balken { background: var(--gelb); } .saeule.gruen .saeule-balken { background: var(--gruen); }
+.saeule.falsch { opacity: 0.4; }
+.saeule.richtig .saeule-balken { box-shadow: 0 0 0 3px white, 0 0 28px rgba(255, 255, 255, 0.35); }
+.saeule-text { font-weight: 800; text-align: center; font-size: 15px; }
+.wissen { max-width: 760px; margin: 4px auto 0; line-height: 1.5; }
+
+.rangliste { display: flex; flex-direction: column; gap: 10px; max-width: 760px; margin: 18px auto 0; }
+.rangliste.klein { gap: 6px; margin-top: 22px; }
+.rang-zeile { display: flex; align-items: center; gap: 14px; background: rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 14px 18px; font-size: 20px; font-weight: 850; animation: rein 0.4s ease-out both; }
+.rangliste.klein .rang-zeile { font-size: 15px; padding: 9px 14px; }
+.rang-zeile:nth-child(2) { animation-delay: 0.08s; } .rang-zeile:nth-child(3) { animation-delay: 0.16s; } .rang-zeile:nth-child(4) { animation-delay: 0.24s; } .rang-zeile:nth-child(5) { animation-delay: 0.32s; }
+.rang-zeile.erster { background: linear-gradient(90deg, rgba(253, 224, 71, 0.35), rgba(245, 158, 11, 0.18)); }
+.platz { width: 36px; height: 36px; border-radius: 11px; background: rgba(255, 255, 255, 0.14); display: inline-flex; align-items: center; justify-content: center; font-weight: 950; flex: none; }
+.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.serie { color: #fdba74; font-size: 16px; }
+.delta { color: #86efac; font-size: 16px; }
+.gesamt { min-width: 80px; text-align: right; }
+
+.gewinner { text-align: center; font-size: clamp(40px, 6vw, 68px); font-weight: 950; letter-spacing: -0.02em; margin: 6px 0 4px; animation: rein 0.6s ease-out; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin-top: 24px; }
+.stufe { width: 210px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.stufe.s1 { order: 2; } .stufe.s2 { order: 1; } .stufe.s3 { order: 3; }
+.stufe-name { font-weight: 900; font-size: 20px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stufe-punkte { color: var(--leise); font-size: 14px; }
+.stufe-block { width: 100%; border-radius: 18px 18px 6px 6px; display: flex; justify-content: center; padding-top: 12px; font-size: 40px; font-weight: 950; }
+.s1 .stufe-block { height: 190px; background: linear-gradient(180deg, #fde047, #f59e0b); color: #4a2c00; }
+.s2 .stufe-block { height: 140px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); color: #1e293b; }
+.s3 .stufe-block { height: 104px; background: linear-gradient(180deg, #fdba74, #c2410c); color: #431407; }
+
+.konfetti { position: fixed; top: -12px; width: 9px; height: 14px; border-radius: 2px; z-index: 50; pointer-events: none; animation: fallen linear forwards; }
+@keyframes fallen { to { transform: translateY(110vh) rotate(720deg); } }
+
+/* Mitspielen in Lyra: die Ansicht der Spielseite füllt das Fenster */
+#app > .qo-spieler { min-height: 100vh; }

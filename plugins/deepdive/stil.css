@@ -382,3 +382,8 @@ html, body { height: 100%; overflow: hidden; background: var(--dd-grund); color:
   .dd-skript h3 { break-before: page; border-top: none; }
   .dd-skript h4, .dd-skript blockquote { break-inside: avoid; break-after: avoid; }
 }
+
+/* Lyra Campus: Fortschritt im Raum (für Hosts) */
+.campus-tabelle { width: 100%; border-collapse: collapse; font-size: 14px; }
+.campus-tabelle th { text-align: left; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--leise); padding: 6px 10px; }
+.campus-tabelle td { padding: 8px 10px; border-top: 1px solid var(--linie); }

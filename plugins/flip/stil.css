@@ -54,3 +54,8 @@
 .stat { background: var(--flaeche); border-radius: 14px; padding: 12px 14px; }
 .stat-zahl { font-size: 22px; font-weight: 850; color: var(--f, var(--text)); }
 .stat.gross .stat-zahl { color: var(--akzent); }
+
+/* Lyra Campus: Fortschritt im Raum (für Hosts) */
+.campus-tabelle { width: 100%; border-collapse: collapse; font-size: 14px; }
+.campus-tabelle th { text-align: left; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--leise); padding: 6px 10px; }
+.campus-tabelle td { padding: 8px 10px; border-top: 1px solid var(--linie); }

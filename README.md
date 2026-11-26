@@ -11,11 +11,11 @@ installierst – von hier, aus dem neuesten Release:
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
-| **Deep Dive** | 2.0.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
+| **Deep Dive** | 2.1.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |
 | **Echo** | 1.1.0 | Vorlesungen aufnehmen und mitschreiben – auf deinem Mac |
 | **Essenz** | 1.1.0 | Formelblatt aus deinen Unterlagen |
-| **Flip** | 1.2.0 | Karteikarten, die sitzen |
+| **Flip** | 1.3.0 | Karteikarten, die sitzen |
 | **Flow** | 1.0.1 | Fokus-Timer mit Statistik |
 | **Graphit** | 1.1.0 | Schaubilder zeichnen – direkt in der Eingabezeile |
 | **Justitia** | 1.0.0 | Gutachtenstil-Trainer für Jura |
@@ -27,6 +27,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Omega** | 1.0.1 | Kellerautomaten, Turingmaschinen, Grammatiken & CYK |
 | **Prisma** | 1.0.0 | Datenanalyse für CSV und Excel |
 | **Quizzard** | 1.4.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
+| **Quizzard Online** | 1.0.0 | Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt |
 | **Recap** | 1.1.0 | Besprechungen → Entscheidungen & To-dos |
 | **Regie** | 1.0.1 | Vom Thema zum Erklärvideo |
 | **Scout** | 1.1.0 | Recherchiert im Netz und schreibt dir ein Skript |
@@ -34,7 +35,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Sprungbrett** | 1.0.0 | Dein Bewerbungscoach |
 | **Tinte** | 1.1.0 | Briefe & E-Mails, die sitzen |
 | **Veritas** | 1.1.0 | Faktencheck mit Quellen und Prozent-Einschätzung |
-| **Vertex** | 1.0.0 | Grafikrechner – Funktionen zeichnen, untersuchen, modellieren |
+| **Vertex** | 1.1.0 | Grafikrechner – Funktionen zeichnen, untersuchen, modellieren |
 | **Zaster** | 1.0.0 | Haushaltsbuch mit Abo-Radar |
 
 ## Sicherheit

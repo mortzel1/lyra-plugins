@@ -1,0 +1,75 @@
+/* Quizzard Online – Ansicht für Mitspielende (Handy, Tablet, Laptop; im Browser und in Lyra). Immer dunkel wie eine Spielshow. */
+.qo-spieler {
+  --rot: #ef4565; --blau: #3d7bfd; --gelb: #f5a524; --gruen: #1fb978;
+  --grund: #160f2e; --text: #fbf8ff; --leise: #b9b0d9; --karte: rgba(255, 255, 255, 0.08);
+  min-height: 100vh; min-height: 100dvh; box-sizing: border-box; display: flex; flex-direction: column;
+  padding: 14px 16px 22px; color: var(--text); font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  background: radial-gradient(60% 45% at 15% 10%, rgba(168, 85, 247, 0.45), transparent 70%),
+              radial-gradient(55% 40% at 90% 25%, rgba(236, 72, 153, 0.30), transparent 70%),
+              radial-gradient(60% 45% at 50% 100%, rgba(34, 211, 238, 0.22), transparent 70%), var(--grund);
+  -webkit-user-select: none; user-select: none;
+}
+.qo-spieler * { box-sizing: border-box; }
+.qo-kopf { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 14px; }
+.qo-marke { background: linear-gradient(90deg, #c4b5fd, #f9a8d4); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 16px; }
+.qo-name { flex: 1; text-align: right; color: var(--leise); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qo-punkte { background: var(--karte); border-radius: 999px; padding: 5px 12px; }
+.qo-mitte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 20px 6px; }
+.qo-mitte h1 { margin: 6px 0 0; font-size: clamp(26px, 7vw, 38px); font-weight: 900; letter-spacing: -0.02em; }
+.qo-leise { color: var(--leise); margin: 0; font-size: 15px; line-height: 1.45; max-width: 520px; }
+.qo-titel { margin: 0; font-size: 18px; font-weight: 700; }
+.qo-gross-symbol { font-size: 72px; line-height: 1; }
+.qo-schweben { animation: qo-schweben 2.4s ease-in-out infinite; }
+@keyframes qo-schweben { 50% { transform: translateY(-10px) rotate(-6deg); } }
+.qo-punkte-lauf { display: flex; gap: 8px; margin-top: 14px; }
+.qo-punkte-lauf i { width: 10px; height: 10px; border-radius: 50%; background: var(--leise); animation: qo-hupf 1.2s infinite; }
+.qo-punkte-lauf i:nth-child(2) { animation-delay: 0.15s; } .qo-punkte-lauf i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes qo-hupf { 30% { transform: translateY(-8px); opacity: 1; } 0%, 60%, 100% { opacity: 0.4; } }
+
+.qo-frage-seite { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
+.qo-frage-kopf { display: flex; align-items: center; gap: 12px; }
+.qo-pill { background: var(--karte); border-radius: 999px; padding: 6px 12px; font-weight: 800; font-size: 13px; white-space: nowrap; }
+.qo-zeit { flex: 1; display: flex; align-items: center; gap: 10px; }
+.qo-zeit-bahn { position: relative; flex: 1; height: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; overflow: hidden; }
+.qo-zeit-balken { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(90deg, #22d3ee, #a855f7); transition: width 0.2s linear; }
+.qo-zeit-zahl { min-width: 28px; text-align: right; font-weight: 900; font-size: 20px; font-variant-numeric: tabular-nums; }
+.qo-frage { margin: 8px 0 4px; font-size: clamp(20px, 5.4vw, 30px); line-height: 1.3; font-weight: 800; text-align: center; }
+.qo-kacheln { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 260px; }
+.qo-kacheln.n2 { grid-template-columns: 1fr 1fr; }
+.qo-kachel { border: 0; border-radius: 20px; color: white; font: inherit; font-weight: 800; font-size: clamp(16px, 4.2vw, 22px); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px 12px;
+  box-shadow: 0 7px 0 rgba(0, 0, 0, 0.28); transition: transform 0.08s, box-shadow 0.08s, filter 0.15s; text-align: center; }
+.qo-kachel:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28); }
+.qo-kachel:hover { filter: brightness(1.08); }
+.qo-form { font-size: 34px; line-height: 1; }
+.qo-option { line-height: 1.25; overflow-wrap: anywhere; }
+.rot { background: var(--rot); } .blau { background: var(--blau); } .gelb { background: var(--gelb); } .gruen { background: var(--gruen); }
+.qo-gewaehlt { width: 120px; height: 120px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 56px; color: white; box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25); animation: qo-pop 0.35s ease-out; }
+@keyframes qo-pop { 0% { transform: scale(0.6); } 70% { transform: scale(1.08); } }
+
+.qo-ergebnis.gut .qo-gross-symbol { color: #4ade80; font-weight: 900; animation: qo-pop 0.4s ease-out; }
+.qo-ergebnis.schlecht .qo-gross-symbol { color: #fb7185; font-weight: 900; }
+.qo-plus { font-size: 44px; font-weight: 900; background: linear-gradient(90deg, #fde047, #4ade80); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qo-serie { background: rgba(251, 146, 60, 0.2); color: #fdba74; border-radius: 999px; padding: 6px 14px; font-weight: 800; }
+.qo-loesung { font-weight: 700; margin: 4px 0 0; }
+.qo-platz { font-weight: 800; font-size: 17px; margin: 6px 0 0; }
+.qo-wissen { margin-top: 10px; font-size: 14px; }
+
+.qo-podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 22px; width: 100%; max-width: 440px; }
+.qo-stufe { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.qo-stufe.s1 { order: 2; } .qo-stufe.s2 { order: 1; } .qo-stufe.s3 { order: 3; }
+.qo-stufe-name { font-weight: 800; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qo-stufe-punkte { color: var(--leise); font-size: 13px; }
+.qo-stufe-block { width: 100%; border-radius: 14px 14px 6px 6px; display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; font-size: 26px; font-weight: 900; }
+.s1 .qo-stufe-block { height: 120px; background: linear-gradient(180deg, #fde047, #f59e0b); color: #4a2c00; }
+.s2 .qo-stufe-block { height: 86px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); color: #1e293b; }
+.s3 .qo-stufe-block { height: 64px; background: linear-gradient(180deg, #fdba74, #c2410c); color: #431407; }
+
+/* Beitreten (nur Spielseite im Browser) */
+.qo-beitreten { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.qo-eingabe { width: 100%; border: 0; border-radius: 16px; padding: 16px 18px; font: inherit; font-size: 20px; font-weight: 700; text-align: center; background: rgba(255, 255, 255, 0.12); color: var(--text); outline: none; }
+.qo-eingabe:focus { background: rgba(255, 255, 255, 0.18); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.6); }
+.qo-knopf { border: 0; border-radius: 16px; padding: 16px; font: inherit; font-size: 19px; font-weight: 900; color: white; cursor: pointer; background: linear-gradient(135deg, #8b5cf6, #ec4899); box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28); }
+.qo-knopf:disabled { opacity: 0.5; }
+.qo-fehler { color: #fda4af; font-weight: 700; min-height: 1.2em; margin: 0; }
+.qo-fuss { text-align: center; color: var(--leise); font-size: 12px; margin-top: 10px; }

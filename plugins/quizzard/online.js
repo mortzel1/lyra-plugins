@@ -43,11 +43,11 @@ async function raumTeilen(q) {
         'Öffne in Lyra „Campus“ (das Personen-Symbol neben dem Eingabefeld), melde dich an und erstelle einen Raum für deine Klasse, Lerngruppe oder dein Team. Dann kannst du Quizze dort teilen.'),
       [{ text: 'OK', wert: true }]);
   }
-  const wahl = { raum: (raeume.find((r) => r.host) || raeume[0]).id, modus: 'aufgabe', frist: '' };
+  const wahl = { raum: (raeume.find((r) => r.host) || raeume[0]).id, modus: 'aufgabe', frist: '', pflicht: false };
   const inhalt = h('div', { class: 'spalte', style: { minWidth: '420px', gap: '14px' } });
   const malen = () => {
     const r = raeume.find((x) => x.id === wahl.raum);
-    inhalt.replaceChildren(
+    inhalt.replaceChildren(...[
       h('div', { class: 'zeile umbruch' },
         lyra.auswahl({ titel: 'Raum', symbol: '👥', optionen: raeume.map((x) => [x.id, x.name, `${x.mitglieder} Mitglieder${x.host ? ' · du bist Host' : ''}`]), wert: wahl.raum, beiWahl: (w) => { wahl.raum = w; malen(); }, breit: true }),
         lyra.auswahl({ titel: 'Als', optionen: [['aufgabe', '📝 Aufgabe', 'Jeder spielt allein, wann er will – Ergebnisse gehen an dich'], ['live', '⚡ Live-Runde', 'Alle gleichzeitig, du steuerst – mit Rangliste nach jeder Frage']], wert: wahl.modus, beiWahl: (w) => { wahl.modus = w; malen(); }, breit: true })),
@@ -55,10 +55,14 @@ async function raumTeilen(q) {
         ? h('label', { class: 'zeile', style: { gap: '8px' } }, h('span', { class: 'leise' }, 'Abgabe bis (optional)'),
           h('input', { type: 'date', class: 'eingabe', value: wahl.frist, oninput: (e) => { wahl.frist = e.target.value; } }))
         : null,
+      wahl.modus === 'aufgabe'
+        ? lyra.schalter({ wert: wahl.pflicht, beiWahl: (v) => { wahl.pflicht = v; }, text: 'Pflicht (Hausaufgabe)', unter: 'Steht bei allen unter „Abgaben“ – mit Frist auch auf Lyras Startseite.' })
+        : null,
       h('div', { class: 'leise klein', style: { lineHeight: 1.5 } },
         `${q.fragen.length} Fragen gehen Ende-zu-Ende-verschlüsselt an ${r ? r.mitglieder : 'alle'} Mitglieder von „${r ? r.name : ''}“. `,
         q.fragen.some((f) => f.art === 'bild') ? 'Fotos der Bilderfragen lädt Quizzard bei den anderen selbst aus Wikipedia. ' : '',
-        r && !r.host ? 'Du bist dort nicht Host – Ergebnisse bekommen Host und Co-Hosts.' : 'Ergebnisse siehst nur du (und Co-Hosts).'));
+        r && !r.host ? 'Du bist dort nicht Host – Ergebnisse bekommen Host und Co-Hosts.' : 'Ergebnisse siehst nur du (und Co-Hosts).'),
+    ].filter(Boolean));
   };
   malen();
   const ok = await lyra.dialog(`„${q.thema}“ teilen`, inhalt, [{ text: 'Abbrechen', art: 'text', wert: false }, { text: 'Weiter', wert: true }]);
@@ -71,6 +75,7 @@ async function raumTeilen(q) {
       titel: q.thema,
       modus: wahl.modus,
       frist: wahl.frist ? new Date(wahl.frist + 'T23:59:00').getTime() : null,
+      pflicht: wahl.modus === 'aufgabe' && wahl.pflicht,
       daten: { quiz: { thema: q.thema, fragen }, zeit: z.einst.zeit || 20 },
     });
     lyra.toast(wahl.modus === 'live' ? '✓ Geteilt – öffne die Live-Runde im Raum, um zu starten' : '✓ Geteilt – die Mitglieder finden das Quiz unter „Aufgaben“', 'ok');

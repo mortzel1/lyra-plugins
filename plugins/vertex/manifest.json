@@ -1,7 +1,7 @@
 {
   "kennung": "vertex",
   "name": "Vertex",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "untertitel": "Grafikrechner – Funktionen zeichnen, untersuchen, modellieren",
   "kategorie": "informatik",
   "beschreibung": "Tipp eine Funktion ein, wie du sie auch auf Papier schreibst – f(x) = 2x² − 4, √x, |x − 1|, sin x –, und Vertex zeichnet den Graphen sofort. Mit Schiebereglern für Parameter, Punkten, Ungleichungen, Kreisen und Kurven. Vertex rechnet die ganze Kurvendiskussion exakt aus (Nullstellen als √2 oder 3/4 statt Kommazahlen), löst Steckbriefaufgaben mit Rechenweg und findet Ausgleichsfunktionen zu Messwerten – alles auf deinem Mac, ohne KI. Die KI hilft nur, wenn du willst: eine Aufgabe in Funktionen übersetzen oder dir die Kurvendiskussion erklären.",
@@ -11,9 +11,10 @@
   "berechtigungen": [
     "ki",
     "speicher",
-    "dateien"
+    "dateien",
+    "campus"
   ],
-  "datenhinweis": "nur, wenn du die KI nutzt: deine Beschreibung bzw. Aufgabe und die berechneten Werte zum Erklären",
+  "datenhinweis": "nur, wenn du die KI nutzt: deine Beschreibung bzw. Aufgabe und die berechneten Werte zum Erklären; in Lyra Campus nur, was du teilst – Ende-zu-Ende-verschlüsselt, Lyra fragt vorher",
   "funktionen": [
     "Schreiben wie auf Papier: 2x², √x, |x|, sin x, e^-x, f'(x), log_2(x), Dezimalkomma – mit Symbolleiste für π, √, Betrag und Co.",
     "Funktionen, Punkte P(1|2), Gleichungen (Kreis x² + y² = 4), Ungleichungen (y < x² wird schraffiert), Parameter- und Polarkurven, Bereiche wie {0 < x < 2}",
@@ -25,13 +26,17 @@
     "Zeichnen per KI: „Parabel mit Scheitel (2|1) durch den Ursprung“ – Vertex prüft die Vorschläge, du übernimmst",
     "Mehrere Blätter, Rückgängig, Export als PNG, SVG oder pgfplots-Code für LaTeX",
     "Direkt in Lyras Eingabezeile: Funktion eintippen, Graph und Kurvendiskussion erscheinen in der Antwort",
-    "Macht bei Fusion mit: zeichnet Graphen und liefert exakte Kurvendiskussionen für andere Plugins"
+    "Macht bei Fusion mit: zeichnet Graphen und liefert exakte Kurvendiskussionen für andere Plugins",
+    "Mit Lyra Campus: Blätter mit Graphen in einen Raum teilen"
   ],
   "chat": {
     "titel": "Graph zeichnen",
     "platzhalter": "Funktion, z. B. f(x) = x² − 4"
   },
   "neuerungen": {
+    "1.1.0": [
+      "Mit Lyra Campus: Teile ein Blatt mit Graphen in einen Raum – als Material oder Aufgabe"
+    ],
     "1.0.0": [
       "Neu: Vertex, der Grafikrechner von Lyra"
     ]

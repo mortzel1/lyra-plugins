@@ -128,8 +128,44 @@ async function stellen(suche, anzahl) {
   }
 }
 
+// ================================================================== Lyra Campus: Stapel teilen
+
+async function stapelTeilen(s) {
+  await Campus.teilen({ titel: s.titel, typ: 'karten', daten: { stapel: { titel: s.titel, wunsch: s.wunsch || '', karten: s.karten.map((k) => ({ vorne: k.vorne, hinten: k.hinten })) } }, beschreibung: `${s.karten.length} Karteikarten` });
+}
+
+/** Aus einem Raum geöffnet: eigene Kopie des Stapels (mit frischem Lernstand) anlegen bzw. wieder öffnen. */
+async function campusOeffnen() {
+  const k = await Campus.kontext('karten');
+  if (!k || !k.inhalt.daten || !k.inhalt.daten.stapel) return false;
+  z.campusKontext = k;
+  const id = 'campus-' + k.inhalt.id;
+  let s = z.stapel.find((x) => x.id === id);
+  if (!s) {
+    const q = k.inhalt.daten.stapel;
+    s = { id, titel: q.titel || k.inhalt.titel, wunsch: q.wunsch || '', erstellt: jetzt(), karten: [], naechsteId: 0,
+      campus: { raum: k.raum.name, inhalt: k.inhalt.id, von: k.inhalt.name, aufgabe: k.inhalt.modus === 'aufgabe', pflicht: !!k.inhalt.pflicht } };
+    for (const c of q.karten || []) {
+      s.naechsteId++;
+      s.karten.push({ id: s.naechsteId, vorne: c.vorne, hinten: c.hinten, quelle: null, gesehen: 0, falsch: 0, intervall: 0, leicht: 2.5, faellig: 0, zuletzt: 0, note: 0 });
+    }
+    await speichern(s);
+    lyra.toast(`🗂 „${s.titel}“ von ${k.inhalt.name} ist jetzt in deinen Stapeln`, 'ok');
+  }
+  await oeffnen(id);
+  if (k.host && k.inhalt.modus === 'aufgabe') {
+    setTimeout(() => Campus.fortschrittDialog(`Fortschritt in „${k.raum.name}“`, ['Gelernt', 'Sitzen'], (d) => [`${Math.round((d.gelernt || 0) * 100)} %`, `${d.sitzen || 0}/${d.karten || 0}`]), 300);
+  }
+  return true;
+}
+
 async function speichern(s) {
   s.geaendert = jetzt();
+  const ck = z.campusKontext;
+  if (s.campus && s.campus.aufgabe && ck && !ck.host && ck.inhalt.id === s.campus.inhalt) {
+    const sitzen = s.karten.filter((k) => k.intervall >= 7).length;
+    Campus.melden({ gelernt: fortschritt(s), sitzen, karten: s.karten.length, fertig: sitzen === s.karten.length });
+  }
   try {
     await lyra.speicher.schreiben('stapel/' + s.id, s);
   } catch (_) {}
@@ -228,6 +264,11 @@ async function start() {
   lyra.bei('einstellungen', einstellungenZeigen);
   document.addEventListener('keydown', taste);
   const route = z.info.route || decodeURIComponent(location.hash.slice(1));
+  if (route === 'campus' && await campusOeffnen()) {
+    if (route === 'einstellungen') einstellungenZeigen();
+    startseite();
+    return;
+  }
   if (route.startsWith('neu')) {
     const p = new URLSearchParams(route.split('?')[1] || '');
     z.eingaben.thema = p.get('thema') || '';
@@ -779,6 +820,7 @@ function stapelAnsicht() {
       unter: s.wunsch && s.wunsch !== s.titel ? s.wunsch : `${s.karten.length} Karten · erstellt ${lyra.zeitText(s.erstellt)}`,
       zurueck: { titel: 'Alle Stapel', bei: zurueck },
       aktionen: [
+        h('button', { class: 'knopf symbol', title: 'In einen Raum teilen (Lyra Campus)', onclick: () => stapelTeilen(s) }, '👥'),
         h('button', { class: 'knopf symbol', title: 'Umbenennen', onclick: umbenennen }, '✎'),
         h('button', { class: 'knopf symbol', title: 'Stapel löschen', onclick: stapelLoeschen }, '🗑'),
       ],

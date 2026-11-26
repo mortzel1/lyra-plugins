@@ -1,7 +1,7 @@
 {
   "kennung": "deepdive",
   "name": "Deep Dive",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "untertitel": "Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung",
   "kategorie": "lernen",
   "beschreibung": "Deep Dive begleitet dich wie eine sehr gute Lehrkraft durch ein Thema aus deinen Unterlagen – von den Grundlagen bis zur Prüfung. Ein Einstufungstest prüft dein Vorwissen und ergänzt fehlende Grundlagen. Der Lernpfad hat Lernziele je Kapitel; jedes wird erklärt, abgefragt und geprüft – ein Kapitel gilt erst als gemeistert, wenn kein Lernziel mehr eine Lücke hat. Zu jedem Häppchen gibt es Merksatz, Verständnisfrage, Tutor-Chat und Lehrer-Werkzeuge (Beispiel durchrechnen, einfacher, tiefer, Analogie, typische Fehler, Schaubild). Im Kapitel-Check helfen gestufte Hinweise; danach sorgt ein Wiederholungsplan dafür, dass es bleibt. Mit Probeklausur samt Note und Prüfungsbericht, Skript zum Drucken, Glossar und Lernzeit. Lehrstil (Nachhilfelehrer, Professorin, sokratisch) und Niveau (Schule, Bachelor, Master) wählst du selbst.",
@@ -14,9 +14,10 @@
     "speicher",
     "startseite",
     "erinnerungen",
-    "werkzeuge"
+    "werkzeuge",
+    "campus"
   ],
-  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen sowie deine Antworten, Lösungen und Rückfragen in Deep Dive",
+  "datenhinweis": "die passenden Auszüge aus deinen Unterlagen sowie deine Antworten, Lösungen und Rückfragen in Deep Dive; in Lyra Campus nur, was du teilst – Ende-zu-Ende-verschlüsselt, Lyra fragt vorher",
   "funktionen": [
     "Einstufungstest: prüft dein Vorwissen und ergänzt fehlende Grundlagen als eigenes Kapitel",
     "Lückenloser Lernpfad mit Lernzielen je Kapitel – jedes wird erklärt, abgefragt und geprüft",
@@ -31,9 +32,14 @@
     "Glossar der Fachbegriffe, das mit jedem Kapitel wächst",
     "Kompetenz-Übersicht, Schwachstellen mit „Gezielt üben“, Lernzeit und Serie",
     "Lehrstil (Nachhilfelehrer, Professorin, sokratisch) und Niveau (Schule, Bachelor, Master) wählbar",
-    "Macht bei Fusion mit: legt Lernkurse an und schreibt Lektionen aus dem Material anderer Plugins"
+    "Macht bei Fusion mit: legt Lernkurse an und schreibt Lektionen aus dem Material anderer Plugins",
+    "Mit Lyra Campus: Kurse als Nachhilfemodul in einen Raum teilen; Hosts sehen bei Aufgaben den Fortschritt"
   ],
   "neuerungen": {
+    "2.1.0": [
+      "Mit Lyra Campus: Teile einen Kurs als Nachhilfemodul in einen Raum – als Material oder als Aufgabe mit Frist",
+      "Aus einem Raum geöffnet bekommst du eine eigene Kopie; bei Aufgaben sieht der Host deinen Fortschritt (verschlüsselt, nach deiner Zustimmung)"
+    ],
     "2.0.0": [
       "Deep Dive ist jetzt dein persönlicher Professor: Einstufung, Lernziele und eine Lückenlos-Garantie",
       "Lehrer-Werkzeuge zu jedem Häppchen: Beispiel, einfacher, tiefer, Analogie, typische Fehler, Schaubild",

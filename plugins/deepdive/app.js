@@ -302,10 +302,60 @@ function datumText(ms) {
   return new Date(ms).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
 }
 
+// ================================================================== Lyra Campus: Kurs als Nachhilfemodul teilen
+
+/** Kopie zum Teilen: Inhalt bleibt (Kapitel, Häppchen, Aufgaben, Glossar), dein Lernstand nicht. */
+function kursSauber(k) {
+  const c = structuredClone(k);
+  delete c.campus;
+  Object.assign(c, { fortschritt: 0, lernzeit: 0, tage: {}, pruefungen: [], schwierigkeiten: [], aktuell: 0, einstufung: null });
+  c.schritte = c.schritte.map((s) => {
+    const x = { ...s, stand: 'offen', pos: 0, runde: 0, punkte: 0, letzte: 0, wiederholung: null, vorwissen: false, ziele: s.inhalte.map(() => ({ wert: null, n: 0 })) };
+    delete x.gemeistertAm; delete x.lueckenBeiAbschluss; delete x.einstufung;
+    x.haeppchen = s.haeppchen.map((p) => { const q = { ...p, rueckfragen: [] }; delete q.gewaehlt; delete q.ergebnis; delete q.erster; return q; });
+    x.aufgaben = s.aufgaben.map((a) => { const q = { ...a, hinweise: [] }; ['gewaehlt', 'punkte', 'bewertet', 'rueckmeldung', 'notiz', 'luecke', 'tippGesehen', 'abgabe'].forEach((f) => delete q[f]); return q; });
+    return x;
+  });
+  return c;
+}
+
+async function kursTeilen(k) {
+  await Campus.teilen({ titel: k.titel, typ: 'kurs', daten: { kurs: kursSauber(k) }, beschreibung: `Kurs mit ${k.schritte.length} Kapiteln` });
+}
+
+/** Aus einem Raum geöffnet: eigene Kopie anlegen (bzw. wieder öffnen); Hosts sehen zuerst den Fortschritt der Klasse. */
+async function campusOeffnen() {
+  const k = await Campus.kontext('kurs');
+  if (!k || !k.inhalt.daten || !k.inhalt.daten.kurs) return false;
+  z.campusKontext = k;
+  const id = 'campus-' + k.inhalt.id;
+  let kurs = z.kurse.find((x) => x.id === id);
+  if (!kurs) {
+    kurs = normalisieren(kursSauber(k.inhalt.daten.kurs));
+    if (!kurs) return false;
+    kurs.id = id;
+    kurs.erstellt = lyra.jetzt();
+    kurs.campus = { raum: k.raum.name, inhalt: k.inhalt.id, von: k.inhalt.name, aufgabe: k.inhalt.modus === 'aufgabe', pflicht: !!k.inhalt.pflicht };
+    await speichern(kurs, { leise: true });
+    lyra.toast(`📚 „${kurs.titel}“ von ${k.inhalt.name} ist jetzt in deinen Kursen`, 'ok');
+  }
+  await oeffnen(id);
+  if (k.host && k.inhalt.modus === 'aufgabe') {
+    setTimeout(() => Campus.fortschrittDialog(`Fortschritt in „${k.raum.name}“`, ['Fortschritt', 'Kapitel', 'Lernziele'],
+      (d) => [`${Math.round((d.fortschritt || 0) * 100)} %`, `${d.gemeistert || 0}/${d.kapitel || 0}`, `${d.ziele || 0}/${d.zieleGesamt || 0}`]), 300);
+  }
+  return true;
+}
+
 let speicherUhr = null;
 async function speichern(k, { leise = false } = {}) {
   k.geaendert = lyra.jetzt();
   k.fortschritt = fortschritt(k);
+  // Aufgabe aus einem Raum: Fortschritt verschlüsselt an Host und Co-Hosts (Lyra fragt einmal nach)
+  const ck = z.campusKontext;
+  if (k.campus && k.campus.aufgabe && ck && !ck.host && ck.inhalt.id === k.campus.inhalt) {
+    Campus.melden({ fortschritt: k.fortschritt, kapitel: k.schritte.length, gemeistert: k.schritte.filter((s) => s.stand === 'gemeistert').length, ziele: sichereZiele(k), zieleGesamt: alleZiele(k).length, fertig: fertigKurs(k) }, fertigKurs(k));
+  }
   try { await lyra.speicher.schreiben('kurse/' + k.id, k); } catch (e) { if (!leise) lyra.toast(meldung(e), 'fehler'); }
   const i = z.kurse.findIndex((x) => x.id === k.id);
   if (i >= 0) z.kurse[i] = k;
@@ -397,7 +447,8 @@ async function start() {
   lyra.bei('zurueck', zurueck);
   lyra.bei('einstellungen', einstellungenZeigen);
   const route = z.info.route || decodeURIComponent(location.hash.slice(1));
-  if (route.startsWith('kurs/')) await oeffnen(route.slice(5));
+  if (route === 'campus' && await campusOeffnen()) { /* aus einem Raum geöffnet */ }
+  else if (route.startsWith('kurs/')) await oeffnen(route.slice(5));
   else if (route.startsWith('wiederholen/')) { await oeffnen(route.slice(12), 'wiederholen'); if (z.kurs) wiederholungStarten(false); }
   else if (route.startsWith('neu?')) { const q = new URLSearchParams(route.slice(4)); z.eingaben.thema = q.get('thema') || ''; z.eingaben.ziel = q.get('ziel') || ''; zeichnen(); }
   else if (route !== 'fusion') zeichnen();
@@ -1596,6 +1647,7 @@ function kursKarte(k) {
       ring(k.fortschritt || 0, 46, 4)),
     h('div', { class: 'dd-karte-inhalt' },
       h('div', { class: 'dd-karte-titel' }, k.titel),
+      k.campus ? h('div', { class: 'dd-mini eine-zeile' }, `👥 von ${k.campus.von} · ${k.campus.raum}${k.campus.pflicht ? ' · Pflicht' : ''}`) : null,
       h('div', { class: 'dd-mini eine-zeile' }, fertig ? `Alle ${k.schritte.length} Kapitel gemeistert` : `Als Nächstes: ${s ? s.titel : ''}`),
       h('div', { class: 'dd-karte-meta' },
         h('span', {}, ic('ziel', 13), `${sichereZiele(k)}/${ziele} Lernziele`),
@@ -1603,6 +1655,7 @@ function kursKarte(k) {
         naechste ? h('span', { class: naechste <= Date.now() ? 'dd-faellig' : '' }, ic('wiederholen', 13), datumText(naechste)) : null,
         h('span', {}, `${gem}/${k.schritte.length} Kapitel`))),
     h('div', { class: 'dd-karte-aktionen' },
+      h('button', { class: 'knopf symbol', title: 'Als Nachhilfemodul in einen Raum teilen (Lyra Campus)', onclick: (e) => { e.stopPropagation(); kursTeilen(k); } }, '👥'),
       h('button', { class: 'knopf symbol', title: 'Mit Flip festigen', onclick: (e) => { e.stopPropagation(); mitFlip(k); } }, ic('karten', 15)),
       h('button', { class: 'knopf symbol', title: 'Löschen', onclick: (e) => { e.stopPropagation(); loeschen(k); } }, ic('muell', 15))));
 }
