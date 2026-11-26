@@ -27,7 +27,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Omega** | 1.0.1 | Kellerautomaten, Turingmaschinen, Grammatiken & CYK |
 | **Prisma** | 1.0.0 | Datenanalyse für CSV und Excel |
 | **Quizzard** | 1.4.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
-| **Quizzard Online** | 1.0.0 | Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt |
+| **Quizzard Online** | 1.1.0 | Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt |
 | **Recap** | 1.1.0 | Besprechungen → Entscheidungen & To-dos |
 | **Regie** | 1.0.1 | Vom Thema zum Erklärvideo |
 | **Scout** | 1.1.0 | Recherchiert im Netz und schreibt dir ein Skript |

@@ -50,7 +50,7 @@
 
   function beitretenZeigen(fehler = '') {
     const name = el('input', { class: 'qo-eingabe', maxlength: '24', placeholder: 'Dein Name', autocomplete: 'nickname', enterkeyhint: 'go' });
-    const knopf = el('button', { class: 'qo-knopf', type: 'submit' }, 'Mitspielen');
+    const knopf = el('button', { class: 'qo-knopf', type: 'submit' }, 'Durchs Portal ✦');
     const meldung = el('p', { class: 'qo-fehler' }, fehler);
     const formular = el('form', { class: 'qo-beitreten', onsubmit: async (e) => {
       e.preventDefault();
@@ -72,10 +72,10 @@
       }
     } }, name, knopf, meldung);
     wurzel.replaceChildren(el('div', { class: 'qo-spieler' },
-      el('div', { class: 'qo-kopf' }, el('span', { class: 'qo-marke' }, 'Quizzard Online')),
+      el('div', { class: 'qo-kopf' }, el('span', { class: 'qo-marke' }, '✦ Quizzard Online')),
       el('div', { class: 'qo-mitte' },
-        el('div', { class: 'qo-gross-symbol qo-schweben' }, '🧙'),
-        el('h1', {}, 'Mitspielen'),
+        el('div', { class: 'qo-orb' }, el('span', {}, '✦')),
+        el('h1', {}, 'Tritt ein'),
         el('p', { class: 'qo-leise' }, 'Gib einen Namen ein – er erscheint in der Rangliste. Kein Konto, keine App nötig.'),
         formular,
         el('p', { class: 'qo-fuss' }, '🔒 Ende-zu-Ende-verschlüsselt mit dem Schlüssel aus deinem Link. Die Seite kommt von der Lyra des Hosts; gespeichert wird nur dein Name für dieses Spiel.'))));
@@ -139,8 +139,8 @@
     schluessel = await schluesselLaden();
     if (!schluessel) {
       wurzel.replaceChildren(el('div', { class: 'qo-spieler' },
-        el('div', { class: 'qo-kopf' }, el('span', { class: 'qo-marke' }, 'Quizzard Online')),
-        el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-gross-symbol' }, '🔗'), el('h1', {}, 'Der Link ist unvollständig'),
+        el('div', { class: 'qo-kopf' }, el('span', { class: 'qo-marke' }, '✦ Quizzard Online')),
+        el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '☾')), el('h1', {}, 'Der Link ist unvollständig'),
           el('p', { class: 'qo-leise' }, 'Scanne den QR-Code noch einmal oder lass dir den ganzen Link schicken (mit dem Teil nach „#“).'))));
       return;
     }
