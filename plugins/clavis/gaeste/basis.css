@@ -1,0 +1,46 @@
+/* Online-Baustein – Grundgerüst der Seite im Browser (Startseite, Name, Fehler). Hell oder dunkel wie das Gerät.
+   Jedes Plugin setzt seine Farben über die Variablen auf .lg-seite (z. B. --lg-akzent). Quelle: werkzeuge/online-baustein. */
+.lg-seite {
+  --lg-grund: #f4f5f8; --lg-flaeche: #ffffff; --lg-text: #17181f; --lg-leise: #6b6f80; --lg-linie: rgba(20, 22, 40, 0.1);
+  --lg-akzent: #6157f0; --lg-akzent-weich: rgba(97, 87, 240, 0.1); --lg-falsch: #d93f45;
+  min-height: 100vh; min-height: 100dvh; box-sizing: border-box; display: flex; flex-direction: column; padding: 14px 16px 22px;
+  background: var(--lg-grund); color: var(--lg-text); font: 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-color-scheme: dark) {
+  .lg-seite { --lg-grund: #121317; --lg-flaeche: #1c1e24; --lg-text: #ececf1; --lg-leise: #9a9fb0; --lg-linie: rgba(255, 255, 255, 0.1);
+    --lg-akzent: #8c84ff; --lg-akzent-weich: rgba(140, 132, 255, 0.16); --lg-falsch: #f07f83; }
+}
+.lg-seite * { box-sizing: border-box; }
+.lg-kopf { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 650; }
+.lg-marke { color: var(--lg-akzent); }
+.lg-mitte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 20px 6px; }
+.lg-mitte h1 { margin: 8px 0 0; font-size: clamp(24px, 6.6vw, 32px); font-weight: 750; letter-spacing: -0.01em; }
+.lg-leise { color: var(--lg-leise); margin: 0; font-size: 15px; max-width: 520px; }
+.lg-orb { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--lg-akzent-weich); color: var(--lg-akzent); }
+.lg-orb span { font-size: 30px; font-weight: 700; line-height: 1; }
+.lg-orb.aus { background: var(--lg-linie); color: var(--lg-leise); }
+.lg-formular { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.lg-eingabe { width: 100%; border: 1.5px solid var(--lg-linie); border-radius: 12px; padding: 14px; font: inherit; font-size: 19px; text-align: center; background: var(--lg-flaeche); color: var(--lg-text); outline: none; }
+.lg-eingabe:focus { border-color: var(--lg-akzent); box-shadow: 0 0 0 3px var(--lg-akzent-weich); }
+.lg-knopf { border: 0; border-radius: 14px; padding: 14px; font: inherit; font-size: 17px; font-weight: 700; color: white; cursor: pointer; background: var(--lg-akzent); }
+.lg-knopf:disabled { opacity: 0.4; }
+.lg-fehler { color: var(--lg-falsch); font-weight: 600; min-height: 1.2em; margin: 0; }
+.lg-fuss { text-align: center; color: var(--lg-leise); font-size: 12px; margin-top: 10px; max-width: 420px; }
+
+/* Host in Lyra: Beitritt (QR, Link, Campus) */
+.lo-beitritt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 700px) { .lo-beitritt { grid-template-columns: 1fr; } }
+.lo-weg { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 16px; padding: 16px; }
+.lo-weg-titel { font-weight: 700; font-size: 15.5px; margin-bottom: 2px; }
+.lo-portal { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 12px; }
+/* Der QR-Code bleibt ein ganzes Quadrat mit weißem Rand (die Kamera braucht die Ecken) */
+.lo-qr { display: block; width: 210px; height: 210px; image-rendering: pixelated; background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--linie); }
+.lo-link-zeile { display: flex; align-items: center; gap: 8px; max-width: 100%; }
+.lo-link { font-size: 12px; background: var(--karte); padding: 5px 9px; border-radius: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lo-laedt { display: flex; align-items: center; gap: 10px; padding: 26px 0; }
+.lo-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lo-chip { border: 1px solid var(--linie); border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--text); background: var(--karte); cursor: pointer; }
+.lo-chip:hover { border-color: var(--falsch); }
+.lo-warten { animation: lo-pulsieren 1.8s ease-in-out infinite; }
+@keyframes lo-pulsieren { 50% { opacity: 0.45; } }

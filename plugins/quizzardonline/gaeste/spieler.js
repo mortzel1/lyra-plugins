@@ -1,6 +1,6 @@
 'use strict';
 /*
- * Quizzard Online – Ansicht für Mitspielende („Sternwarte“). Dieselbe Ansicht im Browser (Spielseite, ohne Lyra) und in
+ * Quizzard Online – Ansicht für Mitspielende (schlicht, hell oder dunkel wie das Gerät). Dieselbe Ansicht im Browser (Spielseite, ohne Lyra) und in
  * Lyra (über einen Campus-Raum). Ohne Abhängigkeiten; die Verbindung bringt der Aufrufer mit (senden, empfangen).
  *
  *   const s = QOSpieler.erstellen(wurzel, { senden: (daten) => …, ich: { id, name }, bild: (id) => dataUrl|null });
@@ -10,8 +10,8 @@
  * reihenfolge (ordnen), zuordnen (Paare), luecke (eintippen). Die Lösung kennt nur der Host.
  */
 const QOSpieler = (() => {
-  /** Himmelszeichen und Edelstein-Töne der Antwortkarten */
-  const ZEICHEN = ['☾', '✦', '☀', '❖', '✧', '☄'];
+  /** Buchstaben der Antworten (die Töne bleiben als Klassen, der schlichte Stil nutzt sie nicht) */
+  const ZEICHEN = ['A', 'B', 'C', 'D', 'E', 'F'];
   const TOENE = ['amethyst', 'smaragd', 'saphir', 'bernstein', 'rose', 'tuerkis'];
   const zahl = (n) => Math.round(n || 0).toLocaleString('de-DE');
   const fmt = (n) => (Math.abs(n) >= 100 ? Math.round(n) : Math.round(n * 100) / 100).toLocaleString('de-DE');
@@ -29,12 +29,10 @@ const QOSpieler = (() => {
     return e;
   }
 
-  /** Sternbild-Uhr: ein Kreis aus Sternen, die nach und nach verlöschen. */
-  function sternUhr(anteil, sekunden, gross = false) {
-    const n = 24;
-    const an = Math.ceil(anteil * n);
-    return el('div', { class: 'qo-uhr' + (gross ? ' gross' : '') },
-      Array.from({ length: n }, (_, i) => el('i', { class: i < an ? 'an' : '', style: { transform: `rotate(${(i * 360) / n}deg) translateY(calc(var(--r) * -1))` } })),
+  /** Restzeit: schmaler Balken mit Sekunden. */
+  function zeitAnzeige(anteil, sekunden, gross = false) {
+    return el('div', { class: 'qo-zeit' + (gross ? ' gross' : '') + (anteil < 0.25 ? ' knapp' : '') },
+      el('div', { class: 'qo-zeit-bahn' }, el('div', { class: 'qo-zeit-balken', style: { width: `${Math.max(0, Math.min(1, anteil)) * 100}%` } })),
       el('b', {}, String(sekunden)));
   }
 
@@ -49,7 +47,7 @@ const QOSpieler = (() => {
     function uhr() {
       const f = z.frage;
       const rest = Math.max(0, z.ende - performance.now());
-      return sternUhr(f && f.zeit ? rest / (f.zeit * 1000) : 0, Math.ceil(rest / 1000));
+      return zeitAnzeige(f && f.zeit ? rest / (f.zeit * 1000) : 0, Math.ceil(rest / 1000));
     }
 
     /** Antwort abschicken – je Fragetyp eine andere Form (siehe Kopf). */
@@ -87,7 +85,7 @@ const QOSpieler = (() => {
           return [
             el('p', { class: 'qo-hinweis' }, 'Mehrere sind richtig – wähle alle, dann „Abgeben“.'),
             el('div', { class: 'qo-karten' }, f.optionen.map((o, i) => karte(i, o, () => { e.has(i) ? e.delete(i) : e.add(i); malen(); }, e.has(i)))),
-            knopf('Abgeben ✦', () => abschicken([...e].sort()), !e.size),
+            knopf('Abgeben', () => abschicken([...e].sort()), !e.size),
           ];
         case 'schaetzen': {
           const schritt = f.schritt || 1;
@@ -95,7 +93,7 @@ const QOSpieler = (() => {
             el('div', { class: 'qo-schaetz-wert' }, `${fmt(e.wert)}${f.einheit ? ' ' + f.einheit : ''}`),
             el('input', { class: 'qo-regler', type: 'range', min: f.min, max: f.max, step: schritt, value: e.wert, oninput: (ev) => { e.wert = Number(ev.target.value); e.bewegt = true; const w = wurzel.querySelector('.qo-schaetz-wert'); if (w) w.textContent = `${fmt(e.wert)}${f.einheit ? ' ' + f.einheit : ''}`; } }),
             el('div', { class: 'qo-regler-grenzen' }, el('span', {}, fmt(f.min)), el('span', {}, fmt(f.max))),
-            knopf('Schätzung abgeben ✦', () => abschicken(e.wert)),
+            knopf('Abgeben', () => abschicken(e.wert)),
           ];
         }
         case 'reihenfolge':
@@ -107,7 +105,7 @@ const QOSpieler = (() => {
               el('span', { class: 'qo-pfeile' },
                 el('button', { type: 'button', disabled: pos === 0, 'aria-label': 'nach oben', onclick: () => { [e[pos - 1], e[pos]] = [e[pos], e[pos - 1]]; malen(); } }, '▲'),
                 el('button', { type: 'button', disabled: pos === e.length - 1, 'aria-label': 'nach unten', onclick: () => { [e[pos + 1], e[pos]] = [e[pos], e[pos + 1]]; malen(); } }, '▼'))))),
-            knopf('So ist es richtig ✦', () => abschicken(e.slice())),
+            knopf('Abgeben', () => abschicken(e.slice())),
           ];
         case 'zuordnen':
           return [
@@ -117,13 +115,13 @@ const QOSpieler = (() => {
               el('select', { class: 'qo-auswahl', onchange: (ev) => { e[i] = Number(ev.target.value); malen(); } },
                 el('option', { value: '-1' }, '— wählen —'),
                 f.rechts.map((r, j) => { const o = el('option', { value: String(j) }, r); if (e[i] === j) o.selected = true; return o; }))))),
-            knopf('Abgeben ✦', () => abschicken(e.slice()), e.some((x) => x < 0)),
+            knopf('Abgeben', () => abschicken(e.slice()), e.some((x) => x < 0)),
           ];
         case 'luecke': {
           const feld = el('input', { class: 'qo-eingabe', placeholder: 'Deine Antwort', autocomplete: 'off', autocapitalize: 'off', enterkeyhint: 'send', value: e.text,
             oninput: (ev) => { e.text = ev.target.value; }, onkeydown: (ev) => { if (ev.key === 'Enter' && e.text.trim()) abschicken(e.text.trim()); } });
           setTimeout(() => feld.focus(), 30);
-          return [feld, knopf('Abgeben ✦', () => e.text.trim() && abschicken(e.text.trim()))];
+          return [feld, knopf('Abgeben', () => e.text.trim() && abschicken(e.text.trim()))];
         }
         default: // auswahl, wahrfalsch, bild
           return el('div', { class: `qo-karten${f.optionen.length === 2 ? ' zwei' : ''}` }, f.optionen.map((o, i) => karte(i, o, () => abschicken([i]))));
@@ -139,17 +137,17 @@ const QOSpieler = (() => {
     function malen() {
       let inhalt;
       const kopf = el('div', { class: 'qo-kopf' },
-        el('span', { class: 'qo-marke' }, '✦ Quizzard Online'),
+        el('span', { class: 'qo-marke' }, 'Quizzard Online'),
         el('span', { class: 'qo-name' }, ich && ich.name ? ich.name : ''),
-        z.ergebnis && z.ergebnis.gesamt != null ? el('span', { class: 'qo-punkte' }, `✦ ${zahl(z.ergebnis.gesamt)}`) : null);
+        z.ergebnis && z.ergebnis.gesamt != null ? el('span', { class: 'qo-punkte' }, `${zahl(z.ergebnis.gesamt)} P.`) : null);
       switch (z.phase) {
         case 'warten':
           inhalt = el('div', { class: 'qo-mitte' },
-            el('div', { class: 'qo-orb' }, el('span', {}, '✦')),
-            el('h1', {}, `Willkommen${ich && ich.name ? ', ' + ich.name : ''}!`),
+            el('div', { class: 'qo-orb' }, el('span', {}, '✓')),
+            el('h1', {}, `Du bist dabei${ich && ich.name ? ', ' + ich.name : ''}!`),
             z.titel ? el('p', { class: 'qo-titel' }, z.titel) : null,
-            el('p', { class: 'qo-leise' }, z.anzahl ? `${z.anzahl} ${z.anzahl === 1 ? 'Frage' : 'Fragen'} · die Sterne stehen gleich richtig` : 'Gleich geht es los.'),
-            z.mitspieler ? el('p', { class: 'qo-leise klein' }, `${z.mitspieler} ${z.mitspieler === 1 ? 'Person ist' : 'Leute sind'} durchs Portal gekommen`) : null);
+            el('p', { class: 'qo-leise' }, z.anzahl ? `${z.anzahl} ${z.anzahl === 1 ? 'Frage' : 'Fragen'} · gleich geht es los` : 'Gleich geht es los.'),
+            z.mitspieler ? el('p', { class: 'qo-leise klein' }, `${z.mitspieler} ${z.mitspieler === 1 ? 'Person ist' : 'Leute sind'} dabei`) : null);
           break;
         case 'frage': {
           const f = z.frage;
@@ -162,12 +160,12 @@ const QOSpieler = (() => {
         }
         case 'gesendet':
           inhalt = el('div', { class: 'qo-mitte' },
-            el('div', { class: 'qo-orb gesendet' }, el('span', {}, '✧')),
-            el('h1', {}, 'Antwort ist unterwegs'),
-            el('p', { class: 'qo-leise' }, 'Die Sterne entscheiden gleich …'));
+            el('div', { class: 'qo-orb gesendet' }, el('span', {}, '✓')),
+            el('h1', {}, 'Antwort gesendet'),
+            el('p', { class: 'qo-leise' }, 'Gleich kommt die Auflösung.'));
           break;
         case 'zu':
-          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '☾')), el('h1', {}, 'Die Zeit ist um'), el('p', { class: 'qo-leise' }, 'Gleich kommt die Auflösung.'));
+          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '–')), el('h1', {}, 'Die Zeit ist um'), el('p', { class: 'qo-leise' }, 'Gleich kommt die Auflösung.'));
           break;
         case 'aufloesung': {
           const e = z.ergebnis || {};
@@ -175,10 +173,10 @@ const QOSpieler = (() => {
           const voll = (e.teil || 0) >= 0.999;
           const teils = !voll && (e.teil || 0) > 0;
           inhalt = el('div', { class: `qo-mitte qo-ergebnis ${voll ? 'gut' : teils ? 'teils' : 'schlecht'}` },
-            el('div', { class: 'qo-orb' }, el('span', {}, voll ? '✦' : teils ? '✧' : e.beantwortet ? '✕' : '☾')),
-            el('h1', {}, voll ? 'Volltreffer!' : teils ? 'Teilweise richtig' : e.beantwortet ? 'Leider daneben' : 'Keine Antwort'),
+            el('div', { class: 'qo-orb' }, el('span', {}, voll ? '✓' : teils ? '½' : e.beantwortet ? '✕' : '–')),
+            el('h1', {}, voll ? 'Richtig!' : teils ? 'Teilweise richtig' : e.beantwortet ? 'Leider daneben' : 'Keine Antwort'),
             e.delta ? el('div', { class: 'qo-plus' }, `+${zahl(e.delta)}`) : null,
-            e.serie >= 2 ? el('div', { class: 'qo-serie' }, `✦ ${e.serie} Treffer in Folge`) : null,
+            e.serie >= 2 ? el('div', { class: 'qo-serie' }, `${e.serie} richtig in Folge`) : null,
             !voll && a.loesungText ? el('p', { class: 'qo-loesung' }, a.loesungText) : null,
             e.platz ? el('p', { class: 'qo-platz' }, `Platz ${e.platz} von ${a.spieler || '?'} · ${zahl(e.gesamt)} Punkte`) : null,
             a.wissenswert ? el('p', { class: 'qo-leise qo-wissen' }, a.wissenswert) : null);
@@ -189,18 +187,18 @@ const QOSpieler = (() => {
           const e = z.ergebnis || {};
           const podium = s.podium || [];
           inhalt = el('div', { class: 'qo-mitte qo-ende' },
-            el('div', { class: 'qo-orb gold' }, el('span', {}, e.platz === 1 ? '♛' : '✦')),
+            el('div', { class: 'qo-orb gold' }, el('span', {}, e.platz ? String(e.platz) : '✓')),
             el('h1', {}, e.platz === 1 ? 'Du hast gewonnen!' : e.platz ? `Platz ${e.platz}` : 'Das Spiel ist aus'),
-            e.gesamt != null ? el('p', { class: 'qo-platz' }, `${zahl(e.gesamt)} Punkte · ${e.richtigGesamt || 0} Volltreffer`) : null,
+            e.gesamt != null ? el('p', { class: 'qo-platz' }, `${zahl(e.gesamt)} Punkte · ${e.richtigGesamt || 0} richtig`) : null,
             podium.length ? el('div', { class: 'qo-podium' }, podium.map((p, i) => el('div', { class: `qo-stufe s${i + 1}` },
-              el('div', { class: 'qo-stufe-name' }, p.name), el('div', { class: 'qo-stufe-punkte' }, `${zahl(p.punkte)}`), el('div', { class: 'qo-stufe-saeule' }, el('span', {}, ['♛', '✦', '✧'][i]))))) : null);
+              el('div', { class: 'qo-stufe-name' }, p.name), el('div', { class: 'qo-stufe-punkte' }, `${zahl(p.punkte)}`), el('div', { class: 'qo-stufe-saeule' }, String(i + 1))))) : null);
           break;
         }
         case 'entfernt':
-          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '☾')), el('h1', {}, 'Du bist nicht mehr dabei'), el('p', { class: 'qo-leise' }, 'Der Host hat dich aus dem Spiel genommen.'));
+          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '–')), el('h1', {}, 'Du bist nicht mehr dabei'), el('p', { class: 'qo-leise' }, 'Der Host hat dich aus dem Spiel genommen.'));
           break;
         case 'vorbei':
-          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '☾')), el('h1', {}, 'Das Portal ist geschlossen'), el('p', { class: 'qo-leise' }, 'Danke fürs Mitspielen!'));
+          inhalt = el('div', { class: 'qo-mitte' }, el('div', { class: 'qo-orb aus' }, el('span', {}, '✓')), el('h1', {}, 'Das Spiel ist vorbei'), el('p', { class: 'qo-leise' }, 'Danke fürs Mitspielen!'));
           break;
         default:
           inhalt = el('div');
@@ -269,5 +267,5 @@ const QOSpieler = (() => {
     return { empfangen, ich: (x) => { ich = x; malen(); } };
   }
 
-  return { erstellen, ZEICHEN, TOENE, sternUhr };
+  return { erstellen, ZEICHEN, TOENE, zeitAnzeige };
 })();

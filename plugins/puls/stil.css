@@ -1,0 +1,93 @@
+/* Puls – Host in Lyra: Start, Editor, Leinwand, Auswertung. Schlicht, in Lyras Farben (hell oder dunkel wie die App). */
+#app { height: 100vh; overflow: auto; }
+.buehne { max-width: 940px; margin: 0 auto; padding: 26px 28px 44px; }
+.buehne.leinwand { max-width: none; padding: 16px 24px 24px; min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; }
+h2 { font-size: 17px; margin-bottom: 10px; }
+h2.zwischen { margin: 28px 0 10px; }
+.klickbar { cursor: pointer; }
+
+.kopfbereich { text-align: center; margin: 6px 0 22px; }
+.logo { display: inline-flex; align-items: center; gap: 12px; font-size: 34px; font-weight: 800; letter-spacing: -0.02em; }
+.logo-puls { width: 18px; height: 18px; border-radius: 50%; background: var(--akzent); animation: schlag 1.4s ease-in-out infinite; }
+@keyframes schlag { 0%, 100% { transform: scale(0.8); box-shadow: 0 0 0 0 var(--akzent-weich); } 15% { transform: scale(1.1); } 30% { transform: scale(0.9); } 45% { transform: scale(1.05); box-shadow: 0 0 0 14px transparent; } }
+.slogan { color: var(--leise); margin: 6px auto 0; font-size: 15.5px; max-width: 560px; }
+.panel { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 16px; padding: 18px; }
+.hinweis-band { background: var(--akzent-weich); border-radius: 12px; padding: 11px 14px; margin-bottom: 16px; }
+.fehler-text { color: var(--falsch); font-weight: 600; }
+.chip-knopf { border: 1px solid var(--linie); background: var(--karte); color: var(--text); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.chip-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
+.lade.gross { width: 34px; height: 34px; }
+.knopf.gross { font-size: 17px; padding: 13px 26px; border-radius: 14px; }
+.knopf.an { background: var(--akzent); color: white; }
+.zaehler { background: var(--akzent); color: white; border-radius: 999px; font-size: 11.5px; min-width: 18px; padding: 0 6px; margin-left: 6px; display: inline-block; text-align: center; }
+.knopf.an .zaehler { background: white; color: var(--akzent); }
+
+.liste { display: flex; flex-direction: column; gap: 8px; }
+.runden-zeile { display: flex; align-items: center; gap: 8px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 11px 14px; }
+.runden-zeile.klickbar:hover { border-color: var(--akzent); }
+.runden-titel { font-weight: 700; font-size: 16px; }
+
+/* Editor */
+.titel-eingabe { font-size: 19px; font-weight: 700; }
+.einstellungen { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+@media (max-width: 700px) { .einstellungen { grid-template-columns: 1fr; } }
+.schalter-zeile { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.schalter-zeile input { margin-top: 3px; accent-color: var(--akzent); width: 16px; height: 16px; flex: none; }
+.item-karte { display: flex; align-items: center; gap: 12px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 12px 14px; cursor: pointer; }
+.item-karte:hover { border-color: var(--akzent); }
+.item-kurz { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nr { width: 26px; height: 26px; border-radius: 8px; background: var(--karte); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
+.art-marke { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--akzent); margin-bottom: 2px; font-weight: 700; }
+.neu-leiste { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.richtig-wahl { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--linie); background: var(--karte); color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer; flex: none; }
+.richtig-wahl.an { background: var(--ok); border-color: var(--ok); color: white; }
+
+/* Leinwand */
+.leiste-oben { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.live-punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--akzent); animation: schlag 1.4s ease-in-out infinite; flex: none; }
+.leinwand-titel { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pill { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px; padding: 4px 12px; font-size: 13.5px; font-weight: 650; white-space: nowrap; }
+.pill.leise { color: var(--leise); }
+.leinwand-raster { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-height: 0; }
+.leinwand-raster.mit-wand { grid-template-columns: minmax(0, 1fr) 340px; }
+.leinwand-haupt { display: flex; flex-direction: column; min-width: 0; }
+
+.lobby { display: flex; flex-direction: column; gap: 16px; max-width: 900px; width: 100%; margin: 10px auto 0; }
+.lobby-titel { font-size: clamp(30px, 4vw, 46px); font-weight: 800; text-align: center; letter-spacing: -0.02em; margin-top: 10px; }
+.lobby-unter { text-align: center; margin-top: -8px; }
+.lobby-fuss { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 6px; }
+
+.item-buehne { display: flex; flex-direction: column; gap: 14px; flex: 1; max-width: 1100px; width: 100%; margin: 0 auto; }
+.item-kopf { display: flex; align-items: center; gap: 8px; }
+.antwort-zahl { color: var(--leise); font-size: 15px; }
+.antwort-zahl b { color: var(--text); font-size: 22px; font-variant-numeric: tabular-nums; }
+.antwort-zahl.offen b { color: var(--akzent); }
+.frage-gross { font-size: clamp(26px, 3.2vw, 42px); font-weight: 780; line-height: 1.2; letter-spacing: -0.015em; margin: 4px 0 6px; }
+.ergebnis-flaeche { flex: 1; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 18px; padding: 22px 26px; min-height: 260px; }
+.verdeckt { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1.5px dashed var(--linie); border-radius: 18px; min-height: 260px; }
+.verdeckt-zahl { font-size: 72px; font-weight: 800; color: var(--akzent); font-variant-numeric: tabular-nums; line-height: 1; }
+.steuerung { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.punkte { display: flex; justify-content: center; gap: 6px; padding-top: 4px; }
+.punkt { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; background: var(--linie); cursor: pointer; }
+.punkt.fertig { background: color-mix(in srgb, var(--akzent) 40%, var(--linie)); }
+.punkt.an { background: var(--akzent); transform: scale(1.3); }
+
+.wand-panel { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 18px; padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 90px); }
+.wand-zeile { display: flex; gap: 10px; align-items: flex-start; padding: 9px 4px; border-top: 1px solid var(--linie); }
+.wand-zeile:first-of-type { border-top: 0; }
+.wand-zeile.erledigt { opacity: 0.5; }
+.wand-stimmen { display: flex; flex-direction: column; align-items: center; min-width: 34px; color: var(--leise); font-size: 11px; }
+.wand-stimmen b { font-size: 16px; color: var(--text); }
+.wand-text { overflow-wrap: anywhere; font-weight: 550; }
+
+.qr-ueberlagerung { position: fixed; inset: 0; background: rgba(10, 10, 16, 0.55); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 30px; animation: einblenden 0.2s ease-out; }
+@keyframes einblenden { from { opacity: 0; } }
+.qr-karte { background: var(--grund); border-radius: 22px; padding: 22px; width: min(820px, 100%); display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+.qr-karte .lo-qr { width: 300px; height: 300px; }
+.wand-gross { background: var(--grund); border-radius: 22px; padding: 34px 40px; max-width: 900px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.wand-gross-text { font-size: clamp(26px, 3.4vw, 44px); font-weight: 750; line-height: 1.25; }
+
+/* Auswertung */
+.auswertung-titel { font-size: 24px; font-weight: 800; }
+.auswertung-item { margin-top: 14px; }
+.auswertung-item h2 { font-size: 18px; margin: 2px 0 14px; }

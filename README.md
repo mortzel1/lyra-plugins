@@ -10,6 +10,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Arena** | 1.0.1 | Probeklausur unter echten Bedingungen |
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
+| **Clavis** | 1.0.0 | Escape Rooms zum Rätseln und Lernen – allein oder im Team |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
 | **Deep Dive** | 2.1.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |
@@ -26,8 +27,9 @@ installierst – von hier, aus dem neuesten Release:
 | **Oase** | 1.0.1 | Dein Ruhepol – Stress, Kopf und Motivation |
 | **Omega** | 1.0.1 | Kellerautomaten, Turingmaschinen, Grammatiken & CYK |
 | **Prisma** | 1.0.0 | Datenanalyse für CSV und Excel |
+| **Puls** | 1.0.0 | Live-Umfragen und Fragenwand – alle machen auf dem Handy mit |
 | **Quizzard** | 1.4.0 | Das Quiz zu jedem Thema – schnell, bunt, mit Punkten |
-| **Quizzard Online** | 1.1.0 | Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt |
+| **Quizzard Online** | 1.2.0 | Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt |
 | **Recap** | 1.1.0 | Besprechungen → Entscheidungen & To-dos |
 | **Regie** | 1.0.1 | Vom Thema zum Erklärvideo |
 | **Scout** | 1.1.0 | Recherchiert im Netz und schreibt dir ein Skript |

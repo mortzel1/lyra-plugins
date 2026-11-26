@@ -1,0 +1,186 @@
+/* Puls – Ansicht der Teilnehmenden und Ergebnis-Grafiken. Schlicht, hell oder dunkel wie das Gerät.
+   Gilt im Browser (Seite für Gäste) und in Lyra (Leinwand des Hosts, Mitmachen über Campus). */
+:root {
+  --pu-akzent: #e0365b; --pu-akzent-weich: rgba(224, 54, 91, 0.1); --pu-grund: #f5f6f8; --pu-flaeche: #ffffff; --pu-text: #1a1b25;
+  --pu-leise: #6b6f80; --pu-linie: rgba(26, 27, 64, 0.1); --pu-feld: rgba(26, 27, 64, 0.05);
+  --pu-ok: #22a06b; --pu-gelb: #e0a014; --pu-rot: #e5484d;
+  --pu-t0: #e0365b; --pu-t1: #6157f0; --pu-t2: #0e9f8f; --pu-t3: #d97706; --pu-t4: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pu-akzent: #ff6b88; --pu-akzent-weich: rgba(255, 107, 136, 0.15); --pu-grund: #141518; --pu-flaeche: #1d1f25; --pu-text: #ececf1;
+    --pu-leise: #9a9fb0; --pu-linie: rgba(255, 255, 255, 0.1); --pu-feld: rgba(255, 255, 255, 0.06);
+    --pu-ok: #4cc595; --pu-gelb: #f0b941; --pu-rot: #f07f83;
+    --pu-t0: #ff6b88; --pu-t1: #9b94ff; --pu-t2: #3dd6c3; --pu-t3: #f5a54a; --pu-t4: #6ea2ff;
+  }
+}
+.lg-seite { --lg-akzent: var(--pu-akzent); --lg-akzent-weich: var(--pu-akzent-weich); }
+
+/* ---------------------------------------------------------------- Seite der Teilnehmenden */
+.pu-seite { min-height: 100vh; min-height: 100dvh; box-sizing: border-box; display: flex; flex-direction: column; padding: 14px 16px 18px; max-width: 620px; margin: 0 auto;
+  color: var(--pu-text); font: 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+.pu-seite * { box-sizing: border-box; }
+body:has(.pu-seite) { background: var(--pu-grund); margin: 0; }
+.pu-kopf { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 650; min-height: 24px; }
+.pu-marke-puls { color: var(--pu-akzent); }
+.pu-titel-klein { flex: 1; color: var(--pu-leise); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pu-name { color: var(--pu-leise); }
+.pu-mitte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 20px 4px; }
+.pu-mitte.klein { flex: none; padding: 16px 0; }
+.pu-mitte h1 { margin: 10px 0 0; font-size: clamp(24px, 6.4vw, 32px); font-weight: 750; letter-spacing: -0.01em; }
+.pu-leise { color: var(--pu-leise); margin: 0; font-size: 15px; }
+.pu-leise-klein { color: var(--pu-leise); font-size: 12.5px; }
+.pu-orb { width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--pu-akzent-weich); color: var(--pu-akzent); font-size: 30px; font-weight: 700; }
+.pu-orb.ruhig { background: var(--pu-feld); color: var(--pu-leise); }
+.pu-puls { width: 22px; height: 22px; border-radius: 50%; background: var(--pu-akzent); animation: pu-schlag 1.4s ease-in-out infinite; }
+@keyframes pu-schlag { 0%, 100% { transform: scale(0.8); box-shadow: 0 0 0 0 var(--pu-akzent-weich); } 15% { transform: scale(1.1); } 30% { transform: scale(0.9); } 45% { transform: scale(1.05); box-shadow: 0 0 0 18px transparent; } }
+
+.pu-frage-seite { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 12px; }
+.pu-frage-kopf { display: flex; gap: 8px; align-items: center; }
+.pu-pill { background: var(--pu-flaeche); border: 1px solid var(--pu-linie); border-radius: 999px; padding: 3px 11px; font-size: 13px; font-weight: 650; }
+.pu-pill.leise { color: var(--pu-leise); }
+.pu-frage { margin: 4px 0 2px; font-size: clamp(20px, 5.4vw, 26px); line-height: 1.3; font-weight: 700; }
+.pu-frage.klein { font-size: 21px; }
+.pu-hinweis { margin: 0; color: var(--pu-leise); font-size: 14px; }
+
+.pu-karten { display: flex; flex-direction: column; gap: 9px; }
+.pu-karte { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px; cursor: pointer; font: inherit; font-size: 17px; font-weight: 600; color: var(--pu-text);
+  text-align: left; background: var(--pu-flaeche); border: 1.5px solid var(--pu-linie); transition: border-color 0.15s, background 0.15s, transform 0.1s; }
+.pu-karte:hover { border-color: var(--pu-akzent); }
+.pu-karte:active { transform: scale(0.985); }
+.pu-karte.an { border-color: var(--pu-akzent); background: var(--pu-akzent-weich); }
+.pu-marke { width: 30px; height: 30px; flex: none; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 750; background: var(--pu-akzent-weich); color: var(--pu-akzent); }
+.pu-karte.an .pu-marke { background: var(--pu-akzent); color: white; }
+.pu-karte-text { flex: 1; line-height: 1.3; overflow-wrap: anywhere; }
+
+.pu-knopf { border: 0; border-radius: 14px; padding: 14px; font: inherit; font-size: 17px; font-weight: 700; color: white; cursor: pointer; background: var(--pu-akzent); }
+.pu-knopf:disabled { opacity: 0.4; }
+.pu-knopf.zart { background: var(--pu-feld); color: var(--pu-text); font-weight: 600; font-size: 15px; padding: 11px 16px; }
+.pu-zeile-knoepfe { display: flex; gap: 8px; justify-content: flex-end; }
+.pu-spalte { display: flex; flex-direction: column; gap: 8px; }
+.pu-eingabe { width: 100%; border: 1.5px solid var(--pu-linie); border-radius: 12px; padding: 13px; font: inherit; font-size: 17px; background: var(--pu-flaeche); color: var(--pu-text); outline: none; }
+.pu-eingabe:focus { border-color: var(--pu-akzent); box-shadow: 0 0 0 3px var(--pu-akzent-weich); }
+.pu-text { resize: vertical; min-height: 84px; line-height: 1.4; }
+.pu-zahl-zeile { display: flex; align-items: center; gap: 10px; }
+.pu-zahl { font-size: 24px; text-align: center; font-weight: 650; }
+.pu-einheit { font-size: 18px; color: var(--pu-leise); font-weight: 600; }
+.pu-fehler { color: var(--pu-rot); font-weight: 600; margin: 0; min-height: 1em; font-size: 14px; }
+
+.pu-skala { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+.pu-skala-knopf { border: 1.5px solid var(--pu-linie); background: var(--pu-flaeche); color: var(--pu-text); border-radius: 12px; padding: 16px 0; font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; }
+.pu-skala.eng .pu-skala-knopf { font-size: 16px; padding: 14px 0; border-radius: 10px; }
+.pu-skala-knopf:hover { border-color: var(--pu-akzent); }
+.pu-skala-knopf.an { background: var(--pu-akzent); border-color: var(--pu-akzent); color: white; }
+.pu-skala-enden { display: flex; justify-content: space-between; gap: 10px; color: var(--pu-leise); font-size: 13px; }
+
+.pu-ordnen { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pu-ordnen-zeile { display: flex; align-items: center; gap: 12px; padding: 9px 10px 9px 12px; border-radius: 14px; border: 1.5px solid var(--pu-linie); background: var(--pu-flaeche); font-weight: 600; }
+.pu-pfeile { display: flex; flex-direction: column; gap: 4px; }
+.pu-pfeile button { border: 1px solid var(--pu-linie); background: var(--pu-feld); color: var(--pu-text); border-radius: 8px; width: 38px; height: 26px; font-size: 11px; cursor: pointer; }
+.pu-pfeile button:disabled { opacity: 0.3; }
+
+.pu-ampel { display: flex; flex-direction: column; gap: 10px; }
+.pu-ampel-knopf { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; border: 1.5px solid var(--pu-linie); background: var(--pu-flaeche); color: var(--pu-text); font: inherit; font-size: 18px; font-weight: 650; cursor: pointer; text-align: left; }
+.pu-ampel-punkt { width: 26px; height: 26px; border-radius: 50%; flex: none; opacity: 0.85; }
+.pu-ampel-knopf.gruen .pu-ampel-punkt { background: var(--pu-ok); } .pu-ampel-knopf.gelb .pu-ampel-punkt { background: var(--pu-gelb); } .pu-ampel-knopf.rot .pu-ampel-punkt { background: var(--pu-rot); }
+.pu-ampel-knopf.an.gruen { border-color: var(--pu-ok); background: color-mix(in srgb, var(--pu-ok) 12%, var(--pu-flaeche)); }
+.pu-ampel-knopf.an.gelb { border-color: var(--pu-gelb); background: color-mix(in srgb, var(--pu-gelb) 14%, var(--pu-flaeche)); }
+.pu-ampel-knopf.an.rot { border-color: var(--pu-rot); background: color-mix(in srgb, var(--pu-rot) 12%, var(--pu-flaeche)); }
+.pu-ampel-knopf.an .pu-ampel-punkt { opacity: 1; box-shadow: 0 0 0 5px color-mix(in srgb, currentColor 0%, transparent); }
+
+.pu-danke { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 16px 0 6px; }
+.pu-danke .pu-ampel { width: 100%; margin-top: 6px; }
+.pu-haken { width: 54px; height: 54px; border-radius: 50%; background: color-mix(in srgb, var(--pu-ok) 14%, transparent); color: var(--pu-ok); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; animation: pu-auf 0.35s ease-out; }
+@keyframes pu-auf { from { transform: scale(0.4); opacity: 0; } }
+.pu-meins { background: var(--pu-feld); border-radius: 12px; padding: 10px 12px; font-size: 15px; }
+.pu-karte-flach { background: var(--pu-flaeche); border: 1px solid var(--pu-linie); border-radius: 16px; padding: 14px; }
+.pu-name-karte { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 8px; text-align: left; background: var(--pu-flaeche); border: 1px solid var(--pu-linie); border-radius: 16px; padding: 14px; margin-top: 18px; }
+
+.pu-reiter { position: sticky; bottom: 0; display: flex; gap: 6px; padding: 10px 0 0; margin-top: 12px; background: linear-gradient(transparent, var(--pu-grund) 30%); }
+.pu-reiter button { flex: 1; border: 1px solid var(--pu-linie); background: var(--pu-flaeche); color: var(--pu-text); border-radius: 12px; padding: 11px; font: inherit; font-weight: 650; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.pu-reiter button.an { border-color: var(--pu-akzent); color: var(--pu-akzent); background: var(--pu-akzent-weich); }
+.pu-zaehler { background: var(--pu-akzent); color: white; border-radius: 999px; font-size: 12px; min-width: 20px; padding: 1px 6px; }
+
+.pu-wand { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.pu-wand-frage { display: flex; gap: 12px; align-items: flex-start; background: var(--pu-flaeche); border: 1px solid var(--pu-linie); border-radius: 14px; padding: 10px 12px; }
+.pu-wand-frage.erledigt { opacity: 0.55; }
+.pu-wand-text { flex: 1; overflow-wrap: anywhere; padding-top: 4px; }
+.pu-stimme { display: flex; flex-direction: column; align-items: center; min-width: 44px; border: 1px solid var(--pu-linie); background: var(--pu-feld); color: var(--pu-leise); border-radius: 10px; padding: 4px 6px; font: inherit; cursor: pointer; }
+.pu-stimme span { font-size: 11px; }
+.pu-stimme b { font-size: 15px; color: var(--pu-text); }
+.pu-stimme.an { border-color: var(--pu-akzent); background: var(--pu-akzent-weich); color: var(--pu-akzent); }
+
+/* ---------------------------------------------------------------- Ergebnisse (Teilnehmende klein, Leinwand groß) */
+.pu-ergebnis { color: var(--pu-text); }
+.pu-leer { color: var(--pu-leise); text-align: center; padding: 22px 0; }
+.pu-balken-liste { display: flex; flex-direction: column; gap: 12px; }
+.pu-zeile { display: flex; flex-direction: column; gap: 6px; transition: opacity 0.3s; }
+.pu-zeile.blass { opacity: 0.45; }
+.pu-zeile-kopf { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.pu-zeile-text { flex: 1; overflow-wrap: anywhere; }
+.pu-zeile-wert { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.pu-zeile-wert small { color: var(--pu-leise); font-weight: 500; }
+.pu-zeile.richtig .pu-marke { background: var(--pu-ok); color: white; }
+.pu-bahn { height: 10px; border-radius: 999px; background: var(--pu-feld); overflow: hidden; }
+.pu-bahn.kurz { width: 30%; flex: none; }
+.pu-fuellung { height: 100%; border-radius: 999px; background: var(--pu-akzent); transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.pu-zeile.richtig .pu-fuellung { background: var(--pu-ok); }
+
+.pu-kennzahlen { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+.pu-kennzahl { display: flex; flex-direction: column; align-items: center; }
+.pu-kennzahl b { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.pu-kennzahl span { color: var(--pu-leise); font-size: 13px; }
+.pu-kennzahl.wahr b { color: var(--pu-ok); }
+.pu-skala-erg { display: flex; flex-direction: column; gap: 12px; }
+.pu-saeulen { display: flex; gap: 8px; align-items: stretch; height: 170px; }
+.pu-saeule { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.pu-saeule-zahl { font-size: 13px; color: var(--pu-leise); font-variant-numeric: tabular-nums; }
+.pu-saeule-bahn { flex: 1; width: 100%; max-width: 64px; display: flex; align-items: flex-end; background: var(--pu-feld); border-radius: 8px; overflow: hidden; }
+.pu-saeule-fuellung { width: 100%; background: var(--pu-akzent); border-radius: 8px 8px 0 0; transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.pu-saeule-wert { font-weight: 700; }
+
+.pu-wolke { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 16px; padding: 10px 4px; line-height: 1.15; min-height: 120px; }
+.pu-wort { font-weight: 750; letter-spacing: -0.01em; animation: pu-auf 0.4s ease-out; }
+.pu-wort.t0 { color: var(--pu-t0); } .pu-wort.t1 { color: var(--pu-t1); } .pu-wort.t2 { color: var(--pu-t2); } .pu-wort.t3 { color: var(--pu-t3); } .pu-wort.t4 { color: var(--pu-t4); }
+
+.pu-freitext { display: flex; flex-direction: column; gap: 12px; }
+.pu-themen { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.pu-thema { background: var(--pu-akzent-weich); border-radius: 12px; padding: 10px 12px; }
+.pu-thema-kopf { display: flex; justify-content: space-between; gap: 8px; }
+.pu-thema-zahl { font-weight: 750; color: var(--pu-akzent); font-variant-numeric: tabular-nums; }
+.pu-thema-beispiel { color: var(--pu-leise); font-size: 13px; margin-top: 3px; }
+.pu-karten-wand { columns: 1; column-gap: 10px; }
+.pu-karten-wand.gross { columns: 3 240px; }
+.pu-zettel { break-inside: avoid; background: var(--pu-flaeche); border: 1px solid var(--pu-linie); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; overflow-wrap: anywhere; animation: pu-auf 0.35s ease-out; }
+
+.pu-schaetz-erg { display: flex; flex-direction: column; gap: 12px; }
+.pu-histogramm { position: relative; display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-bottom: 2px; border-bottom: 1px solid var(--pu-linie); }
+.pu-hist-saeule { flex: 1; background: var(--pu-akzent); opacity: 0.85; border-radius: 6px 6px 0 0; min-height: 2px; transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.pu-marker { position: absolute; top: -6px; bottom: -6px; width: 0; border-left: 2px dashed var(--pu-text); }
+.pu-marker.wahr { border-left: 3px solid var(--pu-ok); }
+
+.pu-rang { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pu-rang-zeile { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+
+.pu-ampel-erg { display: flex; flex-direction: column; gap: 14px; }
+.pu-ampel-lichter { display: flex; justify-content: center; gap: 22px; }
+.pu-licht { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pu-licht-kreis { width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; opacity: var(--an); transition: opacity 0.5s; }
+.pu-licht.gruen .pu-licht-kreis { background: var(--pu-ok); } .pu-licht.gelb .pu-licht-kreis { background: var(--pu-gelb); } .pu-licht.rot .pu-licht-kreis { background: var(--pu-rot); }
+.pu-licht-name { font-weight: 650; }
+.pu-ampel-streifen { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--pu-feld); }
+.pu-ampel-streifen div { transition: flex 0.5s; }
+.pu-ampel-streifen .gruen { background: var(--pu-ok); } .pu-ampel-streifen .gelb { background: var(--pu-gelb); } .pu-ampel-streifen .rot { background: var(--pu-rot); }
+
+/* Leinwand: alles größer */
+.pu-ergebnis.gross { font-size: 20px; }
+.pu-ergebnis.gross .pu-balken-liste { gap: 16px; }
+.pu-ergebnis.gross .pu-bahn { height: 16px; }
+.pu-ergebnis.gross .pu-marke { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
+.pu-ergebnis.gross .pu-saeulen { height: 300px; }
+.pu-ergebnis.gross .pu-kennzahl b { font-size: 46px; }
+.pu-ergebnis.gross .pu-histogramm { height: 260px; }
+.pu-ergebnis.gross .pu-wolke { font-size: 22px; min-height: 260px; }
+.pu-ergebnis.gross .pu-licht-kreis { width: 150px; height: 150px; font-size: 30px; }
+.pu-ergebnis.gross .pu-ampel-streifen { height: 18px; }
+.pu-ergebnis.gross .pu-zettel { font-size: 17px; }

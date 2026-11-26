@@ -1,0 +1,141 @@
+/* Clavis – Seiten des Hosts in Lyra (Start, Bauen, Raum, Editor, Team-Leiste). Das Spiel selbst: gaeste/welten.css. */
+#app { height: 100vh; overflow: auto; }
+.buehne { max-width: 1020px; margin: 0 auto; padding: 22px 26px 50px; }
+h2 { font-size: 18px; margin-bottom: 10px; }
+h2.zwischen { margin: 30px 0 12px; }
+.panel { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 16px; padding: 18px; }
+.hinweis-band { background: var(--akzent-weich); border-radius: 12px; padding: 11px 14px; margin: 12px 0; }
+.hinweis-band.fehler { background: color-mix(in srgb, var(--falsch) 12%, transparent); color: var(--falsch); }
+.klickbar { cursor: pointer; }
+.nr { width: 26px; height: 26px; border-radius: 8px; background: var(--karte); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
+.liste { display: flex; flex-direction: column; gap: 8px; }
+
+/* Kopf */
+.held { position: relative; overflow: hidden; border-radius: 22px; padding: 34px 28px 30px; text-align: center; color: #f3e9d2;
+  background: radial-gradient(ellipse at 50% -10%, #5a4422 0%, #22190d 45%, #0d0b08 100%); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); }
+.held::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 220, 150, 0.35) 1px, transparent 1.5px); background-size: 120px 90px; opacity: 0.3; animation: staub 40s linear infinite; }
+@keyframes staub { to { background-position: 400px 120px; } }
+.held-schluessel { position: relative; width: 64px; height: 64px; margin: 0 auto 6px; color: #e5b94e; filter: drop-shadow(0 0 18px rgba(229, 185, 78, 0.6)); }
+.held-schluessel .cl-icon { width: 100%; height: 100%; }
+.held-schluessel.drehen { animation: drehen 2.6s ease-in-out infinite; }
+@keyframes drehen { 50% { transform: rotate(-25deg); } }
+.held-titel { position: relative; font-family: "Didot", "Bodoni 72", Georgia, serif; font-size: 52px; font-weight: 600; letter-spacing: 0.08em; margin: 0; }
+.held-text { position: relative; margin: 6px auto 0; max-width: 560px; color: rgba(243, 233, 210, 0.75); font-size: 16px; }
+
+/* Raumkarten */
+.raum-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.raum-karte { display: flex; flex-direction: column; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.raum-karte:hover { transform: translateY(-2px); box-shadow: var(--hoch); }
+.raum-inhalt { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.raum-titel { font-weight: 750; font-size: 17px; }
+.raum-teaser { margin: 2px 0 4px; line-height: 1.45; }
+.raum-meta { margin-bottom: 8px; }
+.cover { position: relative; height: 120px; overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--c-akzent, #e5b94e); background: var(--c-grund, #1b1f2b); }
+.cover.gross { height: auto; min-height: 220px; border-radius: 16px; }
+.cover-licht { position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, var(--c-glanz, rgba(229, 185, 78, 0.35)), transparent 60%); animation: glimmen 4s ease-in-out infinite; }
+@keyframes glimmen { 50% { opacity: 0.5; } }
+.cover-icon { position: relative; width: 58px; height: 58px; filter: drop-shadow(0 0 14px var(--c-glanz, rgba(229, 185, 78, 0.6))); }
+.cover.gross .cover-icon { width: 90px; height: 90px; }
+.cover-welt { position: absolute; left: 12px; bottom: 9px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.7); font-weight: 700; }
+[data-welt="krimi"] { --c-grund: radial-gradient(ellipse at 30% 0%, #3a3328, #12110e); --c-akzent: #d9a441; --c-glanz: rgba(217, 164, 65, 0.4); }
+[data-welt="labor"] { --c-grund: linear-gradient(#0a1c20, #03080a); --c-akzent: #39f5c6; --c-glanz: rgba(57, 245, 198, 0.35); }
+[data-welt="grab"] { --c-grund: radial-gradient(ellipse at 50% 20%, #5a3a1a, #120a04); --c-akzent: #f2c14e; --c-glanz: rgba(242, 160, 60, 0.45); }
+[data-welt="station"] { --c-grund: radial-gradient(ellipse at 50% 120%, #1b2140, #03040a); --c-akzent: #ff9f1c; --c-glanz: rgba(255, 159, 28, 0.38); }
+[data-welt="spuk"] { --c-grund: radial-gradient(ellipse at 70% 0%, #2c2540, #08070c); --c-akzent: #b6f09c; --c-glanz: rgba(182, 240, 156, 0.3); }
+[data-welt="bibliothek"] { --c-grund: radial-gradient(ellipse at 50% 10%, #4a3020, #100a06); --c-akzent: #e0b25c; --c-glanz: rgba(224, 178, 92, 0.4); }
+[data-welt="pirat"] { --c-grund: linear-gradient(#13293a, #071119); --c-akzent: #f0c75e; --c-glanz: rgba(240, 199, 94, 0.4); }
+[data-welt="akademie"] { --c-grund: linear-gradient(#1d2a2a, #0c1113); --c-akzent: #8fd3ff; --c-glanz: rgba(143, 211, 255, 0.35); }
+.cover { background: var(--c-grund); }
+
+.stufen { display: flex; gap: 4px; flex-wrap: wrap; }
+.stufe { border: 1px solid var(--linie); background: transparent; color: var(--leise); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.stufe.an { border-color: var(--akzent); color: var(--akzent); background: var(--akzent-weich); font-weight: 650; }
+
+/* KI-Bauen */
+.welten { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-top: 14px; }
+.welt-wahl { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px 10px; border-radius: 14px; border: 2px solid transparent; background: var(--c-grund); color: var(--c-akzent); cursor: pointer; font: inherit; }
+.welt-wahl .cl-icon { width: 30px; height: 30px; filter: drop-shadow(0 0 8px var(--c-glanz)); }
+.welt-wahl span { color: rgba(255, 255, 255, 0.88); font-size: 13px; font-weight: 650; }
+.welt-wahl.an { border-color: var(--c-akzent); box-shadow: 0 0 16px var(--c-glanz); }
+.welt-kurz { margin: 8px 0 0; }
+.bauen { margin: 50px auto 0; max-width: 520px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bauen .held-schluessel { color: var(--akzent); }
+
+/* Stimmung (Regler) */
+.stimmung { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--karte); }
+@media (max-width: 700px) { .stimmung { grid-template-columns: 1fr; } }
+.regler { display: flex; flex-direction: column; gap: 3px; }
+.regler-kopf { display: flex; align-items: baseline; gap: 6px; }
+.regler-kopf b { font-size: 14px; }
+.regler-kopf small { color: var(--leise); font-size: 11.5px; }
+.regler-wert { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--akzent); min-width: 22px; text-align: right; }
+.regler input { width: 100%; accent-color: var(--akzent); }
+.regler-text { color: var(--leise); font-size: 12px; min-height: 1.3em; }
+.regler.gefahr input { accent-color: #e5484d; } .regler.gefahr .regler-wert { color: #e5484d; }
+.regler.spuk input { accent-color: #8b6cf0; } .regler.spuk .regler-wert { color: #8b6cf0; }
+.regler.grusel input { accent-color: #2e9e6a; } .regler.grusel .regler-wert { color: #2e9e6a; }
+
+/* Ein Raum */
+.raum-held { display: grid; grid-template-columns: 280px 1fr; gap: 18px; align-items: stretch; }
+@media (max-width: 760px) { .raum-held { grid-template-columns: 1fr; } }
+.raum-gross-titel { font-size: 30px; font-weight: 800; margin: 2px 0 6px; letter-spacing: -0.01em; }
+.raum-intro { line-height: 1.6; margin: 0 0 12px; }
+.szenen-vorschau { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.szenen-vorschau h3 { margin: 2px 0 4px; }
+.orte { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ort-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--linie); background: var(--karte); border-radius: 999px; padding: 4px 10px; font-size: 13px; }
+.cl-icon.mini { width: 16px; height: 16px; color: var(--akzent); }
+
+/* Editor */
+.editor { display: flex; flex-direction: column; gap: 12px; }
+.titel-eingabe { font-size: 18px; font-weight: 700; }
+.szene-editor { display: flex; flex-direction: column; gap: 10px; }
+.station-zeile { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--linie); background: var(--karte); cursor: pointer; }
+.station-zeile:hover { border-color: var(--akzent); }
+.station-symbol { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--akzent-weich); color: var(--akzent); flex: none; }
+.station-symbol .cl-icon { width: 24px; height: 24px; }
+.marke { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 650; padding: 1px 8px; border-radius: 999px; background: var(--akzent-weich); color: var(--akzent); }
+.editor-dialog textarea { resize: vertical; }
+
+/* Spiel in Lyra */
+.spiel-huelle { min-height: 100vh; display: flex; flex-direction: column; background: #0f1117; }
+.spiel-wurzel { flex: 1; display: flex; flex-direction: column; }
+.spiel-wurzel > .cl-spiel { flex: 1; min-height: 0; }
+.spiel-huelle.gruppe .spiel-wurzel > .cl-spiel { min-height: calc(100vh - 44px); }
+.host-leiste { display: flex; align-items: center; gap: 10px; padding: 7px 14px; background: #0a0b0f; color: #e8e6df; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13.5px; }
+.host-leiste .leise { color: rgba(232, 230, 223, 0.6); }
+.host-punkt { width: 9px; height: 9px; border-radius: 50%; background: #5fd39a; box-shadow: 0 0 8px #5fd39a; }
+.einladen { position: fixed; right: 16px; top: 54px; z-index: 60; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 70px); overflow: auto; display: none; flex-direction: column; gap: 12px;
+  background: var(--grund); color: var(--text); border: 1px solid var(--linie); border-radius: 18px; padding: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); }
+.einladen.offen { display: flex; animation: ein 0.2s ease-out; }
+@keyframes ein { from { opacity: 0; transform: translateY(-8px); } }
+.einladen h3 { margin: 0; }
+.einladen .lo-beitritt { grid-template-columns: 1fr 1fr; }
+.einladen .lo-qr { width: 170px; height: 170px; }
+.einladen-team { display: flex; flex-direction: column; gap: 6px; }
+
+.stimmung-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 8px; }
+.stimmung-chip { position: relative; overflow: hidden; font-size: 11.5px; font-weight: 650; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--linie); color: var(--leise); }
+.stimmung-chip i { position: absolute; left: 0; bottom: 0; height: 2px; width: var(--w); background: var(--akzent); }
+.stimmung-chip.gefahr i { background: #e5484d; } .stimmung-chip.spuk i { background: #8b6cf0; } .stimmung-chip.grusel i { background: #2e9e6a; }
+
+/* Altersstufe, Jumpscares */
+.alter-wahl { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; padding: 12px 16px; border-radius: 14px; background: var(--karte); }
+.alter-kopf { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.schreck-schalter { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; flex-wrap: wrap; }
+.schreck-schalter input { accent-color: #e5484d; width: 16px; height: 16px; }
+.schreck-schalter span { font-weight: 650; }
+.schreck-schalter.aus { opacity: 0.55; cursor: default; }
+.schreck-schalter.klein span { font-size: 13px; }
+.zwischen-zeile { margin: 30px 0 12px; }
+.alter-chip { font-size: 11.5px; font-weight: 750; padding: 2px 9px; border-radius: 999px; background: var(--akzent-weich); color: var(--akzent); }
+.alter-chip.kinder { background: rgba(34, 160, 107, 0.14); color: #22a06b; }
+.alter-chip.ab18 { background: rgba(229, 72, 77, 0.14); color: #e5484d; }
+.schreck-chip { font-size: 12px; padding: 1px 7px; border-radius: 999px; background: rgba(229, 72, 77, 0.14); }
+[data-welt="zirkus"] { --c-grund: radial-gradient(ellipse at 50% -20%, #7a1d2e, #12060c); --c-akzent: #ffcf4a; --c-glanz: rgba(255, 207, 74, 0.45); }
+[data-welt="dschungel"] { --c-grund: radial-gradient(ellipse at 50% 0%, #1f4a2a, #040c07); --c-akzent: #c8e65a; --c-glanz: rgba(200, 230, 90, 0.35); }
+[data-welt="unterwasser"] { --c-grund: linear-gradient(#0a3a5a, #020b16); --c-akzent: #4fe3ff; --c-glanz: rgba(79, 227, 255, 0.35); }
+[data-welt="spielzeug"] { --c-grund: radial-gradient(ellipse at 50% 0%, #4a2f6b, #110c1c); --c-akzent: #ff9ec7; --c-glanz: rgba(255, 158, 199, 0.4); }
+[data-welt="western"] { --c-grund: linear-gradient(#6b3a1c, #160c05); --c-akzent: #f2b25c; --c-glanz: rgba(242, 178, 92, 0.4); }
+[data-welt="sanatorium"] { --c-grund: linear-gradient(#1d2421, #060807); --c-akzent: #9ef0c8; --c-glanz: rgba(158, 240, 200, 0.25); }
+.cover, .welt-wahl { background: var(--c-grund); }

@@ -1,0 +1,681 @@
+/* Clavis – Spielansicht: Welten, Bühne, Nahaufnahme, Mechaniken, Überraschungen. Alles mit CSS und SVG, ohne Bilder. */
+
+.cl-spiel {
+  --cl-grund: #0f1117; --cl-wand: linear-gradient(#1b1f2b, #10131b); --cl-boden: #0b0d12; --cl-text: #ece9e1; --cl-leise: rgba(236, 233, 225, 0.62);
+  --cl-akzent: #e5b94e; --cl-akzent2: #9ad1ff; --cl-flaeche: rgba(255, 255, 255, 0.06); --cl-rand: rgba(255, 255, 255, 0.12); --cl-glanz: rgba(229, 185, 78, 0.45);
+  --cl-papier: #efe6cf; --cl-papier-text: #2b2418; --cl-karte: #161a24; --cl-ok: #5fd39a; --cl-falsch: #ff6b6b;
+  --cl-schrift: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; --cl-titel: Georgia, "Times New Roman", serif; --cl-mono: "SF Mono", Menlo, Consolas, monospace;
+  position: relative; min-height: 100vh; min-height: 100dvh; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--cl-grund); color: var(--cl-text); font: 16px/1.5 var(--cl-schrift); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+.cl-spiel * { box-sizing: border-box; }
+.cl-spiel button { font-family: inherit; }
+body:has(.cl-spiel) { margin: 0; background: #0f1117; }
+
+/* ---------------------------------------------------------------- Welten */
+.cl-spiel[data-welt="krimi"] { --cl-grund: #0d0e10; --cl-wand: radial-gradient(ellipse at 30% 0%, #3a3328 0%, #1a1814 45%, #0c0c0d 100%); --cl-boden: #120f0b; --cl-akzent: #d9a441; --cl-akzent2: #c94c4c;
+  --cl-glanz: rgba(217, 164, 65, 0.4); --cl-schrift: "American Typewriter", "Courier New", var(--cl-mono); --cl-titel: "Didot", "Bodoni 72", Georgia, serif; --cl-karte: #17150f; --cl-papier: #ece0c3; }
+.cl-spiel[data-welt="labor"] { --cl-grund: #050b0d; --cl-wand: linear-gradient(180deg, #0a1c20 0%, #061114 70%, #03080a 100%); --cl-boden: #041013; --cl-akzent: #39f5c6; --cl-akzent2: #ff3d8b;
+  --cl-glanz: rgba(57, 245, 198, 0.35); --cl-text: #d9fff6; --cl-leise: rgba(217, 255, 246, 0.6); --cl-titel: var(--cl-mono); --cl-karte: #071619; --cl-papier: #e9f5f2; --cl-papier-text: #0f2a26; }
+.cl-spiel[data-welt="grab"] { --cl-grund: #120b05; --cl-wand: radial-gradient(ellipse at 50% 20%, #5a3a1a 0%, #2c1a0b 50%, #120a04 100%); --cl-boden: #1d1208; --cl-akzent: #f2c14e; --cl-akzent2: #3fb7b0;
+  --cl-glanz: rgba(242, 160, 60, 0.45); --cl-text: #f6e7c8; --cl-leise: rgba(246, 231, 200, 0.62); --cl-titel: "Herculanum", "Papyrus", "Copperplate", Georgia, serif; --cl-karte: #23160a; --cl-papier: #e8d3a3; }
+.cl-spiel[data-welt="station"] { --cl-grund: #03050c; --cl-wand: radial-gradient(ellipse at 50% 120%, #1b2140 0%, #0a0d1c 55%, #03040a 100%); --cl-boden: #070a16; --cl-akzent: #ff9f1c; --cl-akzent2: #5ad2ff;
+  --cl-glanz: rgba(255, 159, 28, 0.38); --cl-text: #e6ecff; --cl-leise: rgba(230, 236, 255, 0.6); --cl-titel: var(--cl-mono); --cl-schrift: "SF Pro Display", var(--cl-schrift); --cl-karte: #0b0f20; --cl-papier: #dfe6ff; --cl-papier-text: #121a33; }
+.cl-spiel[data-welt="spuk"] { --cl-grund: #07060b; --cl-wand: radial-gradient(ellipse at 70% 0%, #2c2540 0%, #15111f 50%, #08070c 100%); --cl-boden: #0d0b12; --cl-akzent: #b6f09c; --cl-akzent2: #b38cff;
+  --cl-glanz: rgba(182, 240, 156, 0.3); --cl-text: #ebe6f5; --cl-leise: rgba(235, 230, 245, 0.58); --cl-titel: "Snell Roundhand", "Zapfino", "Baskerville", Georgia, serif; --cl-schrift: "Baskerville", Georgia, serif; --cl-karte: #120f1a; --cl-papier: #e4dccb; }
+.cl-spiel[data-welt="bibliothek"] { --cl-grund: #120c08; --cl-wand: radial-gradient(ellipse at 50% 10%, #4a3020 0%, #24170e 55%, #100a06 100%); --cl-boden: #1a110a; --cl-akzent: #e0b25c; --cl-akzent2: #9c3b2e;
+  --cl-glanz: rgba(224, 178, 92, 0.4); --cl-text: #f3e6d0; --cl-leise: rgba(243, 230, 208, 0.6); --cl-titel: "Hoefler Text", "Baskerville", Georgia, serif; --cl-schrift: "Hoefler Text", "Baskerville", Georgia, serif; --cl-karte: #1d140c; --cl-papier: #efe2c4; }
+.cl-spiel[data-welt="pirat"] { --cl-grund: #06121a; --cl-wand: linear-gradient(180deg, #13293a 0%, #0b1a26 60%, #071119 100%); --cl-boden: #2a1a0e; --cl-akzent: #f0c75e; --cl-akzent2: #e2553f;
+  --cl-glanz: rgba(240, 199, 94, 0.4); --cl-text: #f4ead2; --cl-leise: rgba(244, 234, 210, 0.6); --cl-titel: "Trattatello", "Chalkduster", "Bradley Hand", Georgia, serif; --cl-karte: #0e1d29; --cl-papier: #ead7a8; }
+.cl-spiel[data-welt="akademie"] { --cl-grund: #0c1014; --cl-wand: linear-gradient(180deg, #1d2a2a 0%, #141c1e 60%, #0c1113 100%); --cl-boden: #191512; --cl-akzent: #8fd3ff; --cl-akzent2: #ffd166;
+  --cl-glanz: rgba(143, 211, 255, 0.35); --cl-titel: "Chalkboard SE", "Avenir Next", var(--cl-schrift); --cl-karte: #121a1d; }
+
+/* ---------------------------------------------------------------- Kopf (Zeit, Lösungswort) */
+.cl-hud { position: relative; z-index: 5; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 14px; background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.25)); border-bottom: 1px solid var(--cl-rand); backdrop-filter: blur(8px); }
+.cl-hud-titel { display: flex; align-items: baseline; gap: 10px; min-width: 0; flex: 1; }
+.cl-hud-titel b { font-family: var(--cl-titel); font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-marke { color: var(--cl-akzent); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; font-family: var(--cl-schrift); }
+.cl-uhr-anzeige { font-family: var(--cl-mono); font-size: 22px; font-weight: 700; color: var(--cl-akzent); text-shadow: 0 0 14px var(--cl-glanz); font-variant-numeric: tabular-nums; min-width: 74px; text-align: center; }
+.cl-uhr-anzeige.knapp { color: var(--cl-falsch); animation: cl-puls 1s ease-in-out infinite; }
+.cl-uhr-anzeige.ueber { color: var(--cl-falsch); }
+.cl-wort { display: flex; gap: 4px; }
+.cl-wort-feld { width: 24px; height: 30px; border-radius: 6px; border: 1px solid var(--cl-rand); background: rgba(0, 0, 0, 0.35); display: inline-flex; align-items: center; justify-content: center; font-family: var(--cl-mono); font-weight: 800; color: var(--cl-akzent); }
+.cl-wort-feld.voll { border-color: var(--cl-akzent); box-shadow: 0 0 10px var(--cl-glanz) inset; }
+.cl-wort-feld.neu { animation: cl-landen 0.8s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes cl-landen { 0% { transform: translateY(-40px) scale(1.8); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; } }
+.cl-hud-knoepfe { display: flex; gap: 6px; align-items: center; }
+.cl-hud-knopf { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--cl-rand); background: var(--cl-flaeche); color: var(--cl-text); cursor: pointer; font-size: 16px; }
+.cl-hud-knopf:hover { border-color: var(--cl-akzent); }
+.cl-team { font-size: 13px; color: var(--cl-leise); margin-right: 4px; }
+
+/* ---------------------------------------------------------------- Bühne */
+.cl-buehne { position: relative; flex: 1; display: flex; flex-direction: column; background: var(--cl-wand); overflow: hidden; min-height: 460px; }
+.cl-buehne::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28%; background: linear-gradient(transparent, var(--cl-boden)); pointer-events: none; }
+.cl-spiel.cl-notlicht .cl-buehne { filter: sepia(0.6) hue-rotate(-30deg) saturate(2.4) brightness(0.55); transition: filter 1.2s; }
+.cl-kulisse { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.cl-szenen { position: relative; z-index: 2; display: flex; gap: 6px; padding: 12px 14px 0; flex-wrap: wrap; }
+.cl-szene-reiter { border: 1px solid var(--cl-rand); background: rgba(0, 0, 0, 0.35); color: var(--cl-text); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 14px; }
+.cl-szene-reiter.an { border-color: var(--cl-akzent); color: var(--cl-akzent); box-shadow: 0 0 14px var(--cl-glanz); }
+.cl-szene-reiter.zu { opacity: 0.45; cursor: not-allowed; }
+.cl-szene-kopf { position: relative; z-index: 2; text-align: center; padding: 22px 18px 4px; max-width: 760px; margin: 0 auto; }
+.cl-szene-kopf h2 { margin: 0; font-family: var(--cl-titel); font-size: clamp(24px, 4vw, 34px); font-weight: 600; letter-spacing: 0.01em; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6); }
+.cl-szene-kopf p { margin: 6px 0 0; color: var(--cl-leise); }
+.cl-objekte { position: relative; z-index: 3; flex: 1; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 18px 22px; padding: 18px 18px 40px; }
+.cl-objekt { position: relative; width: 138px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 18px; border: 1px solid transparent; background: transparent; color: var(--cl-text); cursor: pointer;
+  transform: translateY(var(--v)); transition: background 0.2s, border-color 0.2s; }
+.cl-objekte.neu .cl-objekt { animation: cl-auftauchen 0.6s both cubic-bezier(0.2, 0.9, 0.3, 1.2); animation-delay: var(--d); }
+@keyframes cl-auftauchen { from { opacity: 0; transform: translateY(calc(var(--v) + 24px)) scale(0.9); } }
+.cl-objekt:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--cl-rand); }
+.cl-objekt-licht { position: absolute; top: 4px; left: 50%; width: 110px; height: 110px; margin-left: -55px; border-radius: 50%; background: radial-gradient(circle, var(--cl-glanz), transparent 65%); opacity: 0.55; animation: cl-glimmen 3.2s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes cl-glimmen { 50% { opacity: 0.2; transform: scale(0.9); } }
+.cl-objekt-bild { position: relative; width: 84px; height: 84px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: var(--cl-akzent); background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(0, 0, 0, 0.25)); border: 1px solid var(--cl-rand); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); transition: transform 0.25s; }
+.cl-objekt:hover .cl-objekt-bild { transform: translateY(-4px) rotate(-2deg); }
+.cl-objekt-bild .cl-icon { width: 48px; height: 48px; filter: drop-shadow(0 0 8px var(--cl-glanz)); }
+.cl-objekt-name { position: relative; font-weight: 650; font-size: 14.5px; text-align: center; line-height: 1.25; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
+.cl-objekt-haken { position: absolute; top: 6px; right: 18px; width: 26px; height: 26px; border-radius: 50%; background: var(--cl-ok); color: #06210f; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(95, 211, 154, 0.6); }
+.cl-objekt-tipp { position: absolute; top: 6px; left: 18px; width: 22px; height: 22px; border-radius: 50%; background: var(--cl-akzent2); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.cl-objekt.fertig .cl-objekt-bild { color: var(--cl-leise); filter: saturate(0.3); }
+.cl-objekt.fertig .cl-objekt-licht { display: none; }
+.cl-objekt.ausgang .cl-objekt-bild { width: 96px; height: 112px; border-radius: 14px 14px 6px 6px; border-color: var(--cl-akzent); box-shadow: 0 0 30px var(--cl-glanz), 0 10px 30px rgba(0, 0, 0, 0.5); }
+.cl-objekt.ausgang .cl-objekt-name { color: var(--cl-akzent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 13px; }
+.cl-objekt.tuer-station .cl-objekt-bild::after { content: '⇢'; position: absolute; bottom: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: var(--cl-akzent); color: #111; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+/* ---------------------------------------------------------------- Kulissen je Welt */
+.cl-deko { position: absolute; inset: 0; }
+.cl-deko.regen { background-image: repeating-linear-gradient(105deg, transparent 0 14px, rgba(180, 200, 230, 0.07) 14px 15px); background-size: 200px 200px; animation: cl-regen 0.5s linear infinite; opacity: 0.8; }
+@keyframes cl-regen { to { background-position: -60px 200px; } }
+.cl-deko.jalousie { background: repeating-linear-gradient(180deg, transparent 0 22px, rgba(0, 0, 0, 0.35) 22px 34px); mask-image: linear-gradient(110deg, transparent 15%, black 40%, black 60%, transparent 85%); -webkit-mask-image: linear-gradient(110deg, transparent 15%, black 40%, black 60%, transparent 85%); transform: skewY(-6deg); opacity: 0.6; }
+.cl-deko.lampe { background: radial-gradient(ellipse 40% 35% at 78% 8%, rgba(255, 205, 120, 0.22), transparent 70%); animation: cl-flackern 7s infinite; }
+.cl-deko.raster { background-image: linear-gradient(rgba(57, 245, 198, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 245, 198, 0.07) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(transparent, black 40%, black 70%, transparent); -webkit-mask-image: linear-gradient(transparent, black 40%, black 70%, transparent); }
+.cl-deko.scan, .cl-deko.warnlicht { background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px); }
+.cl-deko.scan::after { content: ''; position: absolute; left: 0; right: 0; height: 120px; background: linear-gradient(transparent, rgba(57, 245, 198, 0.08), transparent); animation: cl-scan 6s linear infinite; }
+@keyframes cl-scan { from { top: -120px; } to { top: 100%; } }
+.cl-deko.blasen { background: radial-gradient(circle at 12% 80%, rgba(57, 245, 198, 0.18) 0 3px, transparent 4px), radial-gradient(circle at 15% 70%, rgba(57, 245, 198, 0.14) 0 2px, transparent 3px), radial-gradient(circle at 88% 76%, rgba(255, 61, 139, 0.16) 0 3px, transparent 4px), radial-gradient(circle at 86% 64%, rgba(255, 61, 139, 0.12) 0 2px, transparent 3px); animation: cl-steigen 5s ease-in infinite; }
+@keyframes cl-steigen { to { transform: translateY(-60px); opacity: 0; } }
+.cl-deko.fackel { background: radial-gradient(circle 220px at 6% 38%, rgba(255, 150, 50, 0.3), transparent 70%); animation: cl-flackern 2.4s infinite; }
+.cl-deko.fackel.r { background: radial-gradient(circle 220px at 94% 38%, rgba(255, 150, 50, 0.3), transparent 70%); animation-delay: -1.1s; }
+.cl-deko.sand { background-image: radial-gradient(rgba(255, 220, 160, 0.35) 1px, transparent 1.5px); background-size: 90px 70px; animation: cl-sand 14s linear infinite; opacity: 0.5; }
+@keyframes cl-sand { to { background-position: 400px 120px; } }
+.cl-deko.zeichen { inset: auto 0 auto 0; top: 10px; height: 34px; background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(242, 193, 78, 0.18) 18px 20px, transparent 20px 30px, rgba(242, 193, 78, 0.12) 30px 34px); border-top: 2px solid rgba(242, 193, 78, 0.25); border-bottom: 2px solid rgba(242, 193, 78, 0.25); }
+.cl-deko.sterne { background-image: radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 20%, #fff, transparent), radial-gradient(1.5px 1.5px at 40% 70%, #cfe3ff, transparent), radial-gradient(1px 1px at 85% 55%, #fff, transparent), radial-gradient(1px 1px at 10% 85%, #fff, transparent), radial-gradient(1.2px 1.2px at 55% 45%, #fff, transparent); background-size: 260px 260px; animation: cl-treiben 60s linear infinite; opacity: 0.8; }
+@keyframes cl-treiben { to { background-position: -520px 130px; } }
+.cl-deko.bullauge { inset: auto; top: 30px; right: 6%; width: 140px; height: 140px; border-radius: 50%; border: 10px solid rgba(160, 175, 210, 0.25); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 0 0 4px rgba(0, 0, 0, 0.4); background: radial-gradient(circle at 30% 30%, #2a5fbf 0 12%, transparent 13%), radial-gradient(circle at 60% 60%, #fff 0 0.6%, transparent 1%), #02030a; }
+.cl-deko.warnlicht::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--cl-akzent); box-shadow: 0 0 30px var(--cl-akzent); animation: cl-warn 2s ease-in-out infinite; }
+@keyframes cl-warn { 50% { opacity: 0.15; } }
+.cl-deko.mond { inset: auto; top: 26px; right: 9%; width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fffbe8, #d8d2b8 60%, #a9a38c); box-shadow: 0 0 60px rgba(255, 250, 220, 0.35); opacity: 0.85; }
+.cl-deko.nebel { background: radial-gradient(ellipse 60% 25% at 30% 85%, rgba(200, 190, 230, 0.14), transparent 70%), radial-gradient(ellipse 50% 20% at 75% 90%, rgba(200, 230, 200, 0.1), transparent 70%); animation: cl-nebel 18s ease-in-out infinite alternate; }
+.cl-deko.nebel.zwei { animation-duration: 25s; animation-direction: alternate-reverse; transform: scaleX(-1); }
+@keyframes cl-nebel { to { transform: translateX(8%); } }
+.cl-deko.kerzenlicht { background: radial-gradient(circle 260px at 50% 100%, rgba(255, 190, 100, 0.12), transparent 70%); animation: cl-flackern 1.8s infinite; }
+@keyframes cl-flackern { 0%, 100% { opacity: 1; } 20% { opacity: 0.8; } 22% { opacity: 1; } 45% { opacity: 0.88; } 60% { opacity: 0.95; } 62% { opacity: 0.75; } 64% { opacity: 1; } }
+.cl-deko.regale { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 6px, rgba(120, 70, 40, 0.18) 6px 9px, rgba(0, 0, 0, 0) 9px 14px, rgba(160, 60, 40, 0.14) 14px 19px, rgba(0, 0, 0, 0) 19px 23px, rgba(60, 90, 60, 0.15) 23px 27px), repeating-linear-gradient(180deg, transparent 0 88px, rgba(40, 22, 10, 0.8) 88px 96px); mask-image: linear-gradient(90deg, black 0 18%, transparent 30% 70%, black 82%); -webkit-mask-image: linear-gradient(90deg, black 0 18%, transparent 30% 70%, black 82%); opacity: 0.9; }
+.cl-deko.staub { background-image: radial-gradient(rgba(255, 230, 180, 0.4) 1px, transparent 1.5px); background-size: 120px 90px; animation: cl-sand 40s linear infinite reverse; opacity: 0.35; }
+.cl-deko.glanz { background: radial-gradient(ellipse 30% 50% at 50% 0%, rgba(255, 220, 150, 0.15), transparent 70%); }
+.cl-deko.planken { top: auto; height: 34%; background: repeating-linear-gradient(90deg, #3a2414 0 120px, #2e1c0f 120px 122px), linear-gradient(#3a2414, #24160b); opacity: 0.45; }
+.cl-deko.wellen { top: auto; height: 80px; bottom: 0; background: radial-gradient(ellipse 60px 18px at 50% 100%, rgba(90, 170, 210, 0.25), transparent 70%); background-size: 120px 40px; animation: cl-wellen 4s ease-in-out infinite alternate; }
+@keyframes cl-wellen { to { background-position: 60px 6px; } }
+.cl-deko.laterne { background: radial-gradient(circle 200px at 15% 20%, rgba(255, 200, 100, 0.22), transparent 70%); transform-origin: 15% 0; animation: cl-schaukeln 5s ease-in-out infinite alternate; }
+@keyframes cl-schaukeln { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.cl-deko.tafel { inset: 16% 18% auto 18%; height: 38%; border-radius: 6px; background: #1e3a2e; border: 10px solid #4a3324; box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5); opacity: 0.35; }
+.cl-deko.fenster { inset: 14% auto auto 4%; width: 110px; height: 160px; border: 6px solid rgba(255, 255, 255, 0.12); background: linear-gradient(#0d1a2b, #142a3f); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.5); opacity: 0.7; }
+.cl-spiel[data-welt="akademie"] .cl-deko.mond { width: 40px; height: 40px; top: 18%; right: auto; left: calc(4% + 50px); }
+
+/* ---------------------------------------------------------------- Nahaufnahme */
+.cl-nah { position: absolute; inset: 0; z-index: 20; display: flex; align-items: flex-start; justify-content: center; padding: 22px 12px; overflow: auto; background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(5px); animation: cl-ein 0.2s ease-out; }
+.cl-nah.weg { animation: cl-aus 0.25s ease-in forwards; }
+@keyframes cl-ein { from { opacity: 0; } }
+@keyframes cl-aus { to { opacity: 0; } }
+.cl-nah-karte { position: relative; width: min(760px, 100%); background: linear-gradient(170deg, var(--cl-karte), color-mix(in srgb, var(--cl-karte) 85%, black)); border: 1px solid var(--cl-rand); border-radius: 22px; padding: 18px 20px 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.4); margin: auto 0; }
+.cl-nah-karte.auf { animation: cl-zoom 0.38s cubic-bezier(0.2, 1, 0.3, 1); }
+@keyframes cl-zoom { from { transform: scale(0.82) translateY(30px); opacity: 0; } }
+.cl-nah-karte.wackeln { animation: cl-wackeln 0.45s; }
+@keyframes cl-wackeln { 15%, 55% { transform: translateX(-10px); } 35%, 75% { transform: translateX(10px); } }
+.cl-nah-kopf { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.cl-nah-symbol { width: 54px; height: 54px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--cl-akzent); background: rgba(255, 255, 255, 0.06); border: 1px solid var(--cl-rand); flex: none; }
+.cl-nah-symbol .cl-icon { width: 34px; height: 34px; }
+.cl-nah-ort { font-size: 12px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--cl-akzent); font-weight: 700; }
+.cl-nah-kopf h3 { margin: 2px 0 0; font-family: var(--cl-titel); font-size: 22px; font-weight: 600; }
+.cl-schliessen { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.06); color: var(--cl-text); cursor: pointer; font-size: 16px; flex: none; }
+.cl-nah-text { color: var(--cl-leise); margin: 4px 0 12px; white-space: pre-line; }
+.cl-nah-mech { margin-top: 10px; }
+.cl-wachsen { flex: 1; min-width: 0; }
+.cl-leise { color: var(--cl-leise); }
+.cl-klein, .klein { font-size: 13px; }
+.cl-zeile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cl-zeile.mitte { justify-content: center; }
+
+.cl-zettel { position: relative; background: var(--cl-papier); color: var(--cl-papier-text); border-radius: 4px; padding: 14px 16px; margin: 10px 2px 6px; transform: rotate(-0.6deg); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); font-family: "Bradley Hand", "Segoe Print", "Marker Felt", var(--cl-schrift); }
+.cl-zettel::before { content: ''; position: absolute; top: -8px; left: 50%; width: 70px; height: 18px; margin-left: -35px; background: rgba(255, 245, 200, 0.55); transform: rotate(2deg); }
+.cl-zettel b { display: block; font-size: 15px; margin-bottom: 4px; }
+.cl-zettel-text { white-space: pre-line; font-size: 16px; }
+.cl-zettel.fremd { background: rgba(255, 255, 255, 0.05); color: var(--cl-leise); border: 1px dashed var(--cl-rand); transform: none; box-shadow: none; font-family: var(--cl-schrift); }
+.cl-zettel.fremd::before { display: none; }
+.cl-zettel-tabelle { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px 10px; font-family: var(--cl-mono); font-size: 14px; margin-top: 6px; }
+.cl-zettel-paar { display: flex; align-items: center; gap: 6px; }
+.cl-zettel-tabelle.runen .cl-rune { width: 26px; height: 26px; }
+
+.cl-hinweise { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.cl-hinweis { width: 100%; background: color-mix(in srgb, var(--cl-akzent2) 16%, transparent); border: 1px solid color-mix(in srgb, var(--cl-akzent2) 40%, transparent); border-radius: 12px; padding: 9px 12px; animation: cl-zoom 0.3s ease-out; }
+.cl-hinweis-nr { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--cl-akzent2); font-weight: 700; }
+
+.cl-belohnung { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 16px 0 6px; }
+.cl-belohnung-schloss { width: 86px; height: 86px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--cl-ok); background: radial-gradient(circle, rgba(95, 211, 154, 0.25), transparent 70%); animation: cl-entriegeln 0.9s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.cl-belohnung-schloss .cl-icon { width: 52px; height: 52px; }
+@keyframes cl-entriegeln { 0% { transform: scale(0.5) rotate(-30deg); opacity: 0; } 60% { transform: scale(1.15) rotate(8deg); opacity: 1; } }
+.cl-belohnung-titel { font-family: var(--cl-titel); font-size: 24px; color: var(--cl-ok); }
+.cl-fragment { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--cl-leise); }
+.cl-fragment-steine { display: flex; gap: 8px; }
+.cl-fragment-stein { width: 58px; padding: 8px 0 6px; border-radius: 12px; background: linear-gradient(160deg, color-mix(in srgb, var(--cl-akzent) 35%, transparent), rgba(0, 0, 0, 0.3)); border: 1px solid var(--cl-akzent); display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 20px var(--cl-glanz); animation: cl-landen 0.7s both; }
+.cl-fragment-stein b { font-size: 28px; font-family: var(--cl-mono); color: var(--cl-akzent); }
+.cl-fragment-stein small { font-size: 11px; color: var(--cl-leise); }
+
+/* ---------------------------------------------------------------- Knöpfe, Eingaben */
+.cl-knopf { border: 0; border-radius: 12px; padding: 12px 20px; font-size: 16px; font-weight: 700; color: #14110a; background: linear-gradient(180deg, color-mix(in srgb, var(--cl-akzent) 85%, white), var(--cl-akzent)); cursor: pointer; box-shadow: 0 4px 18px var(--cl-glanz); transition: transform 0.1s, filter 0.15s; }
+.cl-knopf:hover { filter: brightness(1.08); }
+.cl-knopf:active { transform: translateY(1px) scale(0.98); }
+.cl-knopf:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.cl-knopf.zart { background: rgba(255, 255, 255, 0.08); color: var(--cl-text); border: 1px solid var(--cl-rand); box-shadow: none; font-weight: 600; }
+.cl-knopf.klein { padding: 7px 12px; font-size: 13.5px; border-radius: 10px; }
+.cl-knopf.gross { padding: 15px 30px; font-size: 18px; border-radius: 14px; }
+.cl-rund { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.07); color: var(--cl-text); font-size: 20px; cursor: pointer; flex: none; }
+.cl-rund.klein { width: 34px; height: 34px; font-size: 17px; }
+.cl-rund:hover { border-color: var(--cl-akzent); color: var(--cl-akzent); }
+.cl-eingabe-zeile { display: flex; gap: 8px; margin-top: 14px; }
+.cl-eingabe { flex: 1; min-width: 0; border: 1px solid var(--cl-rand); background: rgba(0, 0, 0, 0.35); color: var(--cl-text); border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 17px; outline: none; letter-spacing: 0.04em; }
+.cl-eingabe.gross { font-family: var(--cl-mono); text-transform: uppercase; font-size: 19px; letter-spacing: 0.12em; }
+.cl-eingabe:focus { border-color: var(--cl-akzent); box-shadow: 0 0 0 3px var(--cl-glanz); }
+.cl-aufgabe { background: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--cl-akzent); border-radius: 0 12px 12px 0; padding: 11px 14px; white-space: pre-line; margin-bottom: 14px; }
+.cl-haken { display: inline-flex; align-items: center; gap: 6px; }
+.cl-mech { display: flex; flex-direction: column; gap: 12px; }
+
+/* Rollenschloss */
+.cl-schloss { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.cl-rollen { display: flex; gap: 8px; padding: 14px 16px; border-radius: 18px; background: linear-gradient(180deg, #2a2a30, #141418); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 10px 30px rgba(0, 0, 0, 0.4); flex-wrap: wrap; justify-content: center; }
+.cl-rolle { display: flex; flex-direction: column; align-items: center; gap: 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
+.cl-rolle-knopf { width: 44px; height: 26px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, 0.08); color: var(--cl-leise); cursor: pointer; font-size: 11px; }
+.cl-rolle-knopf:hover { color: var(--cl-akzent); }
+.cl-rolle-fenster { width: 44px; height: 58px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg, #0c0c0e, #3c3a36 30%, #f1ead8 46%, #f1ead8 54%, #3c3a36 70%, #0c0c0e); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.cl-rolle-wert { font-family: var(--cl-mono); font-weight: 800; font-size: 28px; color: #1b1712; }
+.cl-rollen.finale .cl-rolle.bekannt .cl-rolle-fenster { box-shadow: inset 0 0 0 2px var(--cl-akzent), 0 0 14px var(--cl-glanz); }
+
+/* Chiffrierscheibe, Drehrad */
+.cl-geheimtext { font-family: var(--cl-mono); font-size: clamp(18px, 4vw, 26px); letter-spacing: 0.22em; text-align: center; padding: 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.35); color: var(--cl-akzent); word-break: break-word; }
+.cl-geheimtext.klein { font-size: 16px; letter-spacing: 0.1em; }
+.cl-scheibe-zeile { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.cl-scheibe, .cl-drehrad, .cl-uhr { width: min(250px, 62vw); height: auto; touch-action: none; }
+.cl-scheibe-ring { fill: #2b2418; stroke: var(--cl-akzent); stroke-width: 2; }
+.cl-scheibe-ring2 { fill: #3e3322; stroke: rgba(0, 0, 0, 0.5); stroke-width: 2; }
+.cl-scheibe-innen { transition: transform 0.25s cubic-bezier(0.3, 1.3, 0.5, 1); }
+.cl-scheibe-a { fill: #f2e6c9; font: 700 14px var(--cl-mono); }
+.cl-scheibe-i { fill: var(--cl-akzent); font: 700 13px var(--cl-mono); }
+.cl-scheibe-mitte { fill: #1a150d; stroke: var(--cl-akzent); stroke-width: 1.5; }
+.cl-scheibe-zahl { fill: var(--cl-akzent); font: 800 22px var(--cl-mono); }
+.cl-scheibe-zeiger { fill: var(--cl-falsch); }
+.cl-drehrad-box { position: relative; }
+.cl-drehrad-rand { fill: url(#none) #23252b; stroke: #8d9099; stroke-width: 3; }
+.cl-drehrad g { transition: transform 0.15s; }
+.cl-drehrad-strich { stroke: #cfd2d8; stroke-width: 2; }
+.cl-drehrad-zahl { fill: #e7e9ee; font: 700 12px var(--cl-mono); }
+.cl-drehrad-knauf { fill: #3a3d45; stroke: #9ea2ab; stroke-width: 2; }
+.cl-drehrad-anzeige { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font: 800 20px var(--cl-mono); color: var(--cl-akzent); pointer-events: none; }
+.cl-slots { display: flex; justify-content: center; gap: 10px; }
+.cl-slot { min-width: 54px; text-align: center; padding: 8px; border-radius: 10px; border: 1px dashed var(--cl-rand); font: 700 20px var(--cl-mono); color: var(--cl-leise); }
+.cl-slot.voll { border-style: solid; border-color: var(--cl-akzent); color: var(--cl-akzent); }
+
+/* Morse */
+.cl-morse-buehne { display: flex; justify-content: center; padding: 18px; }
+.cl-morselampe { width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4a4030, #1a1610); border: 6px solid #2c2a26; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8); transition: background 0.05s, box-shadow 0.05s; }
+.cl-morselampe.an { background: radial-gradient(circle at 40% 35%, #fffbe0, #ffd35a 50%, #ff9a1a); box-shadow: 0 0 40px 12px rgba(255, 200, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.6); }
+
+/* Runen */
+.cl-runenreihe { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 16px; border-radius: 14px; background: rgba(0, 0, 0, 0.3); color: var(--cl-akzent); }
+.cl-rune { width: 28px; height: 28px; }
+.cl-rune.gross { width: 46px; height: 46px; filter: drop-shadow(0 0 6px var(--cl-glanz)); }
+
+/* Lampen */
+.cl-lampenfeld { display: grid; gap: 10px; width: min(330px, 80vw); margin: 0 auto; }
+.cl-lampe { aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.12); background: radial-gradient(circle at 40% 35%, #33302a, #121110); cursor: pointer; transition: background 0.2s, box-shadow 0.2s, transform 0.1s; }
+.cl-lampe:active { transform: scale(0.93); }
+.cl-lampe.an { background: radial-gradient(circle at 40% 35%, #fffbe8, var(--cl-akzent) 55%, color-mix(in srgb, var(--cl-akzent) 60%, black)); box-shadow: 0 0 22px var(--cl-glanz); }
+
+/* Kabel */
+.cl-kabelfeld { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; padding: 6px 0; }
+.cl-kabel-spalte { display: flex; flex-direction: column; gap: 10px; }
+.cl-kabel-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.cl-kabel { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6)); }
+.cl-klemme { position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.05); color: var(--cl-text); cursor: pointer; text-align: left; font-size: 14.5px; }
+.cl-klemme.rechts { flex-direction: row; }
+.cl-klemme span { flex: 1; }
+.cl-klemme.gewaehlt { border-color: var(--cl-akzent); box-shadow: 0 0 12px var(--cl-glanz); }
+.cl-buchse { width: 16px; height: 16px; border-radius: 50%; flex: none; background: #0b0b0b; border: 3px solid #777; box-shadow: 0 0 0 3px var(--kabel, transparent); }
+
+/* Schiebepuzzle */
+.cl-schiebefeld { display: grid; gap: 6px; width: min(320px, 80vw); margin: 0 auto; padding: 8px; border-radius: 16px; background: rgba(0, 0, 0, 0.4); }
+.cl-kachel { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--cl-rand); background: linear-gradient(160deg, color-mix(in srgb, var(--cl-akzent) 30%, #333), #1c1c1c); color: var(--cl-text); font: 800 24px var(--cl-mono); cursor: pointer; transition: transform 0.12s; }
+.cl-kachel.passt { color: var(--cl-akzent); }
+.cl-kachel.leer { background: transparent; border-color: transparent; }
+
+/* Reihenfolge */
+.cl-ordnen { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cl-ordnen-zeile { display: flex; align-items: center; gap: 12px; padding: 9px 10px 9px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--cl-rand); }
+.cl-nr { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--cl-akzent) 25%, transparent); color: var(--cl-akzent); font-weight: 800; flex: none; }
+.cl-pfeile { display: flex; flex-direction: column; gap: 4px; }
+.cl-pfeile button { width: 36px; height: 24px; border-radius: 7px; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.06); color: var(--cl-text); cursor: pointer; font-size: 10px; }
+.cl-pfeile button:disabled { opacity: 0.25; }
+
+/* Suchbild */
+.cl-suchfeld { position: relative; height: min(360px, 60vh); border-radius: 14px; overflow: hidden; background: radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.06), transparent 60%), rgba(0, 0, 0, 0.35); border: 1px solid var(--cl-rand); }
+.cl-suchding { position: absolute; width: 34px; height: 34px; padding: 4px; border: 0; background: none; color: color-mix(in srgb, var(--cl-text) 70%, transparent); cursor: pointer; }
+.cl-suchding .cl-icon { width: 100%; height: 100%; }
+.cl-suchding.ja { color: var(--cl-ok); filter: drop-shadow(0 0 8px var(--cl-ok)); }
+.cl-suchding.ja::after { content: ''; position: absolute; inset: -6px; border: 2px solid var(--cl-ok); border-radius: 50%; }
+.cl-suchding.nein { color: var(--cl-falsch); }
+.cl-icon.klein { width: 26px; height: 26px; color: var(--cl-akzent); }
+
+/* Taschenlampe */
+.cl-dunkel { --x: -200px; --y: -200px; position: relative; height: min(340px, 56vh); border-radius: 14px; overflow: hidden; cursor: crosshair; touch-action: none;
+  background: #000; background-image: radial-gradient(circle var(--r) at var(--x) var(--y), rgba(255, 240, 200, 0.16), transparent 80%); }
+.cl-wandschrift { position: absolute; font: 700 18px "Marker Felt", "Bradley Hand", var(--cl-mono); color: #e9dfc8; letter-spacing: 0.08em; white-space: nowrap;
+  -webkit-mask-image: radial-gradient(circle var(--r) at var(--x) var(--y), black 40%, transparent 100%); mask-image: radial-gradient(circle var(--r) at var(--x) var(--y), black 40%, transparent 100%); }
+.cl-dunkel .cl-wandschrift { -webkit-mask-image: none; mask-image: none; opacity: 0; }
+.cl-dunkel::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle var(--r) at var(--x) var(--y), transparent 55%, #000 100%); }
+.cl-dunkel .cl-wandschrift { opacity: 1; }
+.cl-wandschrift.gross { font-size: 28px; color: #f3e0b0; }
+
+/* Geheimtinte */
+.cl-blatt { position: relative; background: var(--cl-papier); color: var(--cl-papier-text); border-radius: 4px; padding: 22px 24px 60px; font-family: "Snell Roundhand", "Bradley Hand", Georgia, serif; font-size: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transition: background 0.5s, color 0.5s; }
+.cl-blatt-text { white-space: pre-line; line-height: 1.6; }
+.cl-tinte { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font: 800 30px var(--cl-mono); letter-spacing: 0.3em; color: transparent; transition: color 0.6s, text-shadow 0.6s; }
+.cl-tinte.spiegel { transform: scaleX(-1); }
+.cl-blatt.uv { background: #1a0c33; color: rgba(200, 170, 255, 0.35); box-shadow: 0 0 60px rgba(140, 80, 255, 0.5), inset 0 0 80px rgba(120, 60, 255, 0.5); }
+.cl-blatt.uv .cl-tinte { color: #d6ff5c; text-shadow: 0 0 12px #c6ff3a, 0 0 30px #9cff00; }
+
+/* Terminal */
+.cl-terminal { background: #020a05; border: 1px solid #1b3b26; border-radius: 12px; padding: 12px; font: 14px/1.5 var(--cl-mono); color: #57ff8a; text-shadow: 0 0 6px rgba(87, 255, 138, 0.5); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9); cursor: text; }
+.cl-term-ausgabe { height: 220px; overflow: auto; white-space: pre-wrap; }
+.cl-term-zeile.leise { opacity: 0.6; }
+.cl-term-zeile.ein { color: #b7ffcb; }
+.cl-term-zeile.fehler { color: #ff6b6b; text-shadow: 0 0 6px rgba(255, 80, 80, 0.5); }
+.cl-term-zeile.ok { color: #fff; font-weight: 800; letter-spacing: 0.2em; }
+.cl-term-prompt { display: flex; gap: 8px; align-items: center; border-top: 1px solid #12301c; padding-top: 8px; }
+.cl-term-eingabe { flex: 1; background: transparent; border: 0; outline: none; color: #b7ffcb; font: inherit; caret-color: #57ff8a; }
+
+/* Akte */
+.cl-spuren { background: var(--cl-papier); color: var(--cl-papier-text); border-radius: 4px; padding: 12px 16px; font-family: var(--cl-mono); font-size: 14px; transform: rotate(0.4deg); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); }
+.cl-spuren ol { margin: 6px 0 0; padding-left: 20px; }
+.cl-personen { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.cl-person { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--cl-rand); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: opacity 0.3s; }
+.cl-person.raus { opacity: 0.35; text-decoration: line-through; }
+.cl-person-kopf { display: flex; align-items: center; gap: 10px; }
+.cl-person-bild { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 800 18px var(--cl-titel); background: color-mix(in srgb, var(--cl-akzent) 25%, #222); color: var(--cl-akzent); flex: none; }
+.cl-person ul { margin: 0; padding-left: 16px; font-size: 13.5px; }
+.cl-person-knoepfe { display: flex; gap: 6px; margin-top: auto; }
+
+/* Verhör */
+.cl-verhoer { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow: auto; padding: 4px; }
+.cl-blase { max-width: 85%; padding: 9px 13px; border-radius: 16px; animation: cl-zoom 0.25s ease-out; }
+.cl-blase.figur { align-self: flex-start; background: rgba(255, 255, 255, 0.08); border-bottom-left-radius: 4px; }
+.cl-blase.figur.leise { color: var(--cl-leise); font-style: italic; }
+.cl-blase.ich { align-self: flex-end; background: color-mix(in srgb, var(--cl-akzent) 30%, transparent); border-bottom-right-radius: 4px; }
+.cl-optionen { display: flex; flex-direction: column; gap: 8px; }
+.cl-option { display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.05); color: var(--cl-text); cursor: pointer; font-size: 15.5px; }
+.cl-option:hover { border-color: var(--cl-akzent); }
+.cl-option.falsch { border-color: var(--cl-falsch); opacity: 0.6; }
+.cl-option-zeichen { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--cl-akzent) 22%, transparent); color: var(--cl-akzent); font-weight: 800; flex: none; }
+.cl-inschrift { font-family: var(--cl-titel); font-size: 20px; text-align: center; padding: 16px; border-radius: 12px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.2)); border: 1px solid var(--cl-rand); }
+.cl-luecke { display: inline-block; min-width: 3em; margin: 0 6px; border-bottom: 3px solid var(--cl-akzent); color: var(--cl-akzent); }
+
+/* Spieluhr */
+.cl-tasten { display: flex; gap: 8px; justify-content: center; }
+.cl-taste { width: 56px; height: 120px; border-radius: 10px 10px 16px 16px; border: 1px solid rgba(0, 0, 0, 0.5); cursor: pointer; transition: transform 0.08s, filter 0.1s; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45); }
+.cl-taste.t0 { background: linear-gradient(#ff8a7a, #c4473a); } .cl-taste.t1 { background: linear-gradient(#ffd27a, #c4912f); } .cl-taste.t2 { background: linear-gradient(#8af0a6, #2f9e57); } .cl-taste.t3 { background: linear-gradient(#8ac8ff, #2f6fc4); } .cl-taste.t4 { background: linear-gradient(#d0a6ff, #7a44c4); }
+.cl-taste.an, .cl-taste:active { transform: translateY(4px); filter: brightness(1.45); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 255, 255, 0.4); }
+.cl-melodie-punkte { display: flex; justify-content: center; gap: 6px; }
+.cl-mp { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--cl-rand); }
+.cl-mp.voll { background: var(--cl-akzent); }
+
+/* Uhr */
+.cl-uhr { display: block; margin: 0 auto; }
+.cl-uhr-rand { fill: #f3ead4; stroke: #6b4b2a; stroke-width: 6; }
+.cl-uhr-zahl { fill: #3b2a18; font: 600 13px var(--cl-titel); }
+.cl-uhr-stunde { stroke: #22160b; stroke-width: 6; stroke-linecap: round; transition: transform 0.2s; }
+.cl-uhr-minute { stroke: #22160b; stroke-width: 3.5; stroke-linecap: round; transition: transform 0.2s; }
+.cl-uhr-mitte { fill: #b8862b; }
+.cl-uhr-knoepfe { display: flex; justify-content: center; gap: 26px; }
+.cl-uhr-knoepfe > div { display: flex; align-items: center; gap: 6px; }
+
+/* Anagramm */
+.cl-anagramm-ziel, .cl-anagramm-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.cl-anagramm-ziel { min-height: 54px; padding: 8px; border-radius: 12px; background: rgba(0, 0, 0, 0.3); }
+.cl-stein { width: 44px; height: 48px; border-radius: 9px; border: 1px solid rgba(0, 0, 0, 0.5); background: linear-gradient(180deg, #f4ead2, #d5c7a6); color: #2a2216; font: 800 22px var(--cl-mono); cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); }
+.cl-stein.platz { background: transparent; border: 1px dashed var(--cl-rand); box-shadow: none; }
+.cl-stein.weg { visibility: hidden; }
+.cl-stein.gelegt { animation: cl-zoom 0.2s ease-out; }
+
+/* Karte */
+.cl-karte-rahmen { position: relative; padding: 14px; border-radius: 10px; background: #e8d4a0; box-shadow: inset 0 0 40px rgba(120, 80, 30, 0.6), 0 10px 30px rgba(0, 0, 0, 0.5); }
+.cl-windrose { position: absolute; top: 4px; right: 10px; font: 800 14px var(--cl-titel); color: #5a3d1a; }
+.cl-kartenfeld { display: grid; gap: 2px; width: min(360px, 78vw); margin: 0 auto; }
+.cl-kartenzelle { aspect-ratio: 1; border: 1px dashed rgba(90, 60, 25, 0.3); background: transparent; color: #4a2f12; cursor: pointer; padding: 3px; }
+.cl-kartenzelle .cl-icon { width: 100%; height: 100%; }
+.cl-kartenzelle.gewaehlt { background: rgba(200, 40, 30, 0.25); }
+.cl-kartenzelle.gewaehlt::after { content: '✕'; color: #b3261e; font: 900 20px var(--cl-titel); }
+.cl-kartenzelle.marke.gewaehlt::after { content: none; }
+
+/* Bits */
+.cl-bits { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.cl-bit { width: 48px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; border-radius: 12px; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.04); color: var(--cl-leise); cursor: pointer; }
+.cl-bit-lampe { width: 18px; height: 18px; border-radius: 50%; background: #2a1414; box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8); }
+.cl-bit.an .cl-bit-lampe { background: #ff5252; box-shadow: 0 0 12px #ff5252; }
+.cl-bit-hebel { width: 14px; height: 30px; border-radius: 7px; background: #555; position: relative; }
+.cl-bit-hebel::after { content: ''; position: absolute; left: -3px; right: -3px; height: 14px; bottom: 0; border-radius: 6px; background: #ddd; transition: bottom 0.15s; }
+.cl-bit.an .cl-bit-hebel::after { bottom: 16px; background: var(--cl-akzent); }
+.cl-bit-summe { text-align: center; font: 800 30px var(--cl-mono); color: var(--cl-akzent); }
+
+/* ---------------------------------------------------------------- Intro, Ende, Leer */
+.cl-intro { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px 16px; background: var(--cl-wand); overflow: hidden; }
+.cl-intro-karte { position: relative; z-index: 2; max-width: 640px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; animation: cl-zoom 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
+.cl-intro-welt { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cl-akzent); font-weight: 700; }
+.cl-intro-titel { margin: 0; font-family: var(--cl-titel); font-size: clamp(34px, 7vw, 58px); font-weight: 600; line-height: 1.08; text-shadow: 0 4px 40px var(--cl-glanz); }
+.cl-intro-text { font-size: 17px; line-height: 1.65; color: var(--cl-text); min-height: 5em; white-space: pre-line; margin: 0; }
+.cl-intro-team { font-size: 14px; }
+.cl-warten { animation: cl-puls 1.8s ease-in-out infinite; }
+@keyframes cl-puls { 50% { opacity: 0.45; } }
+.cl-sterne { display: flex; gap: 10px; font-size: 44px; }
+.cl-sterne span { color: rgba(255, 255, 255, 0.15); }
+.cl-sterne span.an { color: var(--cl-akzent); text-shadow: 0 0 20px var(--cl-glanz); animation: cl-entriegeln 0.8s both; animation-delay: var(--d); }
+.cl-ende-zahlen { display: flex; gap: 28px; }
+.cl-ende-zahlen div { display: flex; flex-direction: column; }
+.cl-ende-zahlen b { font: 800 26px var(--cl-mono); color: var(--cl-akzent); }
+.cl-ende-zahlen span { font-size: 12px; color: var(--cl-leise); text-transform: uppercase; letter-spacing: 0.12em; }
+.cl-intro.ende:not(.geschafft) .cl-intro-titel { text-shadow: 0 4px 40px rgba(255, 80, 80, 0.4); }
+.cl-leer { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 30px; }
+.cl-schluessel-gross { width: 80px; height: 80px; color: var(--cl-akzent); }
+.cl-schluessel-gross .cl-icon { width: 100%; height: 100%; }
+.cl-schluessel-gross.drehen { animation: cl-drehen 2.6s ease-in-out infinite; }
+@keyframes cl-drehen { 50% { transform: rotate(-25deg); } }
+
+.cl-notizbuch h4 { margin: 16px 0 6px; font-family: var(--cl-titel); color: var(--cl-akzent); font-weight: 600; }
+.cl-notiz { padding: 7px 0; border-top: 1px solid var(--cl-rand); font-size: 14.5px; }
+
+/* ---------------------------------------------------------------- Meldungen und Überraschungen */
+.cl-toast { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 40; background: rgba(10, 10, 14, 0.9); border: 1px solid var(--cl-rand); color: var(--cl-text); padding: 10px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); animation: cl-hoch 0.3s ease-out; max-width: 90%; text-align: center; }
+.cl-toast.ok { border-color: var(--cl-ok); }
+.cl-toast.falsch { border-color: var(--cl-falsch); }
+.cl-toast.weg { opacity: 0; transition: opacity 0.4s; }
+@keyframes cl-hoch { from { transform: translate(-50%, 20px); opacity: 0; } }
+
+.cl-effekt { position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 20px; animation: cl-ein 0.3s; cursor: pointer; }
+.cl-effekt.weg { animation: cl-aus 0.45s forwards; }
+.cl-effekt-karte { max-width: 520px; text-align: center; padding: 22px 26px; border-radius: 18px; background: rgba(8, 8, 12, 0.82); border: 1px solid var(--cl-rand); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); animation: cl-zoom 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+.cl-effekt-symbol { font-size: 40px; margin-bottom: 6px; }
+.cl-effekt-text { font-family: var(--cl-titel); font-size: 21px; line-height: 1.4; }
+.cl-effekt.stromausfall { background: #000; animation: cl-stromaus 1.4s steps(1) both; }
+@keyframes cl-stromaus { 0% { background: rgba(0, 0, 0, 0.2); } 10% { background: #000; } 18% { background: rgba(0, 0, 0, 0.3); } 26% { background: #000; } 30% { background: rgba(0, 0, 0, 0.5); } 36%, 100% { background: rgba(0, 0, 0, 0.94); } }
+.cl-effekt.stromausfall .cl-effekt-karte { animation-delay: 1.2s; animation-fill-mode: both; background: rgba(40, 0, 0, 0.6); border-color: rgba(255, 60, 60, 0.4); }
+.cl-effekt.alarm { animation: cl-alarm 0.5s ease-in-out 6 alternate; }
+@keyframes cl-alarm { from { background: rgba(255, 0, 0, 0.05); box-shadow: inset 0 0 60px rgba(255, 0, 0, 0.2); } to { background: rgba(255, 0, 0, 0.32); box-shadow: inset 0 0 200px rgba(255, 0, 0, 0.7); } }
+.cl-effekt.alarm .cl-effekt-symbol { color: #ff5252; font-weight: 900; }
+.cl-effekt.gewitter { animation: cl-blitz 1.2s ease-out both; }
+@keyframes cl-blitz { 0% { background: rgba(255, 255, 255, 0); } 6% { background: rgba(230, 240, 255, 0.95); } 10% { background: rgba(0, 0, 0, 0.3); } 16% { background: rgba(230, 240, 255, 0.8); } 30%, 100% { background: rgba(0, 0, 10, 0.5); } }
+.cl-effekt.schritte, .cl-effekt.fluestern { background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(0, 0, 0, 0.85) 80%); animation: cl-vignette 3s ease-in-out both; }
+@keyframes cl-vignette { 0% { opacity: 0; } 30% { opacity: 1; } }
+.cl-effekt.fluestern .cl-effekt-text { font-style: italic; letter-spacing: 0.06em; animation: cl-verschwimmen 2.6s ease-in-out infinite alternate; }
+@keyframes cl-verschwimmen { to { filter: blur(1.5px); opacity: 0.7; } }
+.cl-effekt.fackel { background: radial-gradient(circle at 50% 60%, rgba(255, 140, 40, 0.35), rgba(0, 0, 0, 0.7) 70%); }
+.cl-effekt.geheimtuer, .cl-effekt.beben, .cl-effekt.glitch { background: rgba(0, 0, 0, 0.45); }
+.cl-effekt.anruf .cl-effekt-symbol, .cl-effekt.funkspruch .cl-effekt-symbol { animation: cl-klingeln 0.15s linear 12 alternate; display: inline-block; }
+@keyframes cl-klingeln { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+.cl-effekt.brief { background: rgba(0, 0, 0, 0.55); }
+.cl-brief { position: relative; width: min(440px, 92%); padding: 34px 28px 26px; background: var(--cl-papier); color: var(--cl-papier-text); border-radius: 4px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); font-family: "Snell Roundhand", "Bradley Hand", Georgia, serif; font-size: 19px; line-height: 1.5; animation: cl-brief 0.9s cubic-bezier(0.2, 1, 0.3, 1); }
+@keyframes cl-brief { from { transform: translateY(120%) rotate(-12deg); } }
+.cl-brief-siegel { position: absolute; top: -18px; left: 50%; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #d84a3a, #8a1d12); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); }
+.cl-spiel.cl-wackeln { animation: cl-beben 0.12s linear 8; }
+@keyframes cl-beben { 25% { transform: translate(3px, -2px); } 50% { transform: translate(-3px, 2px); } 75% { transform: translate(2px, 3px); } }
+.cl-spiel.cl-glitch .cl-buehne { animation: cl-glitch 0.18s steps(2) 7; }
+@keyframes cl-glitch { 0% { filter: hue-rotate(90deg) contrast(1.6); transform: translate(4px, 0) skewX(4deg); } 50% { filter: hue-rotate(-60deg) saturate(3); transform: translate(-6px, 2px); clip-path: inset(10% 0 30% 0); } 100% { filter: none; transform: none; } }
+
+@media (max-width: 620px) {
+  .cl-hud { gap: 8px; padding: 8px 10px; }
+  .cl-hud-titel { flex-basis: 100%; }
+  .cl-wort-feld { width: 20px; height: 26px; font-size: 13px; }
+  .cl-objekt { width: 104px; }
+  .cl-objekt-bild { width: 70px; height: 70px; }
+  .cl-objekt-bild .cl-icon { width: 40px; height: 40px; }
+  .cl-kabelfeld { gap: 30px; }
+  .cl-taste { width: 46px; height: 100px; }
+  .cl-nah { padding: 10px 6px; }
+  .cl-nah-karte { padding: 14px 14px 18px; border-radius: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .cl-spiel *, .cl-spiel *::before, .cl-spiel *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+
+/* ---------------------------------------------------------------- Stimmung (Spannung, Gefahr, Spuk, Gänsehaut) */
+.cl-spiel { --spannung: 0.5; --gefahr: 0.4; --spuk: 0.2; --grusel: 0.2; }
+.cl-deko.geist { background: radial-gradient(ellipse 9% 22% at 20% 55%, rgba(220, 235, 255, calc(var(--spuk) * 0.16)), transparent 70%); filter: blur(6px); animation: cl-geist 26s ease-in-out infinite; }
+.cl-deko.geist.zwei { animation-duration: 34s; animation-delay: -12s; transform: scaleX(-1); }
+@keyframes cl-geist { 0% { transform: translate(-10%, 4%); opacity: 0; } 15% { opacity: 1; } 50% { transform: translate(55%, -6%); opacity: 0.7; } 70% { opacity: 0; } 100% { transform: translate(90%, 2%); opacity: 0; } }
+.cl-deko.schatten { background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(0, 0, 0, calc(var(--grusel) * 0.75)) 100%); }
+.cl-deko.augen::before, .cl-deko.augen::after { content: ''; position: absolute; width: 26px; height: 8px; background: radial-gradient(circle at 25% 50%, rgba(255, 60, 40, 0.85) 0 3px, transparent 4px), radial-gradient(circle at 75% 50%, rgba(255, 60, 40, 0.85) 0 3px, transparent 4px); filter: drop-shadow(0 0 4px rgba(255, 40, 20, 0.8)); opacity: 0; animation: cl-augen 17s infinite; }
+.cl-deko.augen::before { left: 7%; top: 62%; }
+.cl-deko.augen::after { right: 9%; top: 30%; animation-delay: -8s; animation-duration: 23s; }
+@keyframes cl-augen { 0%, 70%, 100% { opacity: 0; } 72%, 79% { opacity: 1; transform: scaleY(1); } 75% { transform: scaleY(0.1); } 81% { opacity: 0; } }
+.cl-deko.gefahr-rand { box-shadow: inset 0 0 calc(40px + var(--gefahr) * 80px) rgba(255, 30, 30, calc(var(--gefahr) * 0.35)); animation: cl-gefahr 2.6s ease-in-out infinite; }
+@keyframes cl-gefahr { 50% { opacity: 0.35; } }
+.cl-spiel.stark-gefahr .cl-uhr-anzeige { color: #ff6b6b; text-shadow: 0 0 14px rgba(255, 60, 60, 0.6); }
+.cl-spiel.stark-spuk .cl-objekt-licht { animation: cl-flackern 2.2s infinite, cl-glimmen 3.2s ease-in-out infinite; }
+.cl-spiel.stark-grusel .cl-szene-kopf h2 { animation: cl-zittern-schrift 9s infinite; }
+@keyframes cl-zittern-schrift { 0%, 96%, 100% { transform: none; filter: none; } 97% { transform: translateX(2px) skewX(-3deg); filter: blur(0.6px); } 98% { transform: translateX(-2px); } }
+
+/* Kleine Momente */
+.cl-moment { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.cl-moment.flackern { background: #000; animation: cl-moment-flackern 0.9s steps(1) forwards; }
+@keyframes cl-moment-flackern { 0% { opacity: 0.85; } 12% { opacity: 0; } 22% { opacity: 0.7; } 30% { opacity: 0.1; } 40%, 100% { opacity: 0; } }
+.cl-moment.schatten { background: radial-gradient(ellipse 7% 30% at 50% 60%, rgba(0, 0, 0, 0.85), transparent 70%); filter: blur(4px); animation: cl-moment-schatten 2.4s ease-in-out forwards; }
+@keyframes cl-moment-schatten { from { transform: translateX(-70%); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } to { transform: translateX(70%); opacity: 0; } }
+.cl-moment.augen::after { content: ''; position: absolute; left: var(--x); top: var(--y); width: 34px; height: 10px; background: radial-gradient(circle at 25% 50%, #fff6d0 0 3px, transparent 4px), radial-gradient(circle at 75% 50%, #fff6d0 0 3px, transparent 4px); filter: drop-shadow(0 0 6px #ffcf5c); animation: cl-augen 3.8s forwards; animation-delay: -2.7s; }
+.cl-moment.kaelte { box-shadow: inset 0 0 120px rgba(170, 210, 255, 0.45); background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(200, 230, 255, 0.12)); animation: cl-kaelte 4s ease-in-out forwards; }
+@keyframes cl-kaelte { 0% { opacity: 0; } 25%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.cl-objekt.zittern { animation: cl-zittern 0.09s linear 12; }
+@keyframes cl-zittern { 50% { transform: translate(calc(var(--v) * 0 + 2px), var(--v)) rotate(2deg); } }
+.cl-spiel.cl-falle::after { content: ''; position: absolute; inset: 0; z-index: 50; pointer-events: none; animation: cl-falle 0.9s ease-out forwards; }
+@keyframes cl-falle { 0% { background: rgba(255, 30, 30, 0.55); } 100% { background: transparent; } }
+.cl-spiel.cl-falle .cl-uhr-anzeige { animation: cl-landen 0.6s; }
+
+/* Seite im Browser: dunkle Startseite passend zu Clavis */
+.lg-seite { --lg-grund: #0f1117; --lg-flaeche: #1a1d26; --lg-text: #ece9e1; --lg-leise: #a6a39b; --lg-linie: rgba(255, 255, 255, 0.12); --lg-akzent: #e5b94e; --lg-akzent-weich: rgba(229, 185, 78, 0.14); }
+.lg-seite .lg-mitte h1 { font-family: "Didot", "Bodoni 72", Georgia, serif; font-weight: 600; letter-spacing: 0.02em; }
+.lg-seite .lg-knopf { color: #14110a; }
+
+/* ================================================================ Neue Welten */
+.cl-spiel[data-welt="zirkus"] { --cl-grund: #12060c; --cl-wand: radial-gradient(ellipse at 50% -20%, #7a1d2e 0%, #3a0d1a 45%, #12060c 100%); --cl-boden: #2a1408; --cl-akzent: #ffcf4a; --cl-akzent2: #ff4d6d;
+  --cl-glanz: rgba(255, 207, 74, 0.45); --cl-titel: "Rockwell", "Didot", Georgia, serif; --cl-karte: #1e0b12; --cl-papier: #fff1c9; }
+.cl-spiel[data-welt="dschungel"] { --cl-grund: #04100a; --cl-wand: radial-gradient(ellipse at 50% 0%, #1f4a2a 0%, #0c2414 50%, #040c07 100%); --cl-boden: #10180a; --cl-akzent: #c8e65a; --cl-akzent2: #ff9a3c;
+  --cl-glanz: rgba(200, 230, 90, 0.35); --cl-titel: "Papyrus", "Herculanum", Georgia, serif; --cl-karte: #0b1a10; --cl-papier: #e9e0b8; }
+.cl-spiel[data-welt="unterwasser"] { --cl-grund: #020b16; --cl-wand: linear-gradient(180deg, #0a3a5a 0%, #062238 50%, #020b16 100%); --cl-boden: #04121e; --cl-akzent: #4fe3ff; --cl-akzent2: #ffcb47;
+  --cl-glanz: rgba(79, 227, 255, 0.35); --cl-text: #e0f7ff; --cl-titel: var(--cl-mono); --cl-karte: #06182a; --cl-papier: #dff2fb; --cl-papier-text: #08263a; }
+.cl-spiel[data-welt="spielzeug"] { --cl-grund: #120d1e; --cl-wand: radial-gradient(ellipse at 50% 0%, #4a2f6b 0%, #241a3d 55%, #110c1c 100%); --cl-boden: #2a1a12; --cl-akzent: #ff9ec7; --cl-akzent2: #7fe0ff;
+  --cl-glanz: rgba(255, 158, 199, 0.4); --cl-titel: "Chalkboard SE", "Marker Felt", Georgia, serif; --cl-karte: #1c1430; --cl-papier: #fff3e0; }
+.cl-spiel[data-welt="western"] { --cl-grund: #140b05; --cl-wand: linear-gradient(180deg, #6b3a1c 0%, #3a1f0f 55%, #160c05 100%); --cl-boden: #2a170a; --cl-akzent: #f2b25c; --cl-akzent2: #c0392b;
+  --cl-glanz: rgba(242, 178, 92, 0.4); --cl-titel: "Rockwell", "American Typewriter", Georgia, serif; --cl-schrift: "American Typewriter", var(--cl-schrift); --cl-karte: #211207; --cl-papier: #ecd9b0; }
+.cl-spiel[data-welt="sanatorium"] { --cl-grund: #070908; --cl-wand: linear-gradient(180deg, #1d2421 0%, #111614 60%, #060807 100%); --cl-boden: #0c0f0d; --cl-akzent: #9ef0c8; --cl-akzent2: #ff5a5a;
+  --cl-glanz: rgba(158, 240, 200, 0.25); --cl-text: #dfe6e2; --cl-titel: "Courier New", var(--cl-mono); --cl-karte: #0f1412; --cl-papier: #d9d6c8; }
+
+.cl-deko.zeltbahnen { background: repeating-conic-gradient(from 0deg at 50% -40%, rgba(255, 60, 90, 0.18) 0 10deg, rgba(255, 240, 220, 0.06) 10deg 20deg); }
+.cl-deko.scheinwerfer { background: radial-gradient(ellipse 18% 70% at 30% 0%, rgba(255, 240, 180, 0.14), transparent 70%), radial-gradient(ellipse 18% 70% at 70% 0%, rgba(255, 200, 240, 0.12), transparent 70%); animation: cl-schwenk 9s ease-in-out infinite alternate; }
+@keyframes cl-schwenk { to { background-position: 120px 0, -120px 0; } }
+.cl-deko.blaetter { background: radial-gradient(ellipse 30% 22% at 0% 0%, rgba(30, 90, 40, 0.9), transparent 70%), radial-gradient(ellipse 30% 22% at 100% 0%, rgba(30, 90, 40, 0.9), transparent 70%), radial-gradient(ellipse 18% 30% at 0% 100%, rgba(20, 70, 30, 0.8), transparent 70%), radial-gradient(ellipse 18% 30% at 100% 100%, rgba(20, 70, 30, 0.8), transparent 70%); }
+.cl-deko.gluehwuermchen { background-image: radial-gradient(circle, rgba(230, 255, 120, 0.9) 0 1.5px, transparent 3px); background-size: 160px 120px; animation: cl-sand 22s linear infinite, cl-flackern 3s infinite; opacity: 0.6; }
+.cl-deko.lichtwellen { background: repeating-radial-gradient(ellipse at 40% -10%, rgba(120, 220, 255, 0.08) 0 12px, transparent 12px 30px); animation: cl-treiben 30s linear infinite; }
+.cl-deko.tapete { background-image: radial-gradient(circle, rgba(255, 158, 199, 0.12) 0 6px, transparent 7px), radial-gradient(circle, rgba(127, 224, 255, 0.1) 0 4px, transparent 5px); background-size: 60px 60px, 60px 60px; background-position: 0 0, 30px 30px; }
+.cl-deko.sonne { background: radial-gradient(circle 140px at 80% 18%, rgba(255, 200, 120, 0.35), transparent 70%); }
+.cl-deko.kacheln { background-image: linear-gradient(rgba(200, 220, 210, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 220, 210, 0.05) 1px, transparent 1px); background-size: 34px 34px; mask-image: linear-gradient(transparent 10%, black 40%); -webkit-mask-image: linear-gradient(transparent 10%, black 40%); }
+.cl-deko.roehre { background: linear-gradient(180deg, rgba(200, 255, 230, 0.16), transparent 35%); animation: cl-roehre 6s infinite steps(1); }
+@keyframes cl-roehre { 0%, 42%, 46%, 80%, 82%, 100% { opacity: 1; } 43%, 45%, 81% { opacity: 0.1; } }
+.cl-deko.flecken { background: radial-gradient(ellipse 12% 8% at 20% 70%, rgba(60, 50, 30, 0.35), transparent 70%), radial-gradient(ellipse 8% 14% at 85% 40%, rgba(50, 60, 40, 0.3), transparent 70%); }
+.cl-deko.funkeln { background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 2.5px), radial-gradient(circle, rgba(255, 210, 120, 0.8) 0 1px, transparent 2px); background-size: 140px 120px, 90px 80px; animation: cl-flackern 2.6s infinite, cl-sand 30s linear infinite; opacity: 0.7; }
+
+/* ================================================================ Kinder: hell, bunt, verspielt */
+.cl-spiel[data-alter="kinder"] { --cl-wand: radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--cl-akzent) 55%, #8fd3ff) 0%, #4b5bd6 45%, #26307a 100%); --cl-boden: #2a3a8a;
+  --cl-titel: "Chalkboard SE", "Marker Felt", "Comic Sans MS", var(--cl-schrift); --cl-schrift: "Avenir Next Rounded", "Arial Rounded MT Bold", -apple-system, sans-serif; --cl-karte: #2d3592; --cl-text: #fffdf5; }
+.cl-spiel[data-alter="kinder"] .cl-objekt-bild { border-radius: 28px; background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.06)); }
+.cl-spiel[data-alter="kinder"] .cl-objekt:not(.fertig) .cl-objekt-bild { animation: cl-huepfen 2.4s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes cl-huepfen { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px) rotate(-2deg); } }
+.cl-spiel[data-alter="kinder"] .cl-deko.jalousie, .cl-spiel[data-alter="kinder"] .cl-deko.schatten, .cl-spiel[data-alter="kinder"] .cl-deko.flecken { display: none; }
+.cl-spiel[data-alter="kinder"] .cl-nah-karte { border-radius: 28px; }
+.cl-spiel[data-alter="kinder"] .cl-knopf { border-radius: 999px; }
+
+/* ================================================================ Blut (nur ab 18) */
+.cl-deko.blut { inset: 0 0 auto 0; height: 160px; }
+.cl-deko.blut i { position: absolute; top: -6px; border-radius: 0 0 50% 50% / 0 0 30% 30%; background: linear-gradient(#5a0000, #9b0a0a); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); transform-origin: top; animation: cl-tropfen 9s ease-in infinite; }
+.cl-deko.blut i::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 9px; height: 11px; margin-left: -4.5px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; background: #9b0a0a; }
+@keyframes cl-tropfen { 0% { transform: scaleY(0.2); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1.05); } }
+.cl-deko.handabdruecke svg { position: absolute; width: 70px; fill: rgba(120, 0, 0, 0.45); }
+.cl-spiel.mit-blut .cl-szene-kopf h2 { color: #e8d6d6; text-shadow: 0 2px 0 #5a0000, 0 0 26px rgba(160, 0, 0, 0.5); }
+.cl-moment.blutspur::after { content: ''; position: absolute; left: var(--x); top: 0; width: 6px; height: 0; background: linear-gradient(#5a0000, #a00); border-radius: 0 0 4px 4px; animation: cl-blutspur 4s ease-in forwards; }
+@keyframes cl-blutspur { to { height: 55%; } }
+
+/* ================================================================ Kino-Intro */
+.cl-kino { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; background: #000; overflow: hidden; }
+.cl-kino .cl-kulisse { opacity: 0.45; animation: cl-kino-zoom 30s linear forwards; }
+@keyframes cl-kino-zoom { from { transform: scale(1.15); } to { transform: scale(1); } }
+.cl-kino-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 30%, #000 85%); pointer-events: none; }
+.cl-kino-flaeche { position: relative; z-index: 2; width: min(900px, 92%); min-height: 40vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+.cl-kino-flaeche > * { position: absolute; animation: cl-kino-rein 0.9s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.cl-kino-flaeche > .raus { animation: cl-kino-raus 0.6s ease-in forwards; }
+@keyframes cl-kino-rein { from { opacity: 0; transform: scale(1.12); filter: blur(8px); letter-spacing: 0.3em; } }
+@keyframes cl-kino-raus { to { opacity: 0; transform: scale(0.94); filter: blur(6px); } }
+.cl-kino-vorspann { font-size: 13px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--cl-akzent); }
+.cl-kino-zeile { font-family: var(--cl-titel); font-size: clamp(24px, 4.4vw, 46px); line-height: 1.2; color: var(--cl-text); text-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 0 60px var(--cl-glanz); }
+.cl-kino-titelblock { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.cl-kino-welt { font-size: 13px; letter-spacing: 0.45em; text-transform: uppercase; color: var(--cl-akzent); }
+.cl-kino-titel { margin: 0; font-family: var(--cl-titel); font-size: clamp(38px, 8vw, 86px); font-weight: 700; line-height: 1.05; color: var(--cl-text); text-shadow: 0 6px 60px var(--cl-glanz); }
+.cl-kino-titel span { display: inline-block; animation: cl-buchstabe 0.7s both cubic-bezier(0.2, 1.2, 0.3, 1); animation-delay: calc(var(--i) * 55ms + 0.2s); }
+@keyframes cl-buchstabe { from { opacity: 0; transform: translateY(40px) scale(1.6); filter: blur(10px); } }
+.cl-kino[data-effekt="schreibmaschine"] .cl-kino-titel span { animation: cl-tippen 0.05s both steps(1); animation-delay: calc(var(--i) * 85ms + 0.2s); }
+@keyframes cl-tippen { from { opacity: 0; } }
+.cl-kino[data-effekt="glitch"] .cl-kino-titel { animation: cl-glitch-titel 2.2s steps(2) 0.4s 2; }
+@keyframes cl-glitch-titel { 0%, 100% { text-shadow: 0 6px 60px var(--cl-glanz); transform: none; } 10% { text-shadow: -4px 0 #ff2a6d, 4px 0 #05d9e8; transform: translateX(3px) skewX(-6deg); } 12% { transform: none; } 50% { text-shadow: 3px 0 #ff2a6d, -3px 0 #05d9e8; clip-path: inset(30% 0 40% 0); } 52% { clip-path: none; } }
+.cl-kino[data-effekt="flackern"] .cl-kino-titel { animation: cl-moment-flackern 1.6s steps(1) 0.4s 2; }
+.cl-kino[data-effekt="sand"] .cl-kino-titel span { animation-name: cl-sandrein; animation-duration: 1.2s; }
+@keyframes cl-sandrein { from { opacity: 0; filter: blur(14px); transform: translateX(-30px) scaleX(1.4); } }
+.cl-kino[data-effekt="huepfen"] .cl-kino-titel span { animation-name: cl-hupf; animation-timing-function: cubic-bezier(0.3, 2, 0.4, 1); }
+@keyframes cl-hupf { from { opacity: 0; transform: translateY(-80px) rotate(-20deg); } }
+.cl-kino.blut .cl-kino-titel { color: #e9dada; text-shadow: 0 3px 0 #5a0000, 0 0 40px rgba(170, 0, 0, 0.7); }
+.cl-kino.blut .cl-kino-titelblock::after { content: ''; width: 60%; height: 40px; background: radial-gradient(ellipse 4px 20px at 20% 0, #8a0000 0 99%, transparent 100%), radial-gradient(ellipse 3px 30px at 47% 0, #8a0000 0 99%, transparent 100%), radial-gradient(ellipse 5px 16px at 78% 0, #8a0000 0 99%, transparent 100%); animation: cl-tropfen 3s ease-in both 1s; transform-origin: top; }
+.cl-kino-unter { color: var(--cl-leise); font-size: 14px; letter-spacing: 0.1em; animation: cl-ein 1s 1.2s both; }
+.cl-kino-weiter { position: absolute; right: 18px; bottom: 16px; z-index: 3; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.75); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 13px; }
+.cl-kino.kinder { background: #2a3590; }
+.cl-kino.kinder .cl-kino-vignette { background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(20, 20, 80, 0.7) 90%); }
+.cl-warnung { font-size: 13px; padding: 5px 12px; border-radius: 999px; background: rgba(255, 80, 80, 0.14); border: 1px solid rgba(255, 80, 80, 0.4); color: #ffb4b4; }
+.cl-knopf.puls { animation: cl-knopf-puls 1.8s ease-in-out infinite; }
+@keyframes cl-knopf-puls { 50% { box-shadow: 0 0 0 10px transparent, 0 0 34px var(--cl-glanz); } }
+
+/* Tür zum Raum */
+.cl-tueren { position: absolute; inset: 0; z-index: 45; pointer-events: none; display: flex; perspective: 1200px; }
+.cl-tuerfluegel { flex: 1; background: linear-gradient(90deg, #1b120a, #3a2615 40%, #24170c); border: 3px solid #0a0603; box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.8); position: relative; }
+.cl-tuerfluegel i { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f3d27a, #8a6a20); }
+.cl-tuerfluegel.links { transform-origin: left; animation: cl-fluegel-l 1.5s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+.cl-tuerfluegel.links i { right: 18px; }
+.cl-tuerfluegel.rechts { transform-origin: right; animation: cl-fluegel-r 1.5s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+.cl-tuerfluegel.rechts i { left: 18px; }
+@keyframes cl-fluegel-l { 0%, 20% { transform: rotateY(0); } 100% { transform: rotateY(-95deg); opacity: 0.3; } }
+@keyframes cl-fluegel-r { 0%, 20% { transform: rotateY(0); } 100% { transform: rotateY(95deg); opacity: 0.3; } }
+.cl-tuerlicht { position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: var(--cl-akzent); box-shadow: 0 0 60px 20px var(--cl-glanz); animation: cl-tuerlicht 1.5s forwards; }
+@keyframes cl-tuerlicht { 0%, 15% { opacity: 1; } 100% { opacity: 0; width: 100%; left: 0; margin-left: 0; } }
+
+/* ================================================================ Wendungen im Raum */
+.cl-countdown { flex-basis: 100%; position: relative; height: 26px; border-radius: 8px; overflow: hidden; background: rgba(255, 40, 40, 0.15); border: 1px solid rgba(255, 70, 70, 0.5); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; letter-spacing: 0.05em; }
+.cl-countdown-balken { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #ff3b3b, #ff8a3b); opacity: 0.55; transition: width 1s linear; }
+.cl-countdown span { position: relative; }
+.cl-spiel[data-alter="kinder"] .cl-countdown { background: rgba(255, 210, 80, 0.15); border-color: rgba(255, 210, 80, 0.6); }
+.cl-taschenlampe, .cl-nebelschicht { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.8s; }
+.cl-buehne.dunkel .cl-taschenlampe { opacity: 1; background: radial-gradient(circle 120px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.97) 100%); }
+.cl-spiel[data-alter="kinder"] .cl-buehne.dunkel .cl-taschenlampe { background: radial-gradient(circle 160px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(10, 10, 60, 0.6) 50%, rgba(10, 10, 60, 0.9) 100%); }
+.cl-buehne.vernebelt .cl-nebelschicht { opacity: 1; background: radial-gradient(ellipse 60% 40% at 30% 60%, rgba(220, 225, 235, 0.55), transparent 70%), radial-gradient(ellipse 50% 40% at 70% 50%, rgba(220, 225, 235, 0.5), transparent 70%), rgba(200, 205, 215, 0.25); backdrop-filter: blur(4px); animation: cl-nebel 8s ease-in-out infinite alternate; }
+.cl-spiel[data-alter="kinder"] .cl-buehne.vernebelt .cl-nebelschicht { background-image: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0 10px, transparent 12px), radial-gradient(circle, rgba(180, 230, 255, 0.4) 0 16px, transparent 18px); background-size: 90px 90px, 140px 140px; backdrop-filter: blur(2px); }
+.cl-objekt.bonus .cl-objekt-bild { border-color: var(--cl-akzent2); box-shadow: 0 0 26px color-mix(in srgb, var(--cl-akzent2) 60%, transparent); animation: cl-bonus 1.6s ease-in-out infinite; }
+@keyframes cl-bonus { 50% { transform: translateY(-5px) scale(1.04); } }
+.cl-objekt-neu { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); background: var(--cl-akzent2); color: #fff; font-size: 11px; font-weight: 800; border-radius: 999px; padding: 1px 8px; }
+.cl-objekt.blockiert .cl-objekt-bild { filter: grayscale(1) brightness(0.6); }
+.cl-objekt-kette { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); font-size: 34px; filter: drop-shadow(0 2px 4px #000); animation: cl-wackeln 0.4s 2; }
+.cl-verriegelt { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 22px 0; color: var(--cl-leise); }
+.cl-verriegelt b { color: var(--cl-falsch); font-size: 20px; }
+.cl-verriegelt-kette { font-size: 44px; }
+.cl-zeitbonus { font: 800 28px var(--cl-mono); color: var(--cl-ok); }
+.cl-hud-knopf.aus { opacity: 0.45; }
+
+/* ================================================================ Effekte (neu) */
+.cl-scherbe { position: absolute; width: 16px; height: 12px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(180, 220, 255, 0.4)); clip-path: polygon(50% 0, 100% 80%, 0 100%); animation: cl-scherbe 1.1s cubic-bezier(0.2, 0.7, 0.4, 1) forwards; }
+@keyframes cl-scherbe { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+.cl-regenguss { position: absolute; inset: 0; background-image: repeating-linear-gradient(100deg, transparent 0 7px, rgba(190, 210, 255, 0.25) 7px 8px); background-size: 120px 120px; animation: cl-regen 0.25s linear infinite; }
+.cl-effekt.regen.kinder .cl-regenguss { background-image: repeating-linear-gradient(100deg, transparent 0 9px, rgba(160, 220, 255, 0.35) 9px 10px); }
+.cl-schwarm { position: absolute; animation: cl-schwarm 2.2s ease-in forwards; }
+@keyframes cl-schwarm { from { transform: translate(0, 0) rotate(0); opacity: 0; } 15% { opacity: 1; } to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+.cl-schwarm.noten { color: var(--cl-akzent); text-shadow: 0 0 10px var(--cl-glanz); animation-duration: 3.4s; }
+.cl-schwarm.krabbel { animation-duration: 1.8s; }
+.cl-effekt.schrei { background: radial-gradient(circle, transparent 30%, rgba(120, 0, 0, 0.55) 100%); animation: cl-ein 0.1s, cl-alarm 0.25s ease-in-out 4 alternate; }
+.cl-effekt.lachen .cl-effekt-text { animation: cl-verschwimmen 0.6s ease-in-out infinite alternate; }
+.cl-effekt.explosion:not(.kinder) { animation: cl-explosion 1.2s ease-out both; }
+@keyframes cl-explosion { 0% { background: rgba(255, 240, 200, 0.95); } 15% { background: rgba(255, 120, 30, 0.6); } 100% { background: rgba(20, 10, 5, 0.6); } }
+.cl-effekt.tuerknall { animation: cl-ein 0.05s, cl-knall 0.6s ease-out; }
+@keyframes cl-knall { 0% { background: rgba(0, 0, 0, 0.95); } 100% { background: rgba(0, 0, 0, 0.45); } }
+.cl-effekt.kinder .cl-effekt-karte { background: rgba(40, 50, 140, 0.9); border-radius: 26px; border-color: rgba(255, 255, 255, 0.3); }
+.cl-effekt.kinder .cl-effekt-text { font-family: "Chalkboard SE", "Marker Felt", var(--cl-schrift); }
+
+/* Konfetti */
+.cl-konfetti { position: absolute; inset: 0; z-index: 46; pointer-events: none; overflow: hidden; }
+.cl-konfetti i { position: absolute; top: -20px; border-radius: 2px; animation: cl-konfetti linear forwards; }
+@keyframes cl-konfetti { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
+
+/* ================================================================ Jumpscares */
+.cl-schreck { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; }
+.cl-schreck.weg { animation: cl-aus 0.5s forwards; }
+.cl-schreck.fratze, .cl-schreck.puppe, .cl-schreck.gestalt, .cl-schreck.hand { background: #000; animation: cl-schreck-blitz 0.95s steps(1) both; }
+@keyframes cl-schreck-blitz { 0% { background: #fff; } 6% { background: #000; } 50% { background: #050000; } }
+.cl-fratze { width: min(80vw, 520px); height: auto; animation: cl-fratze 0.9s cubic-bezier(0.1, 0.9, 0.2, 1) both; filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.25)); }
+@keyframes cl-fratze { 0% { transform: scale(0.3); } 30% { transform: scale(1.35) rotate(-3deg); } 40% { transform: scale(1.3) rotate(3deg) translateX(8px); } 50% { transform: scale(1.38) rotate(-2deg); } 100% { transform: scale(1.45); } }
+.cl-gestalt { height: 140vh; animation: cl-gestalt 0.9s cubic-bezier(0.6, 0, 0.9, 0.4) both; filter: blur(1px); }
+@keyframes cl-gestalt { from { transform: scale(0.08) translateY(20%); } to { transform: scale(1.5) translateY(10%); } }
+.cl-hand { width: min(70vw, 420px); color: #0d0d0d; animation: cl-hand 0.7s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.cl-hand.blut { color: #7d0000; filter: drop-shadow(0 0 8px rgba(120, 0, 0, 0.8)); }
+@keyframes cl-hand { from { transform: scale(2.6); filter: blur(12px); opacity: 0; } 40% { opacity: 1; filter: blur(0); } to { transform: scale(1); } }
+.cl-schreck.hand { background: rgba(200, 210, 220, 0.15); }
+.cl-blutspritzer { position: absolute; inset: 0; background: radial-gradient(circle 60px at 30% 40%, rgba(130, 0, 0, 0.85), transparent 70%), radial-gradient(circle 35px at 70% 30%, rgba(130, 0, 0, 0.8), transparent 70%), radial-gradient(circle 80px at 60% 75%, rgba(110, 0, 0, 0.75), transparent 70%); animation: cl-ein 0.1s; }
+.cl-schreck.fledermaeuse .cl-schwarm, .cl-schreck.spinnen .cl-schwarm { animation-duration: 2s; }
+.cl-katze { display: flex; flex-direction: column; align-items: center; font-size: 120px; animation: cl-fratze 0.8s cubic-bezier(0.1, 1.4, 0.3, 1) both; }
+.cl-katze b { font-size: 34px; color: #ffe08a; font-family: var(--cl-titel); text-shadow: 0 0 20px #000; }
+
+/* ================================================================ Neue Mechaniken */
+.cl-labyrinth { width: min(340px, 82vw); height: auto; display: block; margin: 0 auto; background: rgba(0, 0, 0, 0.35); border-radius: 12px; touch-action: none; }
+.cl-lab-wand { stroke: var(--cl-akzent); stroke-width: 3; stroke-linecap: round; fill: none; filter: drop-shadow(0 0 3px var(--cl-glanz)); }
+.cl-lab-spur { stroke: color-mix(in srgb, var(--cl-akzent2) 70%, transparent); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
+.cl-lab-figur { fill: var(--cl-akzent2); filter: drop-shadow(0 0 6px var(--cl-akzent2)); transition: cx 0.12s, cy 0.12s; }
+.cl-lab-ziel { fill: color-mix(in srgb, var(--cl-ok) 50%, transparent); stroke: var(--cl-ok); }
+.cl-lab-box { position: relative; width: min(340px, 82vw); margin: 0 auto; }
+.cl-lab-box .cl-labyrinth { width: 100%; }
+.cl-lab-nebel { position: absolute; inset: 0; border-radius: 12px; pointer-events: none; transition: background 0.12s; }
+.cl-steuerkreuz { display: grid; grid-template-columns: repeat(3, 40px); gap: 6px; justify-content: center; }
+.cl-memofeld { display: grid; gap: 8px; width: min(440px, 88vw); margin: 0 auto; }
+.cl-memo { position: relative; aspect-ratio: 3 / 4; border: 0; padding: 0; background: none; cursor: pointer; perspective: 600px; }
+.cl-memo-rueck, .cl-memo-vorn { position: absolute; inset: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.35s; }
+.cl-memo-rueck { background: linear-gradient(150deg, color-mix(in srgb, var(--cl-akzent) 40%, #222), #151515); color: var(--cl-akzent); font: 800 26px var(--cl-titel); border: 1px solid var(--cl-rand); }
+.cl-memo-vorn { background: var(--cl-papier); color: var(--cl-papier-text); transform: rotateY(180deg); padding: 6px; font-size: 13px; font-weight: 650; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+.cl-memo-vorn .cl-icon { width: 60%; height: 60%; }
+.cl-memo.auf .cl-memo-rueck { transform: rotateY(180deg); }
+.cl-memo.auf .cl-memo-vorn { transform: rotateY(360deg); }
+.cl-memo.paar .cl-memo-vorn { box-shadow: 0 0 0 3px var(--cl-ok), 0 0 18px rgba(95, 211, 154, 0.5); }
+.cl-rohr-rahmen { position: relative; width: min(360px, 80vw); margin: 0 auto; padding: 0 18px; }
+.cl-rohrfeld { display: grid; gap: 3px; background: rgba(0, 0, 0, 0.4); padding: 6px; border-radius: 12px; }
+.cl-rohr { aspect-ratio: 1; padding: 0; border: 1px solid var(--cl-rand); border-radius: 6px; background: rgba(255, 255, 255, 0.04); cursor: pointer; }
+.cl-rohr svg { width: 100%; height: 100%; transform: rotate(var(--d)); transition: transform 0.2s; }
+.cl-rohr line { stroke: #7b8494; stroke-width: 9; stroke-linecap: round; }
+.cl-rohr circle { fill: #7b8494; }
+.cl-rohr.nass line, .cl-rohr.nass circle { stroke: var(--cl-akzent2); fill: var(--cl-akzent2); filter: drop-shadow(0 0 4px var(--cl-akzent2)); }
+.cl-rohr-quelle, .cl-rohr-senke { position: absolute; width: 18px; height: 18px; margin-top: -9px; border-radius: 50%; }
+.cl-rohr-quelle { left: 0; background: var(--cl-akzent2); box-shadow: 0 0 12px var(--cl-akzent2); }
+.cl-rohr-senke { right: 0; border: 3px solid var(--cl-ok); }
+.cl-kristalle { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.cl-kristall { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 8px; border-radius: 14px; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.04); color: var(--cl-text); cursor: pointer; min-width: 64px; }
+.cl-kristall.gewaehlt { border-color: var(--cl-akzent); box-shadow: 0 0 14px var(--cl-glanz); transform: translateY(-4px); }
+.cl-kristall-stein { width: 34px; height: 46px; background: var(--f); clip-path: polygon(50% 0, 100% 30%, 80% 100%, 20% 100%, 0 30%); filter: drop-shadow(0 0 10px var(--f)); }
+.cl-kristall small { font-size: 12px; }

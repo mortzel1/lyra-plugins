@@ -1,0 +1,37 @@
+{
+  "kennung": "clavis",
+  "name": "Clavis",
+  "version": "1.0.0",
+  "untertitel": "Escape Rooms zum Rätseln und Lernen – allein oder im Team",
+  "kategorie": "lernen",
+  "beschreibung": "Clavis sperrt dich ein – und du rätselst dich hinaus. Acht fertige Räume vom Kinder-Zirkus bis zum Horror-Sanatorium, oder ein Raum, den die KI dir aus einem Thema baut, gern aus deinen Unterlagen: Dann öffnen Fragen, Begriffe und Zusammenhänge aus deinem Stoff die Schlösser. 27 Rätsel-Mechaniken, 14 Welten mit eigenem Look und Soundtrack, ein Kino-Intro, das neugierig macht – und während du rätselst, passiert ständig etwas: Schreie, Anrufe, Stromausfall, ein Geheimfach mit Bonusrätsel, ein Countdown, ein verriegeltes Schloss. Altersstufe von Kinder bis ab 18, Regler für Spannung, Gefahr, Spuk und Grusel, Jumpscares zum Ein- und Ausschalten. Allein spielen oder im Team: per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, oder in Lyra Campus.",
+  "farbe": "#C99A3B",
+  "symbol": "<circle cx='7.5' cy='9' r='4.2' fill='none' stroke-width='1.9'/><path d='M10.6 11.8L20 21.2M15.8 17l2.4-2.4M18.2 19.4l2.4-2.4' stroke-width='1.9' fill='none'/>",
+  "einstieg": "index.html",
+  "berechtigungen": [
+    "unterlagen",
+    "ki",
+    "speicher",
+    "campus",
+    "gaeste"
+  ],
+  "datenhinweis": "beim Bauen dein Thema, Altersstufe, Stimmung und passende Auszüge aus deinen Unterlagen an die KI – mit „Lyra (lokal)“ bleibt alles auf deinem Mac; im Team-Spiel nur der Raum (ohne Lösungen), Namen und Spielzüge – über die Seite im Browser (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen; die Lösungen bleiben auf deinem Mac",
+  "funktionen": [
+    "Acht fertige Räume in vier Schwierigkeiten – vom Zauberzirkus für Kinder bis zum Horror-Sanatorium ab 18",
+    "Die KI baut Räume aus einem Thema oder deinen Unterlagen – Clavis macht daraus garantiert lösbare Rätsel",
+    "Kino-Intro mit Teasern, Soundtrack je Welt und über 40 Soundeffekte – Schrei, Alarm, Regen, Telefon, Wolfsheulen …",
+    "Wendungen während des Spiels: Hinweise und Buchstaben geschenkt, Geheimfach mit Bonusrätsel – oder Dunkelheit, Nebel, Countdown, verriegelte Schlösser",
+    "Altersstufe Kinder, ab 10, ab 14, ab 18: verspielt und bunt bis düster und brutal – Blut nur ab 18",
+    "Regler für Spannung, Gefahr, Spuk und Grusel; Jumpscares ein- und ausschaltbar",
+    "27 Mechaniken: Schlösser, Chiffrierscheibe, Morsefunk, Runen, Geheimtinte, Taschenlampe, Terminal, Ermittlungsakte, Verhör, Tresor, Labyrinth, Memory, Rohrleitung, Farbcode …",
+    "14 Welten – Krimi, Labor, Grabkammer, Raumstation, Spukhaus, Bibliothek, Piratenschiff, Akademie, Zirkus, Dschungeltempel, Unterwasserstation, Spielzeugladen, Wilder Westen, Sanatorium",
+    "Allein oder im Team: per Link oder QR-Code im Browser – ohne Lyra, ohne Konto – oder in Lyra Campus; Zettel verteilen sich, damit ihr redet",
+    "Lösungen bleiben verborgen – auch in deinen eigenen Räumen, bis du den Editor ausdrücklich öffnest",
+    "Eigene Räume im Editor bauen"
+  ],
+  "neuerungen": {
+    "1.0.0": [
+      "Escape Rooms in Lyra: fertige Räume, KI-Räume aus deinem Stoff, Kino-Intro, Soundtracks, Wendungen, Jumpscares, Altersstufen, Editor, Team-Spiel per Link, QR-Code oder Campus"
+    ]
+  }
+}

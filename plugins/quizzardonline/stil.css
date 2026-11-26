@@ -1,200 +1,119 @@
-/* Quizzard Online – Host-Bildschirm „Sternwarte“: Nachthimmel, Gold und Mondlicht, Zauberkarten mit Himmelszeichen.
-   Groß und gut lesbar, auch an der Leinwand. Immer dunkel. */
-:root {
-  --nacht: #0a0f24; --nacht2: #050816; --gold: #e9c46a; --gold2: #f6e3a1; --mond: #9fe7dc;
-  --text: #f3efe2; --leise: #a9b0cc; --glas: rgba(255, 255, 255, 0.045); --rand: rgba(233, 196, 106, 0.28);
-  --amethyst: #b794f6; --smaragd: #4fd1a5; --saphir: #63b3ed; --bernstein: #f6c66b; --rose: #f687b3; --tuerkis: #5eead4;
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-  --farbe: var(--gold); --akzent: var(--gold); --akzent-weich: rgba(233, 196, 106, 0.18);
-  --flaeche: rgba(255, 255, 255, 0.05); --karte: rgba(255, 255, 255, 0.05); --karte-hover: rgba(255, 255, 255, 0.09); --linie: rgba(255, 255, 255, 0.1);
-  color-scheme: dark;
-}
-html, body { margin: 0; color: var(--text); font-family: -apple-system, system-ui, sans-serif; overflow: hidden;
-  background: radial-gradient(120% 70% at 50% -10%, #1b2552 0%, transparent 60%), linear-gradient(180deg, var(--nacht), var(--nacht2)); }
-/* Sternenfeld und ein Hauch Nebel */
-body::before, body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-body::before {
-  background-image: radial-gradient(1.2px 1.2px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 72% 12%, #fff8 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 38% 64%, #fffc 50%, transparent 51%), radial-gradient(1px 1px at 88% 44%, #fff9 50%, transparent 51%),
-    radial-gradient(1px 1px at 22% 86%, #fff7 50%, transparent 51%), radial-gradient(1.8px 1.8px at 60% 34%, #f6e3a1cc 50%, transparent 51%),
-    radial-gradient(1px 1px at 94% 82%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 48% 8%, #fff9 50%, transparent 51%);
-  background-size: 280px 280px; opacity: 0.65; animation: funkeln 6s ease-in-out infinite alternate; }
-body::after { background: radial-gradient(40% 30% at 80% 20%, rgba(183, 148, 246, 0.16), transparent 70%), radial-gradient(45% 35% at 10% 85%, rgba(94, 234, 212, 0.10), transparent 70%); }
-@keyframes funkeln { to { opacity: 0.9; } }
-#app { position: relative; z-index: 1; height: 100vh; overflow: auto; }
-.buehne { max-width: 980px; margin: 0 auto; padding: 26px 28px 44px; }
-.buehne.im-spiel { max-width: 1180px; }
-.zeile { display: flex; align-items: center; }
-.spalte { display: flex; flex-direction: column; }
-.umbruch { flex-wrap: wrap; }
-.wachsen { flex: 1; min-width: 0; }
-.mitte { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.leise { color: var(--leise); }
-.klein { font-size: 13px; }
-.fett { font-weight: 750; }
-.gold { color: var(--gold); }
-h1, h2 { margin: 0; }
-h1, .serif, .spiel-titel, .frage-gross, .gewinner, .schaetz-gross { font-family: var(--serif); font-weight: 600; }
-h2 { font-size: 17px; font-weight: 750; margin-bottom: 10px; color: var(--gold2); }
+/* Quizzard Online – Host-Bildschirm: schlicht und klar, in Lyras Farben (hell oder dunkel wie die App).
+   Groß und gut lesbar, auch an der Leinwand. Baut auf lyra.css auf. */
+#app { height: 100vh; overflow: auto; }
+.buehne { max-width: 960px; margin: 0 auto; padding: 26px 28px 44px; }
+.buehne.im-spiel { max-width: 1160px; }
+h2 { font-size: 17px; margin-bottom: 10px; }
 h2.zwischen { margin: 28px 0 10px; }
 
-.knopf { border: 0; border-radius: 14px; padding: 12px 22px; font: inherit; font-size: 15.5px; font-weight: 800; color: #2a1d02; cursor: pointer;
-  background: linear-gradient(180deg, var(--gold2), var(--gold)); box-shadow: 0 0 0 1px #fff3 inset, 0 8px 22px rgba(233, 196, 106, 0.22); transition: transform 0.1s, filter 0.15s; }
-.knopf:hover { filter: brightness(1.06); }
-.knopf:active { transform: translateY(2px); }
-.knopf:disabled { opacity: 0.4; cursor: default; filter: none; }
-.knopf.tonal { background: rgba(255, 255, 255, 0.06); color: var(--gold2); box-shadow: 0 0 0 1px var(--rand) inset; }
-.knopf.text { background: none; box-shadow: none; color: var(--gold); padding: 8px 10px; }
-.knopf.riesig { font-size: 21px; padding: 17px 42px; border-radius: 18px; font-family: var(--serif); font-weight: 700; }
-.knopf.klein { font-size: 13px; padding: 8px 12px; }
-.knopf.symbol { padding: 6px 9px; font-size: 13px; background: rgba(255, 255, 255, 0.06); color: var(--text); box-shadow: none; }
-.eingabe { border: 1px solid var(--rand); border-radius: 14px; padding: 12px 15px; font: inherit; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: var(--text); outline: none; }
-.eingabe:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.2); }
-textarea.eingabe { resize: vertical; }
+.logo { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin-top: 8px; }
+.slogan { text-align: center; color: var(--leise); margin: 6px auto 24px; font-size: 15.5px; max-width: 560px; }
+.panel { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 16px; padding: 18px; }
+.hinweis-band { background: var(--akzent-weich); border-radius: 12px; padding: 11px 14px; margin-bottom: 16px; }
+.fehler-text { color: var(--falsch); font-weight: 600; }
+.knopf.riesig { font-size: 18px; padding: 14px 32px; border-radius: 14px; }
 
-.logo { font-family: var(--serif); font-size: 56px; font-weight: 600; text-align: center; line-height: 1.05; letter-spacing: 0.01em;
-  background: linear-gradient(90deg, var(--gold2), var(--gold), var(--mond), var(--gold2)); background-size: 300% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent; animation: schimmern 9s linear infinite; }
-.logo-stern { -webkit-text-fill-color: var(--gold2); text-shadow: 0 0 24px rgba(246, 227, 161, 0.8); }
-.logo.klein { font-size: 26px; }
-@keyframes schimmern { to { background-position: 300% 0; } }
-.slogan { text-align: center; color: var(--leise); margin: 10px auto 26px; font-size: 16.5px; max-width: 620px; line-height: 1.5; }
-.panel { background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)); border: 1px solid var(--rand); border-radius: 22px; padding: 20px; backdrop-filter: blur(8px); }
-.hinweis-band { border: 1px solid var(--rand); background: rgba(233, 196, 106, 0.08); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; }
-.fehler-text { color: #fda4af; font-weight: 650; }
 .typen { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
-.typ-chip { border: 1px solid rgba(255, 255, 255, 0.14); background: transparent; color: var(--leise); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
-.typ-chip.an { border-color: var(--gold); color: var(--gold2); background: rgba(233, 196, 106, 0.1); }
+.typ-chip { border: 1px solid var(--linie); background: transparent; color: var(--leise); border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+.typ-chip.an { border-color: var(--akzent); color: var(--akzent); background: var(--akzent-weich); }
 
 .liste { display: flex; flex-direction: column; gap: 8px; }
-.quiz-zeile { display: flex; align-items: center; gap: 8px; background: var(--glas); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 12px 14px; }
+.quiz-zeile { display: flex; align-items: center; gap: 8px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 11px 14px; }
 .quiz-zeile > .wachsen { cursor: pointer; }
-.quiz-titel { font-family: var(--serif); font-weight: 650; font-size: 17px; }
-
-.orb { width: 120px; height: 120px; margin-top: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 35% 30%, #fff6 0%, #e9c46a55 25%, #1b2552 70%); box-shadow: 0 0 0 1px var(--rand), 0 0 60px rgba(233, 196, 106, 0.35); animation: atmen 2.6s ease-in-out infinite; }
-.orb span { font-size: 50px; color: var(--gold2); text-shadow: 0 0 18px rgba(246, 227, 161, 0.8); animation: drehen 12s linear infinite; }
-@keyframes atmen { 50% { transform: scale(1.06); box-shadow: 0 0 0 1px var(--rand), 0 0 90px rgba(233, 196, 106, 0.5); } }
-@keyframes drehen { to { transform: rotate(360deg); } }
+.quiz-titel { font-weight: 700; font-size: 16px; }
+.lade.gross { width: 34px; height: 34px; margin-top: 60px; }
 
 /* Editor */
-.titel-eingabe { font-family: var(--serif); font-size: 20px; font-weight: 650; }
-.frage-karte { background: var(--glas); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 12px 14px; cursor: pointer; }
-.frage-karte:hover { border-color: var(--rand); }
-.nr { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--rand); color: var(--gold2); display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; flex: none; }
-.typ-marke { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mond); margin-bottom: 2px; }
-.mini-foto { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; border: 1px solid var(--rand); flex: none; }
+.titel-eingabe { font-size: 19px; font-weight: 700; }
+.frage-karte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 12px 14px; cursor: pointer; }
+.frage-karte:hover { border-color: var(--akzent); }
+.nr { width: 26px; height: 26px; border-radius: 8px; background: var(--karte); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
+.typ-marke { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--leise); margin-bottom: 2px; font-weight: 650; }
+.mini-foto { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; flex: none; }
 .optionen-mini { display: flex; flex-wrap: wrap; gap: 6px; }
-.opt { --ton: var(--gold); border: 1px solid color-mix(in srgb, var(--ton) 45%, transparent); color: var(--leise); border-radius: 9px; padding: 3px 9px; font-size: 13px; }
-.opt.richtig { color: var(--text); background: color-mix(in srgb, var(--ton) 22%, transparent); border-color: var(--ton); }
-.richtig-wahl { --ton: var(--gold); width: 40px; height: 40px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ton) 55%, transparent); background: transparent; color: var(--ton); font-size: 17px; cursor: pointer; flex: none; }
-.richtig-wahl.an { background: color-mix(in srgb, var(--ton) 35%, transparent); color: white; box-shadow: 0 0 14px color-mix(in srgb, var(--ton) 55%, transparent); }
-.amethyst { --ton: var(--amethyst); } .smaragd { --ton: var(--smaragd); } .saphir { --ton: var(--saphir); }
-.bernstein { --ton: var(--bernstein); } .rose { --ton: var(--rose); } .tuerkis { --ton: var(--tuerkis); }
+.opt { border: 1px solid var(--linie); color: var(--leise); border-radius: 8px; padding: 2px 8px; font-size: 13px; }
+.opt.richtig { color: var(--ok); border-color: var(--ok); font-weight: 650; }
+.richtig-wahl { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--linie); background: var(--karte); color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer; flex: none; }
+.richtig-wahl.an { background: var(--ok); border-color: var(--ok); color: white; }
 
 /* Fotos */
 .foto { margin: 0 auto 8px; text-align: center; }
-.foto img { max-width: 100%; max-height: 240px; border-radius: 14px; border: 1px solid var(--rand); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45); }
+.foto img { max-width: 100%; max-height: 240px; border-radius: 12px; }
 .foto.gross img { max-height: 34vh; }
 .foto figcaption { color: var(--leise); font-size: 11.5px; margin-top: 4px; }
-.foto-link { border: 0; background: none; color: var(--gold); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
+.foto-link { border: 0; background: none; color: var(--akzent); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
 .foto.fehlt { color: var(--leise); font-size: 13px; padding: 10px; }
 
-/* Lobby: das Portal */
-.spiel-titel { font-size: 32px; letter-spacing: 0.005em; }
+/* Lobby */
+.spiel-titel { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; }
 .lobby-raster { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
 @media (max-width: 760px) { .lobby-raster { grid-template-columns: 1fr; } }
-.portal { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 10px; }
-/* Der QR-Code bleibt ein ganzes Quadrat (die Ecken braucht die Kamera) – nur der Ring darum dreht sich */
-.portal-ring { position: relative; width: 336px; height: 336px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle, rgba(13, 20, 48, 0.9) 64%, transparent 65%); }
-.portal-ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, var(--gold), var(--mond), var(--amethyst), var(--rose), var(--gold));
-  -webkit-mask: radial-gradient(circle, transparent 64.5%, #000 65.5%); mask: radial-gradient(circle, transparent 64.5%, #000 65.5%);
-  animation: drehen 14s linear infinite; filter: drop-shadow(0 0 18px rgba(233, 196, 106, 0.45)); }
-.qr { position: relative; z-index: 1; display: block; width: 210px; height: 210px; image-rendering: pixelated; background: white; padding: 10px; border-radius: 12px; }
+.portal { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px; }
+/* Der QR-Code bleibt ein ganzes Quadrat mit weißem Rand (die Kamera braucht die Ecken) */
+.qr { display: block; width: 230px; height: 230px; image-rendering: pixelated; background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--linie); }
 .link-zeile { display: flex; align-items: center; gap: 8px; max-width: 100%; }
-.link { font-size: 12.5px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 10px; border-radius: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.spieler-chip { border: 1px solid var(--rand); border-radius: 999px; padding: 7px 14px; font: inherit; font-weight: 700; color: var(--text); background: rgba(233, 196, 106, 0.06); cursor: pointer; }
-.spieler-chip:hover { border-color: #fda4af; }
+.link { font-size: 12.5px; background: var(--karte); padding: 5px 9px; border-radius: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.spieler-chip { border: 1px solid var(--linie); border-radius: 999px; padding: 6px 12px; font: inherit; font-weight: 600; color: var(--text); background: var(--karte); cursor: pointer; }
+.spieler-chip:hover { border-color: var(--falsch); }
 .spieler-chip.ruhig { cursor: default; }
-@keyframes rein { from { transform: scale(0.6) translateY(6px); opacity: 0; } }
+.spieler-chip.ruhig:hover { border-color: var(--linie); }
 .warte-text { animation: pulsieren 1.8s ease-in-out infinite; }
 @keyframes pulsieren { 50% { opacity: 0.45; } }
-.lade { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid rgba(255, 255, 255, 0.25); border-top-color: var(--gold); animation: drehen 0.8s linear infinite; vertical-align: -3px; }
 
 /* Spiel */
-.leiste-oben { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 700; }
-.pill { border: 1px solid var(--rand); border-radius: 999px; padding: 6px 13px; font-size: 13.5px; white-space: nowrap; color: var(--gold2); }
-.pill.leise { color: var(--leise); border-color: rgba(255, 255, 255, 0.1); }
-.frage-gross { font-size: clamp(26px, 3.3vw, 42px); text-align: center; line-height: 1.25; margin: 10px auto 4px; max-width: 1000px; }
-.frage-gross.klein { font-size: 22px; color: var(--leise); }
-.luecke { display: inline-block; min-width: 4em; border-bottom: 3px solid var(--gold); margin: 0 6px; }
-.host-karten { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.host-karten.n2 { grid-template-columns: 1fr 1fr; }
-.host-karte { --ton: var(--gold); position: relative; overflow: hidden; display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 18px; min-height: 76px;
-  font-size: clamp(17px, 1.8vw, 24px); font-weight: 650; background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
-  border: 1.5px solid color-mix(in srgb, var(--ton) 55%, transparent); box-shadow: inset 0 0 28px color-mix(in srgb, var(--ton) 12%, transparent); }
-.host-karte.schlicht { --ton: rgba(255, 255, 255, 0.4); min-height: 60px; font-size: 18px; }
-.siegel { width: 48px; height: 48px; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; color: var(--ton);
-  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--ton) 35%, transparent), transparent 70%); border: 1px solid color-mix(in srgb, var(--ton) 60%, transparent); text-shadow: 0 0 10px var(--ton); }
-.host-karte .anzahl { font-family: var(--serif); font-size: 28px; font-weight: 700; z-index: 1; }
-.host-karte .balken { position: absolute; left: 0; bottom: 0; height: 5px; background: var(--ton); box-shadow: 0 0 12px var(--ton); transition: width 0.7s ease-out; }
-.host-karte.falsch { opacity: 0.38; }
-.host-karte.richtig { background: linear-gradient(135deg, color-mix(in srgb, var(--ton) 32%, transparent), color-mix(in srgb, var(--ton) 8%, transparent)); box-shadow: 0 0 34px color-mix(in srgb, var(--ton) 40%, transparent); }
-.host-uhr { display: flex; }
-.aufgabe-hinweis { text-align: center; color: var(--mond); font-size: 18px; margin: 4px 0 12px; }
-.gross-zeichen { font-family: var(--serif); font-size: 64px; color: var(--gold2); line-height: 1.1; text-shadow: 0 0 20px rgba(233, 196, 106, 0.5); }
+.leiste-oben { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 650; }
+.pill { background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px; padding: 5px 12px; font-size: 13.5px; white-space: nowrap; }
+.pill.leise { color: var(--leise); }
+.frage-gross { font-size: clamp(24px, 3.1vw, 38px); font-weight: 750; text-align: center; line-height: 1.25; margin: 10px auto 4px; max-width: 980px; letter-spacing: -0.01em; }
+.frage-gross.klein { font-size: 20px; color: var(--leise); font-weight: 650; }
+.luecke { display: inline-block; min-width: 4em; border-bottom: 3px solid var(--akzent); margin: 0 6px; }
+.host-uhr { width: 280px; }
+.host-uhr .qo-zeit { max-width: none; }
+.host-uhr .qo-zeit-bahn { height: 8px; }
+.host-uhr .qo-zeit b { font-size: 22px; min-width: 32px; }
+.host-karten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.host-karte { position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; min-height: 70px;
+  font-size: clamp(17px, 1.7vw, 22px); font-weight: 650; background: var(--flaeche); border: 1.5px solid var(--linie); }
+.host-karte.schlicht { min-height: 56px; font-size: 18px; }
+.siegel { width: 40px; height: 40px; flex: none; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 750; background: var(--akzent-weich); color: var(--akzent); }
+.host-karte .anzahl { font-size: 24px; font-weight: 750; font-variant-numeric: tabular-nums; z-index: 1; }
+.host-karte .balken { position: absolute; left: 0; bottom: 0; height: 4px; background: var(--akzent); transition: width 0.6s ease-out; }
+.host-karte.falsch { opacity: 0.45; }
+.host-karte.richtig { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, var(--flaeche)); }
+.host-karte.richtig .siegel { background: var(--ok); color: white; }
+.host-karte.richtig .balken { background: var(--ok); }
+.aufgabe-hinweis { text-align: center; color: var(--leise); font-size: 17px; margin: 4px 0 12px; }
 .zuordnen-spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.schaetz-gross { font-size: clamp(44px, 6vw, 72px); color: var(--gold2); text-shadow: 0 0 30px rgba(233, 196, 106, 0.45); }
-.loesung-liste { max-width: 640px; margin: 10px auto; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; counter-reset: schritt; }
-.loesung-liste li, .paar-zeile { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--rand); background: var(--glas); font-size: 19px; font-weight: 650; }
-.loesung-liste li::before { counter-increment: schritt; content: counter(schritt); width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold2); display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); flex: none; }
+.zuordnen-spalten .host-karte { min-height: 70px; }
+.schaetz-gross { font-size: clamp(40px, 5.6vw, 64px); font-weight: 800; color: var(--ok); font-variant-numeric: tabular-nums; }
+.loesung-liste { max-width: 620px; margin: 10px auto; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; counter-reset: schritt; }
+.loesung-liste li, .paar-zeile { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--linie); background: var(--flaeche); font-size: 18px; font-weight: 600; }
+.loesung-liste li::before { counter-increment: schritt; content: counter(schritt); width: 28px; height: 28px; border-radius: 8px; background: var(--ok); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex: none; }
 .paar-zeile { justify-content: space-between; }
 .zaehler { margin-top: 10px; }
-.wissen { max-width: 760px; margin: 4px auto 0; line-height: 1.5; }
+.wissen { max-width: 760px; margin: 4px auto 0; }
 
-.rangliste { display: flex; flex-direction: column; gap: 10px; max-width: 760px; margin: 18px auto 0; }
+.rangliste { display: flex; flex-direction: column; gap: 8px; max-width: 720px; margin: 18px auto 0; }
 .rangliste.klein { gap: 6px; margin-top: 22px; }
-.rang-zeile { display: flex; align-items: center; gap: 14px; background: var(--glas); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 14px 18px; font-size: 20px; font-weight: 700; animation: rein 0.45s ease-out both; }
-.rangliste.klein .rang-zeile { font-size: 15px; padding: 9px 14px; }
-.rang-zeile:nth-child(2) { animation-delay: 0.08s; } .rang-zeile:nth-child(3) { animation-delay: 0.16s; } .rang-zeile:nth-child(4) { animation-delay: 0.24s; } .rang-zeile:nth-child(5) { animation-delay: 0.32s; }
-.rang-zeile.erster { border-color: var(--gold); background: linear-gradient(90deg, rgba(233, 196, 106, 0.22), rgba(233, 196, 106, 0.04)); box-shadow: 0 0 30px rgba(233, 196, 106, 0.18); }
-.platz { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--rand); color: var(--gold2); display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; flex: none; }
+.rang-zeile { display: flex; align-items: center; gap: 14px; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 14px; padding: 12px 16px; font-size: 19px; font-weight: 650; }
+.rangliste.klein .rang-zeile { font-size: 15px; padding: 8px 14px; }
+.rang-zeile.erster { border-color: #e0a014; }
+.platz { width: 32px; height: 32px; border-radius: 9px; background: var(--karte); display: inline-flex; align-items: center; justify-content: center; font-weight: 750; font-size: 15px; flex: none; }
+.rang-zeile.erster .platz { background: #e0a014; color: white; }
 .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.serie { color: var(--gold2); font-size: 16px; }
-.delta { color: var(--mond); font-size: 16px; }
-.gesamt { min-width: 80px; text-align: right; font-family: var(--serif); font-variant-numeric: tabular-nums; }
+.serie { color: var(--leise); font-size: 14px; }
+.delta { color: var(--ok); font-size: 15px; }
+.gesamt { min-width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
 
-.gewinner { text-align: center; font-size: clamp(44px, 6vw, 72px); margin: 6px 0 4px; color: var(--gold2); text-shadow: 0 0 40px rgba(233, 196, 106, 0.55); animation: rein 0.7s ease-out; }
-.podium { display: flex; align-items: flex-end; justify-content: center; gap: 14px; margin-top: 24px; }
-.stufe { --ton: var(--gold); width: 200px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.stufe.s1 { order: 2; } .stufe.s2 { order: 1; --ton: #cfd8e3; } .stufe.s3 { order: 3; --ton: #d9925b; }
-.stufe-name { font-family: var(--serif); font-weight: 700; font-size: 21px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gewinner { text-align: center; font-size: clamp(36px, 5vw, 56px); font-weight: 800; margin: 2px 0 4px; letter-spacing: -0.02em; }
+.podium { display: flex; flex-direction: column; gap: 8px; max-width: 520px; margin: 18px auto 0; }
+.stufe { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 14px; background: var(--flaeche); border: 1px solid var(--linie); }
+.stufe.s1 { border-color: #e0a014; }
+.stufe-saeule { order: -1; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 750; color: white; flex: none; }
+.s1 .stufe-saeule { background: #e0a014; } .s2 .stufe-saeule { background: #9aa3b2; } .s3 .stufe-saeule { background: #c47a46; }
+.stufe-name { flex: 1; font-weight: 700; font-size: 19px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stufe-punkte { color: var(--leise); font-size: 14px; font-variant-numeric: tabular-nums; }
-.stufe-saeule { width: 100%; border-radius: 16px 16px 6px 6px; display: flex; justify-content: center; padding-top: 14px; font-size: 34px; color: var(--ton);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--ton) 50%, transparent), color-mix(in srgb, var(--ton) 6%, transparent)); border: 1px solid color-mix(in srgb, var(--ton) 60%, transparent); text-shadow: 0 0 16px var(--ton); }
-.s1 .stufe-saeule { height: 190px; box-shadow: 0 0 60px rgba(233, 196, 106, 0.35); } .s2 .stufe-saeule { height: 136px; } .s3 .stufe-saeule { height: 100px; }
-
-.schnuppe { position: fixed; top: -20px; color: var(--gold2); text-shadow: 0 0 10px var(--gold); z-index: 50; pointer-events: none; animation: fallen linear forwards; }
-@keyframes fallen { to { transform: translate(-30vw, 110vh) rotate(200deg); opacity: 0.2; } }
 
 /* Mitspielen in Lyra: die Ansicht der Spielseite füllt das Fenster */
 #app > .qo-spieler { min-height: 100vh; }
-
-/* Lyras Bausteine im Sternwarten-Look */
-.dialog { background: #121a3a; color: var(--text); border: 1px solid var(--rand); }
-.dialog .knopf.text { color: var(--gold); }
-.menue { background: #141c3f; border-color: var(--rand); color: var(--text); }
-.menue button { color: var(--text); }
-.menue button:hover, .menue button.an { background: rgba(233, 196, 106, 0.12); }
-.ly-pille { background: rgba(255, 255, 255, 0.05); border-color: var(--rand); color: var(--text); }
-.ly-pille:hover { background: rgba(233, 196, 106, 0.1); }
-.ly-pille .leise, .ly-pille small { color: var(--leise); }
-.ly-eintrag { background: var(--glas); border-color: rgba(255, 255, 255, 0.08); }
-.toast { background: #141c3f; color: var(--text); border: 1px solid var(--rand); }
-
-/* Edelstein-Töne zuletzt, damit sie die Grundfarbe der Karten überschreiben */
-.amethyst { --ton: var(--amethyst); } .smaragd { --ton: var(--smaragd); } .saphir { --ton: var(--saphir); }
-.bernstein { --ton: var(--bernstein); } .rose { --ton: var(--rose); } .tuerkis { --ton: var(--tuerkis); }
-.zuordnen-spalten .host-karte { min-height: 80px; }

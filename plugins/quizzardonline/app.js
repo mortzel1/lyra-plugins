@@ -1,6 +1,6 @@
 'use strict';
 /*
- * Quizzard Online – das Live-Quiz unter demselben Sternenhimmel. Du bist Host (spielst nicht mit) und zeigst die Fragen;
+ * Quizzard Online – das Live-Quiz für alle gleichzeitig. Du bist Host (spielst nicht mit) und zeigst die Fragen;
  * alle anderen antworten auf ihrem Gerät. Wer richtig liegt, bekommt Punkte – je schneller, desto mehr. Am Ende gewinnt,
  * wer die meisten Punkte hat.
  *
@@ -14,7 +14,7 @@
  *  - alle in einem Raum von Lyra Campus mit ihrer Lyra (Ende-zu-Ende-verschlüsselt über Matrix)
  */
 const { h } = lyra;
-const { ZEICHEN, TOENE, sternUhr } = QOSpieler;
+const { ZEICHEN, TOENE, zeitAnzeige } = QOSpieler;
 const TYP = 'quizzard-online';
 
 const TYPEN = {
@@ -399,7 +399,7 @@ async function erstellen() {
   // Erst ansehen und anpassen, dann spielen
   z.quiz = quiz;
   z.ansicht = 'bearbeiten';
-  lyra.toast(`✦ ${fragen.length} Fragen – sieh sie dir an, bevor es losgeht`, 'ok');
+  lyra.toast(`✓ ${fragen.length} Fragen – sieh sie dir an, bevor es losgeht`, 'ok');
   zeichnen();
 }
 
@@ -474,7 +474,7 @@ async function campusTeilen() {
     if (z.kontext) {
       s.campus = { raum: z.kontext.raum };
       anAlle(lobbyNachricht());
-      lyra.toast(`✦ Live-Runde in „${z.kontext.raum.name}“ – die Mitglieder können jetzt beitreten`, 'ok');
+      lyra.toast(`✓ Live-Runde in „${z.kontext.raum.name}“ – die Mitglieder können jetzt beitreten`, 'ok');
     }
   } catch (e) {
     if (!abgebrochen(e)) lyra.toast(meldung(e), 'fehler');
@@ -728,8 +728,8 @@ function frageStarten(i) {
   zeichnen();
   s.takt = setInterval(() => {
     const rest = Math.max(0, s.ende - Date.now());
-    const u = document.querySelector('.host-uhr .qo-uhr');
-    if (u) u.replaceWith(sternUhr(rest / (s.q.zeit * 1000), Math.ceil(rest / 1000), true));
+    const u = document.querySelector('.host-uhr .qo-zeit');
+    if (u) u.replaceWith(zeitAnzeige(rest / (s.q.zeit * 1000), Math.ceil(rest / 1000), true));
     // Kurz nachwarten: Antworten aus der letzten Sekunde sind noch unterwegs
     if (Date.now() >= s.ende + 1500) schliessen();
   }, 250);
@@ -823,7 +823,6 @@ async function spielEnde() {
   z.runden.unshift(runde);
   z.ansicht = 'ende';
   ton('ende');
-  sternschnuppen(110);
   zeichnen();
 }
 
@@ -869,13 +868,13 @@ async function spielerStarten(k) {
   }
 }
 
-// ================================================================== Klang, Sternschnuppen
+// ================================================================== Klang
 
 let audio = null;
 function ton(art) {
   try {
     audio = audio || new AudioContext();
-    // Glöckchen in einer Pentatonik – klingt nach Spieluhr statt Spielhalle
+    // Kurze, leise Töne
     const noten = { frage: [784, 1175], aufloesung: [880, 1319, 1760], ende: [659, 784, 988, 1319, 1568] }[art] || [880];
     noten.forEach((f, i) => {
       const o = audio.createOscillator();
@@ -893,19 +892,6 @@ function ton(art) {
   } catch (_) {}
 }
 
-function sternschnuppen(viel = 80) {
-  for (let i = 0; i < viel; i++) {
-    const k = document.createElement('div');
-    k.className = 'schnuppe';
-    k.textContent = ['✦', '✧', '⋆', '★'][i % 4];
-    k.style.left = Math.random() * 100 + 'vw';
-    k.style.fontSize = 10 + Math.random() * 18 + 'px';
-    k.style.animationDuration = 2.2 + Math.random() * 2 + 's';
-    k.style.animationDelay = Math.random() * 0.8 + 's';
-    document.body.appendChild(k);
-    setTimeout(() => k.remove(), 5200);
-  }
-}
 
 // ================================================================== Ansichten
 
@@ -923,17 +909,17 @@ function startAnsicht() {
   const k = z.kontext;
   const leite = k && k.inhalt && k.inhalt.typ === TYP;
   return [
-    h('div', { class: 'logo' }, h('span', { class: 'logo-stern' }, '✦'), ' Quizzard Online'),
-    h('p', { class: 'slogan' }, 'Ein Quiz unter demselben Sternenhimmel – alle gleichzeitig, wer schneller richtig liegt, strahlt am hellsten.'),
-    leite ? h('div', { class: 'hinweis-band' }, `Live-Runde in „${k.raum.name}“: Wähle unten ein Quiz und öffne das Portal – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
+    h('div', { class: 'logo' }, 'Quizzard Online'),
+    h('p', { class: 'slogan' }, 'Ein Quiz für alle gleichzeitig – wer schneller richtig liegt, bekommt mehr Punkte.'),
+    leite ? h('div', { class: 'hinweis-band' }, `Live-Runde in „${k.raum.name}“: Wähle unten ein Quiz und öffne die Lobby – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
     h('div', { class: 'panel' },
-      h('h2', {}, '✦ Neues Quiz mit KI'),
+      h('h2', {}, 'Neues Quiz mit KI'),
       h('div', { class: 'zeile', style: { gap: '10px' } },
         h('input', {
           class: 'eingabe wachsen', placeholder: 'Thema, z. B. „Photosynthese“ oder „Französische Revolution“', value: z.thema,
           oninput: (e) => { z.thema = e.target.value; }, onkeydown: (e) => { if (e.key === 'Enter') erstellen(); },
         }),
-        h('button', { class: 'knopf', onclick: erstellen }, 'Erschaffen')),
+        h('button', { class: 'knopf', onclick: erstellen }, 'Erstellen')),
       h('div', { class: 'zeile umbruch', style: { gap: '8px', marginTop: '12px' } },
         pille('Fragen', [[5, '5'], [8, '8'], [10, '10'], [15, '15'], [20, '20']], 'anzahl'),
         pille('Zeit je Frage', [[10, '10 s'], [20, '20 s'], [30, '30 s'], [45, '45 s'], [60, '60 s']], 'zeit'),
@@ -956,12 +942,12 @@ function startAnsicht() {
           h('div', { class: 'leise klein' }, `${q.fragen.length} Fragen · ${[...new Set(q.fragen.map((f) => TYPEN[f.art] ? TYPEN[f.art][0] : ''))].filter(Boolean).join(', ')}${q.gespielt ? ` · ${q.gespielt}× gespielt` : ''}`)),
         h('button', { class: 'knopf tonal', title: 'Bearbeiten', onclick: () => { z.quiz = q; z.ansicht = 'bearbeiten'; zeichnen(); } }, '✎'),
         h('button', { class: 'knopf tonal', title: 'Löschen', onclick: () => quizLoeschen(q) }, '✕'),
-        h('button', { class: 'knopf', onclick: () => lobbyOeffnen(q, { campus: leite }) }, 'Portal öffnen ✦'))))
-      : h('p', { class: 'leise' }, 'Noch keine Quizze – erschaffe oben das erste.'),
+        h('button', { class: 'knopf', onclick: () => lobbyOeffnen(q, { campus: leite }) }, 'Live spielen'))))
+      : h('p', { class: 'leise' }, 'Noch keine Quizze – erstelle oben das erste.'),
     z.runden.length ? h('h2', { class: 'zwischen' }, 'Letzte Runden') : null,
     z.runden.length ? h('div', { class: 'liste' }, z.runden.map((r) => h('div', { class: 'quiz-zeile' },
       h('div', { class: 'wachsen' },
-        h('div', { class: 'quiz-titel' }, `♛ ${(r.rangliste[0] && r.rangliste[0].name) || '–'}`),
+        h('div', { class: 'quiz-titel' }, `Gewonnen: ${(r.rangliste[0] && r.rangliste[0].name) || '–'}`),
         h('div', { class: 'leise klein' }, `${r.quiz} · ${r.rangliste.length} Mitspielende · ${lyra.zeitText(r.zeit)}`))))) : null,
   ];
 }
@@ -985,8 +971,8 @@ function neuesLeeresQuiz() {
 
 function zauberAnsicht() {
   return h('div', { class: 'mitte' },
-    h('div', { class: 'orb' }, h('span', {}, '✦')),
-    h('h2', { class: 'serif' }, 'Die Sterne ordnen sich …'),
+    h('div', { class: 'lade gross' }),
+    h('h2', {}, 'Fragen werden erstellt …'),
     h('p', { class: 'leise', id: 'hinweis' }, z.hinweis),
     h('button', { class: 'knopf text', onclick: () => lyra.abbrechen() }, 'Abbrechen'));
 }
@@ -1008,7 +994,7 @@ function bearbeitenAnsicht() {
     h('div', { class: 'zeile', style: { gap: '10px', marginBottom: '14px' } },
       h('button', { class: 'knopf tonal', onclick: () => { z.ansicht = 'start'; z.quiz = null; zeichnen(); } }, '←'),
       h('input', { class: 'eingabe wachsen titel-eingabe', value: q.titel, onchange: (e) => { q.titel = e.target.value.trim() || q.titel; quizSichern(q); } }),
-      h('button', { class: 'knopf', disabled: q.fragen.length < 1, onclick: () => lobbyOeffnen(q, { campus: !!(z.kontext && z.kontext.inhalt && z.kontext.inhalt.typ === TYP) }) }, 'Portal öffnen ✦')),
+      h('button', { class: 'knopf', disabled: q.fragen.length < 1, onclick: () => lobbyOeffnen(q, { campus: !!(z.kontext && z.kontext.inhalt && z.kontext.inhalt.typ === TYP) }) }, 'Live spielen')),
     z.meldung ? h('div', { class: 'hinweis-band' }, z.meldung) : null,
     h('p', { class: 'leise klein' }, `${q.fragen.length} Fragen · Prüfe sie vor dem Spiel – tippe auf eine Frage, um sie zu ändern.`),
     h('div', { class: 'liste' }, q.fragen.map((f, i) => h('div', { class: 'frage-karte', onclick: () => frageBearbeiten(i) },
@@ -1171,8 +1157,8 @@ function fertigeFrage(f) {
 
 function spielerChips() {
   const l = aktiv();
-  if (!l.length) return h('p', { class: 'leise warte-text' }, 'Noch ist niemand durchs Portal gekommen …');
-  return h('div', { class: 'chips' }, l.map((p) => h('button', { class: 'spieler-chip', title: 'Entfernen', onclick: () => spielerEntfernen(p) }, `${p.quelle === 'campus' ? '👥 ' : '✦ '}${p.name}`)));
+  if (!l.length) return h('p', { class: 'leise warte-text' }, 'Warte auf Mitspielende …');
+  return h('div', { class: 'chips' }, l.map((p) => h('button', { class: 'spieler-chip', title: 'Entfernen', onclick: () => spielerEntfernen(p) }, `${p.quelle === 'campus' ? '👥 ' : ''}${p.name}`)));
 }
 
 function lobbyAnsicht() {
@@ -1180,18 +1166,18 @@ function lobbyAnsicht() {
   const g = s.gaeste;
   return [
     h('div', { class: 'zeile', style: { gap: '10px', marginBottom: '6px' } },
-      h('div', { class: 'wachsen' }, h('div', { class: 'leise klein' }, 'Das Portal ist offen'), h('h1', { class: 'spiel-titel' }, s.quiz.titel)),
+      h('div', { class: 'wachsen' }, h('div', { class: 'leise klein' }, 'Lobby'), h('h1', { class: 'spiel-titel' }, s.quiz.titel)),
       h('button', { class: 'knopf text', onclick: () => zurueck() }, 'Schließen')),
     h('div', { class: 'lobby-raster' },
       h('div', { class: 'panel beitritt' },
-        h('h2', {}, '✦ Mit Link oder QR-Code'),
+        h('h2', {}, 'Mit Link oder QR-Code'),
         h('p', { class: 'leise klein' }, 'Von überall, im Browser – ohne Lyra, ohne Konto. Ende-zu-Ende-verschlüsselt.'),
         g ? h('div', { class: 'portal' },
-          g.qr ? h('div', { class: 'portal-ring' }, h('img', { class: 'qr', src: g.qr, alt: 'QR-Code zum Mitspielen' })) : null,
+          g.qr ? h('img', { class: 'qr', src: g.qr, alt: 'QR-Code zum Mitspielen' }) : null,
           h('div', { class: 'link-zeile' },
             h('code', { class: 'link' }, g.url.replace(/^https:\/\//, '').replace(/#.*$/, '#…')),
             h('button', { class: 'knopf tonal klein', onclick: () => lyra.kopieren(g.url) }, 'Link kopieren')))
-          : s.gaesteLaedt ? h('div', { class: 'leise', style: { padding: '30px 0' } }, h('div', { class: 'lade' }), ' Das Portal öffnet sich …')
+          : s.gaesteLaedt ? h('div', { class: 'leise', style: { padding: '30px 0' } }, h('div', { class: 'lade' }), ' Spielseite wird geöffnet …')
             : h('div', {}, s.gaesteFehler ? h('p', { class: 'fehler-text' }, s.gaesteFehler) : null, h('button', { class: 'knopf', onclick: gaesteOeffnen }, 'Spielseite öffnen'))),
       h('div', { class: 'panel' },
         h('h2', {}, '👥 Mit Lyra über Campus'),
@@ -1202,7 +1188,7 @@ function lobbyAnsicht() {
         h('h2', { style: { marginTop: '18px' } }, `Dabei: ${aktiv().length}`),
         spielerChips())),
     h('div', { class: 'mitte', style: { marginTop: '18px' } },
-      h('button', { class: 'knopf riesig', disabled: !aktiv().length, onclick: spielStarten }, `Runde beginnen ✦ (${s.quiz.fragen.length} Fragen)`),
+      h('button', { class: 'knopf riesig', disabled: !aktiv().length, onclick: spielStarten }, `Spiel starten (${s.quiz.fragen.length} Fragen)`),
       h('p', { class: 'leise klein' }, 'Du bist Host und spielst nicht mit – zeig diesen Bildschirm am besten groß für alle.')),
   ];
 }
@@ -1213,7 +1199,7 @@ function kopfzeile() {
     h('span', { class: 'pill' }, `Frage ${s.i + 1} / ${s.quiz.fragen.length}`),
     s.q ? h('span', { class: 'pill leise' }, TYPEN[s.q.art] ? TYPEN[s.q.art][0] : '') : null,
     h('span', { class: 'wachsen' }),
-    s.gaeste ? h('span', { class: 'pill leise', title: s.gaeste.url }, '✦ Portal offen') : null,
+    s.gaeste ? h('span', { class: 'pill leise', title: s.gaeste.url }, 'Link offen') : null,
     s.campus ? h('span', { class: 'pill leise' }, `👥 ${s.campus.raum.name}`) : null,
     h('span', { class: 'pill' }, `${aktiv().length} dabei`));
 }
@@ -1233,19 +1219,19 @@ function frageAnsicht() {
   const rest = Math.max(0, s.ende - Date.now());
   let inhalt;
   if (WAHL.includes(q.art)) inhalt = h('div', { class: `host-karten n${q.optionen.length}` }, q.optionen.map((o, i) => karte(i, o)));
-  else if (q.art === 'schaetzen') inhalt = h('div', { class: 'aufgabe-hinweis' }, h('div', { class: 'gross-zeichen' }, '≈'), `Schätzt auf euren Geräten – zwischen ${fmt(q.min)} und ${fmt(q.max)}${q.einheit ? ' ' + q.einheit : ''}.`);
+  else if (q.art === 'schaetzen') inhalt = h('div', { class: 'aufgabe-hinweis' }, `Schätzt auf euren Geräten – zwischen ${fmt(q.min)} und ${fmt(q.max)}${q.einheit ? ' ' + q.einheit : ''}.`);
   else if (q.art === 'reihenfolge') inhalt = [h('p', { class: 'aufgabe-hinweis' }, 'Bringt es auf euren Geräten in die richtige Reihenfolge:'), h('div', { class: 'host-karten n2' }, q.optionen.map((o, i) => karte(i, o)))];
   else if (q.art === 'zuordnen') {
     inhalt = [h('p', { class: 'aufgabe-hinweis' }, 'Was gehört zusammen?'), h('div', { class: 'zuordnen-spalten' },
       h('div', { class: 'spalte', style: { gap: '8px' } }, q.links.map((l, i) => karte(i, l))),
       h('div', { class: 'spalte', style: { gap: '8px' } }, q.rechts.map((r) => h('div', { class: 'host-karte schlicht' }, r))))];
-  } else if (q.art === 'luecke') inhalt = h('div', { class: 'aufgabe-hinweis' }, h('div', { class: 'gross-zeichen' }, '✎'), 'Tippt die fehlende Antwort auf euren Geräten ein.');
+  } else if (q.art === 'luecke') inhalt = h('div', { class: 'aufgabe-hinweis' }, 'Tippt die fehlende Antwort auf euren Geräten ein.');
   return [
     kopfzeile(),
     q.art === 'bild' ? foto(q, true) : null,
     h('div', { class: 'frage-gross' }, frageText(q)),
     h('div', { class: 'zeile', style: { justifyContent: 'center', gap: '24px', margin: '6px 0 16px' } },
-      h('div', { class: 'host-uhr' }, sternUhr(rest / (q.zeit * 1000), Math.ceil(rest / 1000), true)),
+      h('div', { class: 'host-uhr' }, zeitAnzeige(rest / (q.zeit * 1000), Math.ceil(rest / 1000), true)),
       h('div', { class: 'leise', id: 'beantwortet' }, beantwortetText())),
     inhalt,
     h('div', { class: 'mitte', style: { marginTop: '16px' } }, h('button', { class: 'knopf tonal', onclick: schliessen }, 'Jetzt auflösen')),
@@ -1274,11 +1260,11 @@ function aufloesungAnsicht() {
     inhalt = h('div', { class: 'mitte' },
       h('div', { class: 'schaetz-gross' }, `${fmt(q.wert)}${q.einheit ? ' ' + q.einheit : ''}`),
       mittel != null ? h('p', { class: 'leise' }, `Durchschnitt der Schätzungen: ${fmt(mittel)}${q.einheit ? ' ' + q.einheit : ''}`) : null,
-      naechste.length ? h('div', { class: 'chips' }, naechste.map(([n, w], k) => h('span', { class: 'spieler-chip ruhig' }, `${['♛', '✦', '✧'][k]} ${n}: ${fmt(w)}`))) : null);
+      naechste.length ? h('div', { class: 'chips' }, naechste.map(([n, w], k) => h('span', { class: 'spieler-chip ruhig' }, `${k + 1}. ${n}: ${fmt(w)}`))) : null);
   } else if (q.art === 'reihenfolge') {
     inhalt = h('ol', { class: 'loesung-liste' }, q.loesung.map((o) => h('li', {}, o)));
   } else if (q.art === 'zuordnen') {
-    inhalt = h('div', { class: 'loesung-liste' }, q.paare.map((p) => h('div', { class: 'paar-zeile' }, h('span', {}, p.links), h('span', { class: 'gold' }, '↔'), h('span', {}, p.rechts))));
+    inhalt = h('div', { class: 'loesung-liste' }, q.paare.map((p) => h('div', { class: 'paar-zeile' }, h('span', {}, p.links), h('span', { class: 'leise' }, '↔'), h('span', {}, p.rechts))));
   } else if (q.art === 'luecke') {
     const falsch = {};
     for (const p of aktiv()) { const a = p.antworten[s.i]; if (a && a.teil < 0.999 && a.antwort.trim()) falsch[a.antwort.trim()] = (falsch[a.antwort.trim()] || 0) + 1; }
@@ -1291,9 +1277,9 @@ function aufloesungAnsicht() {
     q.art === 'bild' ? foto(q) : null,
     h('div', { class: 'frage-gross klein' }, frageText(q)),
     inhalt,
-    h('p', { class: 'mitte fett zaehler' }, [`${zz.voll || 0} Volltreffer`, zz.teils ? `${zz.teils} teilweise` : null, `${zz.daneben || 0} daneben`, zz.ohne ? `${zz.ohne} ohne Antwort` : null].filter(Boolean).join(' · ')),
-    q.wissenswert ? h('p', { class: 'mitte leise wissen' }, `✦ ${q.wissenswert}`) : null,
-    h('div', { class: 'mitte', style: { marginTop: '14px' } }, h('button', { class: 'knopf riesig', onclick: weiter }, 'Sternenrang →')),
+    h('p', { class: 'mitte fett zaehler' }, [`${zz.voll || 0} richtig`, zz.teils ? `${zz.teils} teilweise` : null, `${zz.daneben || 0} daneben`, zz.ohne ? `${zz.ohne} ohne Antwort` : null].filter(Boolean).join(' · ')),
+    q.wissenswert ? h('p', { class: 'mitte leise wissen' }, q.wissenswert) : null,
+    h('div', { class: 'mitte', style: { marginTop: '14px' } }, h('button', { class: 'knopf riesig', onclick: weiter }, 'Rangliste →')),
   ];
 }
 
@@ -1303,15 +1289,15 @@ function ranglistenAnsicht() {
   const letzte = s.i + 1 >= s.quiz.fragen.length;
   return [
     kopfzeile(),
-    h('h1', { class: 'mitte serif' }, letzte ? 'Vor dem Finale' : 'Sternenrang'),
+    h('h1', { class: 'mitte' }, letzte ? 'Vor dem Finale' : 'Rangliste'),
     h('div', { class: 'rangliste' }, rang.slice(0, 5).map((p, i) => h('div', { class: 'rang-zeile' + (i === 0 ? ' erster' : '') },
-      h('span', { class: 'platz' }, i === 0 ? '♛' : String(i + 1)),
+      h('span', { class: 'platz' }, String(i + 1)),
       h('span', { class: 'wachsen name' }, p.name),
-      p.serie >= 2 ? h('span', { class: 'serie' }, `✦ ${p.serie}`) : null,
+      p.serie >= 2 ? h('span', { class: 'serie' }, `${p.serie}× in Folge`) : null,
       p.letzt && p.letzt.delta ? h('span', { class: 'delta' }, `+${zahl(p.letzt.delta)}`) : null,
       h('span', { class: 'gesamt' }, zahl(p.punkte))))),
     rang.length > 5 ? h('p', { class: 'mitte leise klein' }, `… und ${rang.length - 5} weitere`) : null,
-    h('div', { class: 'mitte', style: { marginTop: '16px' } }, h('button', { class: 'knopf riesig', onclick: weiter }, letzte ? 'Zum Endstand ♛' : 'Nächste Frage →')),
+    h('div', { class: 'mitte', style: { marginTop: '16px' } }, h('button', { class: 'knopf riesig', onclick: weiter }, letzte ? 'Zum Endstand' : 'Nächste Frage →')),
   ];
 }
 
@@ -1319,12 +1305,12 @@ function endeAnsicht() {
   const rang = rangliste();
   const podium = rang.slice(0, 3);
   return [
-    h('div', { class: 'logo klein' }, 'Am hellsten strahlt …'),
-    podium[0] ? h('h1', { class: 'gewinner' }, `♛ ${podium[0].name}`) : h('h1', { class: 'mitte' }, 'Niemand hat mitgespielt'),
+    h('div', { class: 'leise mitte' }, 'Gewonnen hat'),
+    podium[0] ? h('h1', { class: 'gewinner' }, podium[0].name) : h('h1', { class: 'mitte' }, 'Niemand hat mitgespielt'),
     h('div', { class: 'podium' }, podium.map((p, i) => h('div', { class: `stufe s${i + 1}` },
       h('div', { class: 'stufe-name' }, p.name),
       h('div', { class: 'stufe-punkte' }, `${zahl(p.punkte)} · ${p.richtig}/${z.spiel.quiz.fragen.length}`),
-      h('div', { class: 'stufe-saeule' }, h('span', {}, ['♛', '✦', '✧'][i]))))),
+      h('div', { class: 'stufe-saeule' }, String(i + 1))))),
     rang.length > 3 ? h('div', { class: 'rangliste klein' }, rang.slice(3).map((p, i) => h('div', { class: 'rang-zeile' },
       h('span', { class: 'platz' }, String(i + 4)), h('span', { class: 'wachsen name' }, p.name), h('span', { class: 'gesamt' }, zahl(p.punkte))))) : null,
     h('div', { class: 'zeile', style: { justifyContent: 'center', gap: '10px', marginTop: '20px' } },
