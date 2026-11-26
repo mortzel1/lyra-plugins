@@ -108,3 +108,43 @@
 .qo-beitreten { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .qo-fehler { color: var(--falsch); font-weight: 600; min-height: 1.2em; margin: 0; }
 .qo-fuss { text-align: center; color: var(--leise); font-size: 12px; margin-top: 10px; }
+
+/* ================================================================ Farbe (1.3): jede Antwort hat ihre Farbe, sanfte Farbflächen */
+.qo-spieler { --amethyst: #7c5cff; --smaragd: #12a37a; --saphir: #2f7cf6; --bernstein: #e89611; --rose: #ec4f74; --tuerkis: #0aa9bb; --ton: var(--akzent);
+  background: radial-gradient(70% 45% at 0% 0%, rgba(124, 92, 255, 0.16), transparent 70%), radial-gradient(55% 40% at 100% 8%, rgba(10, 169, 187, 0.13), transparent 70%),
+    radial-gradient(70% 45% at 50% 105%, rgba(236, 79, 116, 0.12), transparent 70%), var(--grund); }
+@media (prefers-color-scheme: dark) {
+  .qo-spieler { --amethyst: #9d85ff; --smaragd: #3fcf9b; --saphir: #6ea2ff; --bernstein: #f5b445; --rose: #ff7a98; --tuerkis: #3fd3e3;
+    background: radial-gradient(70% 45% at 0% 0%, rgba(124, 92, 255, 0.22), transparent 70%), radial-gradient(55% 40% at 100% 8%, rgba(10, 169, 187, 0.16), transparent 70%),
+      radial-gradient(70% 45% at 50% 105%, rgba(236, 79, 116, 0.16), transparent 70%), var(--grund); }
+}
+.amethyst { --ton: var(--amethyst, #7c5cff); } .smaragd { --ton: var(--smaragd, #12a37a); } .saphir { --ton: var(--saphir, #2f7cf6); }
+.bernstein { --ton: var(--bernstein, #e89611); } .rose { --ton: var(--rose, #ec4f74); } .tuerkis { --ton: var(--tuerkis, #0aa9bb); }
+
+.qo-marke { background: linear-gradient(90deg, #7c5cff, #ec4f74 55%, #e89611); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; }
+.qo-mitte h1 { background: linear-gradient(90deg, var(--text), color-mix(in srgb, #7c5cff 70%, var(--text))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qo-punkte { background: linear-gradient(135deg, rgba(124, 92, 255, 0.14), rgba(236, 79, 116, 0.14)); border-color: rgba(124, 92, 255, 0.3); }
+.qo-pill { border-color: color-mix(in srgb, #7c5cff 25%, var(--linie)); }
+
+/* Antwortkarten: getönt, Buchstabe in der Farbe der Antwort */
+.qo-karte { background: color-mix(in srgb, var(--ton) 9%, var(--flaeche)); border-color: color-mix(in srgb, var(--ton) 30%, transparent); }
+.qo-karte:hover { border-color: var(--ton); background: color-mix(in srgb, var(--ton) 15%, var(--flaeche)); }
+.qo-karte .qo-siegel { background: var(--ton); color: white; box-shadow: 0 3px 10px color-mix(in srgb, var(--ton) 40%, transparent); }
+.qo-karte.an { border-color: var(--ton); background: color-mix(in srgb, var(--ton) 24%, var(--flaeche)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ton) 22%, transparent); }
+.qo-karte.an .qo-siegel { background: var(--ton); }
+.qo-ordnen-zeile, .qo-paar { border-color: color-mix(in srgb, var(--ton) 35%, transparent); background: color-mix(in srgb, var(--ton) 8%, var(--flaeche)); }
+.qo-ordnen-zeile .qo-siegel, .qo-paar .qo-siegel { background: var(--ton); color: white; }
+
+.qo-knopf { background: linear-gradient(135deg, #7c5cff, #ec4f74); box-shadow: 0 6px 18px rgba(124, 92, 255, 0.3); }
+.qo-zeit-balken { background: linear-gradient(90deg, #0aa9bb, #7c5cff); }
+.qo-zeit.knapp .qo-zeit-balken { background: linear-gradient(90deg, #e89611, #ec4f74); }
+.qo-orb { background: linear-gradient(135deg, rgba(124, 92, 255, 0.2), rgba(236, 79, 116, 0.2)); color: #7c5cff; }
+.qo-ergebnis.gut .qo-orb { background: linear-gradient(135deg, #3fcf9b, #12a37a); color: white; box-shadow: 0 10px 30px rgba(18, 163, 122, 0.35); }
+.qo-ergebnis.schlecht .qo-orb { background: linear-gradient(135deg, #ff7a98, #ec4f74); color: white; box-shadow: 0 10px 30px rgba(236, 79, 116, 0.3); }
+.qo-plus { background: linear-gradient(90deg, #12a37a, #0aa9bb); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qo-serie { background: linear-gradient(135deg, rgba(232, 150, 17, 0.18), rgba(236, 79, 116, 0.18)); color: #c66a00; }
+@media (prefers-color-scheme: dark) { .qo-serie { color: #f5b445; } }
+.qo-stufe.s1 { background: linear-gradient(135deg, rgba(240, 180, 40, 0.2), rgba(240, 180, 40, 0.05)); }
+.qo-stufe.s2 { background: linear-gradient(135deg, rgba(154, 163, 178, 0.2), rgba(154, 163, 178, 0.04)); }
+.qo-stufe.s3 { background: linear-gradient(135deg, rgba(196, 122, 70, 0.2), rgba(196, 122, 70, 0.04)); }
+.s1 .qo-stufe-saeule { background: linear-gradient(135deg, #f5c542, #e09a0e); } .s2 .qo-stufe-saeule { background: linear-gradient(135deg, #c4cad4, #8e97a6); } .s3 .qo-stufe-saeule { background: linear-gradient(135deg, #e09a6a, #b26a3a); }

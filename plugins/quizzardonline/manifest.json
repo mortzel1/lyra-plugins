@@ -1,7 +1,7 @@
 {
   "kennung": "quizzardonline",
   "name": "Quizzard Online",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "untertitel": "Das Live-Quiz für alle gleichzeitig – wer schneller richtig liegt, gewinnt",
   "kategorie": "lernen",
   "beschreibung": "Du bist Host, alle anderen spielen auf ihrem Handy, Tablet oder Laptop mit: Die Fragen erscheinen bei allen gleichzeitig, wer richtig und schnell antwortet, bekommt mehr Punkte. Alle Fragetypen wie im Quizzard – eine oder mehrere richtig, wahr/falsch, Schätzen, Reihenfolge, Zuordnen, Lückentext und Bilderfragen mit echten Fotos aus Wikipedia. Nach jeder Frage gibt es Auflösung und Rangliste, am Ende die Sieger. Das Quiz zaubert die KI vorher aus einem Thema – gern aus deinen Unterlagen – oder du schreibst es selbst. Mitspielen geht per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, von überall – und in Lyra Campus mit der eigenen Lyra.",
@@ -22,7 +22,7 @@
     "Alle Fragetypen wie im Quizzard: eine oder mehrere richtig, wahr/falsch, Schätzen, Reihenfolge, Zuordnen, Lückentext",
     "Bilderfragen mit echten Fotos aus Wikipedia (keine KI-Bilder) – mit Bildnachweis",
     "Schnell und richtig bringt mehr Punkte (bis 1000 je Frage), teilweise richtig anteilig – dazu ein Bonus für Serien",
-    "Schlichtes, klares Design – hell oder dunkel wie dein Gerät, gut lesbar an der Leinwand",
+    "Farbiges, klares Design – jede Antwort in ihrer Farbe, jede Person mit eigener Farbe, hell oder dunkel wie dein Gerät",
     "Du bist Host und spielst nicht mit – dein Bildschirm ist die Leinwand",
     "Mitspielen per Link oder QR-Code im Browser – ohne Lyra, ohne Konto, von überall, Ende-zu-Ende-verschlüsselt",
     "Mitspielen in Lyra Campus mit der eigenen Lyra – Antworten gehen verschlüsselt nur an dich",
@@ -30,6 +30,10 @@
     "Ergebnisse als CSV sichern, gleiche Runde nochmal spielen"
   ],
   "neuerungen": {
+    "1.3.0": [
+      "Fehler behoben: Bei Bilderfragen blieben die Handys der Gäste stehen, wenn das Foto zu groß war – Fotos gehen jetzt verkleinert hinaus, notfalls kommt die Frage ohne Foto",
+      "Mehr Farbe: jede Antwort in ihrer Farbe, farbige Spieler und Rangliste, Gold, Silber und Bronze"
+    ],
     "1.2.0": [
       "Schlichtes Design: klare Karten mit A, B, C, D, ein einfacher Zeitbalken, hell oder dunkel wie dein Gerät"
     ],

@@ -1,7 +1,7 @@
 {
   "kennung": "puls",
   "name": "Puls",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "untertitel": "Live-Umfragen und Fragenwand – alle machen auf dem Handy mit",
   "kategorie": "lernen",
   "beschreibung": "Puls zeigt dir live, wo deine Gruppe steht: Du stellst Fragen auf der Leinwand, alle antworten auf ihrem Handy – per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, oder in Lyra Campus. Umfragen mit einer oder mehreren Antworten, Skalen, Wortwolken, offene Fragen, Schätzfragen, Rangfolgen und die Verständnis-Ampel. Offene Antworten fasst die KI auf Wunsch zu Themen zusammen. Dazu eine Fragenwand, an der alle Fragen stellen und für die Fragen anderer stimmen. Standardmäßig anonym; gespeichert wird nur das Zusammengefasste.",
@@ -27,6 +27,9 @@
     "Standardmäßig anonym; Auswertung als Markdown oder CSV"
   ],
   "neuerungen": {
+    "1.0.1": [
+      "Fehler behoben: Mit Claude oder ChatGPT hieß es beim Erstellen „nicht gelungen“ – der verlangte Aufbau steht jetzt ausdrücklich in der Anfrage, Antworten werden großzügiger gelesen"
+    ],
     "1.0.0": [
       "Live-Umfragen und Fragenwand: sieben Arten, Leinwand mit Live-Ergebnissen, KI-Themen für offene Antworten"
     ]

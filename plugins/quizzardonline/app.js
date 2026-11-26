@@ -15,6 +15,8 @@
  */
 const { h } = lyra;
 const { ZEICHEN, TOENE, zeitAnzeige } = QOSpieler;
+/** Jede Person behält ihre Farbe (aus dem Namen) */
+const tonVon = (name) => TOENE[[...String(name || '')].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % TOENE.length];
 const TYP = 'quizzard-online';
 
 const TYPEN = {
@@ -173,6 +175,34 @@ function verkleinern(daten) {
         const klein = c.toDataURL('image/jpeg', 0.8);
         fertig(klein.length < daten.length ? klein : daten);
       } catch (_) { fertig(daten); }
+    };
+    img.onerror = () => fertig(null);
+    img.src = daten;
+  });
+}
+
+/** Foto für die Geräte der Gäste: höchstens ~140 KB als Text. Die Spielseite nimmt Nachrichten nur bis 256 KB an –
+ *  ein größeres Foto käme nie an und die Seite bliebe stehen. → data:-URL oder null */
+function fuerGaesteVerkleinern(daten, ziel = 140000) {
+  if (!daten || daten.length <= ziel) return Promise.resolve(daten || null);
+  return new Promise((fertig) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        for (const [px, q] of [[800, 0.7], [720, 0.62], [640, 0.58], [560, 0.55], [480, 0.5], [400, 0.45], [320, 0.4]]) {
+          const f = Math.min(1, px / Math.max(img.naturalWidth, img.naturalHeight));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.naturalWidth * f));
+          c.height = Math.max(1, Math.round(img.naturalHeight * f));
+          const g = c.getContext('2d');
+          g.fillStyle = '#fff';
+          g.fillRect(0, 0, c.width, c.height);
+          g.drawImage(img, 0, 0, c.width, c.height);
+          const d = c.toDataURL('image/jpeg', q);
+          if (d.length <= ziel) return fertig(d);
+        }
+        fertig(null);
+      } catch (_) { fertig(null); }
     };
     img.onerror = () => fertig(null);
     img.src = daten;
@@ -408,6 +438,11 @@ async function erstellen() {
 /** Neues Spiel in der Lobby. campus: aus einem Raum geöffnet (Live-Runde läuft schon über Campus). */
 async function lobbyOeffnen(quiz, { campus = false } = {}) {
   await bilderLaden(quiz.fragen);
+  // Kleinere Fassung der Fotos für die Geräte der Gäste (die Leinwand behält das große Foto)
+  z.gastBilder = z.gastBilder || {};
+  for (const f of quiz.fragen) {
+    if (f.art === 'bild' && f.bild && z.bilder[f.bild.id] && z.gastBilder[f.bild.id] === undefined) z.gastBilder[f.bild.id] = await fuerGaesteVerkleinern(z.bilder[f.bild.id]);
+  }
   z.spiel = {
     id: lyra.neueId(),
     quiz,
@@ -483,10 +518,21 @@ async function campusTeilen() {
 }
 
 /** An alle – Gäste im Browser bekommen auf Wunsch eine eigene Fassung (z. B. mit dem Foto). */
+/** An die Gäste – klappt es mit Foto nicht (z. B. zu groß), geht die Frage ohne Foto hinaus statt gar nicht */
+function gastSenden(d, an = null) {
+  return lyra.gaeste.senden(d, an).catch(() => {
+    if (d && d.bild) {
+      const ohne = { ...d };
+      delete ohne.bild;
+      return lyra.gaeste.senden(ohne, an).catch(() => {});
+    }
+  });
+}
+
 function anAlle(d, fuerGaeste) {
   const s = z.spiel;
   if (!s) return;
-  if (s.gaeste) lyra.gaeste.senden(fuerGaeste || d).catch(() => {});
+  if (s.gaeste) gastSenden(fuerGaeste || d);
   if (s.campus) {
     lyra.campus.live(d).catch((e) => {
       if (abgebrochen(e)) { s.campus = null; lyra.toast('Campus-Mitspieler sind nicht dabei (ohne deine Zustimmung).', ''); zeichnen(); }
@@ -495,7 +541,7 @@ function anAlle(d, fuerGaeste) {
 }
 
 function anEinen(sp, d) {
-  if (sp.quelle === 'link' && z.spiel && z.spiel.gaeste) lyra.gaeste.senden(d, sp.id).catch(() => {});
+  if (sp.quelle === 'link' && z.spiel && z.spiel.gaeste) gastSenden(d, sp.id);
 }
 
 const aktiv = () => [...z.spiel.spieler.values()].filter((p) => p.da);
@@ -553,7 +599,7 @@ function frageNachricht(spaet, mitFoto = false) {
   if (q.art === 'bild' && q.bild) {
     d.bildId = q.bild.id;
     d.bildNachweis = { urheber: q.bild.urheber, lizenz: q.bild.lizenz };
-    if (mitFoto) d.bild = z.bilder[q.bild.id];
+    if (mitFoto && z.gastBilder && z.gastBilder[q.bild.id]) d.bild = z.gastBilder[q.bild.id];
   }
   return d;
 }
@@ -1158,7 +1204,7 @@ function fertigeFrage(f) {
 function spielerChips() {
   const l = aktiv();
   if (!l.length) return h('p', { class: 'leise warte-text' }, 'Warte auf Mitspielende …');
-  return h('div', { class: 'chips' }, l.map((p) => h('button', { class: 'spieler-chip', title: 'Entfernen', onclick: () => spielerEntfernen(p) }, `${p.quelle === 'campus' ? '👥 ' : ''}${p.name}`)));
+  return h('div', { class: 'chips' }, l.map((p) => h('button', { class: 'spieler-chip ' + tonVon(p.name), title: 'Entfernen', onclick: () => spielerEntfernen(p) }, `${p.quelle === 'campus' ? '👥 ' : ''}${p.name}`)));
 }
 
 function lobbyAnsicht() {
@@ -1290,7 +1336,7 @@ function ranglistenAnsicht() {
   return [
     kopfzeile(),
     h('h1', { class: 'mitte' }, letzte ? 'Vor dem Finale' : 'Rangliste'),
-    h('div', { class: 'rangliste' }, rang.slice(0, 5).map((p, i) => h('div', { class: 'rang-zeile' + (i === 0 ? ' erster' : '') },
+    h('div', { class: 'rangliste' }, rang.slice(0, 5).map((p, i) => h('div', { class: 'rang-zeile ' + tonVon(p.name) + (i === 0 ? ' erster' : '') },
       h('span', { class: 'platz' }, String(i + 1)),
       h('span', { class: 'wachsen name' }, p.name),
       p.serie >= 2 ? h('span', { class: 'serie' }, `${p.serie}× in Folge`) : null,
@@ -1311,7 +1357,7 @@ function endeAnsicht() {
       h('div', { class: 'stufe-name' }, p.name),
       h('div', { class: 'stufe-punkte' }, `${zahl(p.punkte)} · ${p.richtig}/${z.spiel.quiz.fragen.length}`),
       h('div', { class: 'stufe-saeule' }, String(i + 1))))),
-    rang.length > 3 ? h('div', { class: 'rangliste klein' }, rang.slice(3).map((p, i) => h('div', { class: 'rang-zeile' },
+    rang.length > 3 ? h('div', { class: 'rangliste klein' }, rang.slice(3).map((p, i) => h('div', { class: 'rang-zeile ' + tonVon(p.name) },
       h('span', { class: 'platz' }, String(i + 4)), h('span', { class: 'wachsen name' }, p.name), h('span', { class: 'gesamt' }, zahl(p.punkte))))) : null,
     h('div', { class: 'zeile', style: { justifyContent: 'center', gap: '10px', marginTop: '20px' } },
       h('button', { class: 'knopf tonal', onclick: csvSichern }, 'Ergebnisse als CSV'),

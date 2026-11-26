@@ -129,9 +129,29 @@ async function zurueck() {
 
 // ================================================================== Items prüfen (KI und Editor)
 
+/** Bezeichnungen, die eine KI statt der Kennung schreiben könnte */
+const ART_NAMEN = {
+  umfrage: 'umfrage', abstimmung: 'umfrage', auswahl: 'umfrage', poll: 'umfrage', multiplechoice: 'umfrage', choice: 'umfrage', quiz: 'umfrage', wissensfrage: 'umfrage', mehrfachauswahl: 'umfrage',
+  skala: 'skala', scale: 'skala', bewertung: 'skala', rating: 'skala', likert: 'skala',
+  wortwolke: 'wortwolke', wordcloud: 'wortwolke', woerter: 'wortwolke',
+  freitext: 'freitext', offen: 'freitext', offenefrage: 'freitext', open: 'freitext', openended: 'freitext', text: 'freitext',
+  schaetzen: 'schaetzen', schaetzfrage: 'schaetzen', schaetzung: 'schaetzen', estimate: 'schaetzen', zahl: 'schaetzen', number: 'schaetzen',
+  rangfolge: 'rangfolge', ranking: 'rangfolge', reihenfolge: 'rangfolge', rang: 'rangfolge',
+  ampel: 'ampel', verstaendnis: 'ampel', verstaendnisampel: 'ampel', trafficlight: 'ampel',
+};
+const artAus = (x) => {
+  const k = String(x || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z]/g, '');
+  return ARTEN[k] ? k : ART_NAMEN[k] || null;
+};
+
 function item(roh) {
-  const a = roh || {};
-  const art = ARTEN[a.art] ? a.art : 'umfrage';
+  const a = { ...(roh || {}) };
+  // Andere Feldnamen (z. B. von Claude oder ChatGPT) übernehmen
+  if (!a.frage) a.frage = a.text || a.question || a.titel || a.title || '';
+  if (!Array.isArray(a.optionen)) a.optionen = a.antworten || a.options || a.answers || a.auswahl || [];
+  if (a.optionen.length && typeof a.optionen[0] === 'object') a.optionen = a.optionen.map((o) => (o && (o.text || o.option || o.antwort || o.label)) || '');
+  if (!Array.isArray(a.richtig) && Number.isInteger(a.richtig)) a.richtig = [a.richtig];
+  const art = artAus(a.art || a.typ || a.type || a.kind) || (a.optionen.length >= 2 ? 'umfrage' : 'freitext');
   const f = { id: a.id || lyra.neueId(), art, frage: text(a.frage).slice(0, 300) };
   if (!f.frage) return null;
   const optionen = (Array.isArray(a.optionen) ? a.optionen : []).map((o) => text(String(o == null ? '' : o)).slice(0, 120)).filter(Boolean);
@@ -200,7 +220,9 @@ async function erstellen() {
         '- skala: "min" 1 und "max" 5 (oder 0 und 10), "links"/"rechts" beschriften die Enden.\n- rangfolge: 3–6 "optionen" zum Ordnen.\n' +
         '- schaetzen: "einheit" (z. B. "km", "%", "Jahre"); ist der richtige Wert bekannt, "wahr_bekannt" true und "wahr" der Wert.\n' +
         '- wortwolke, freitext, ampel: nur die Frage.\n- Höchstens eine "ampel"; nie zweimal hintereinander dieselbe Art.\n' +
-        'Alle Felder sind Pflicht – was eine Art nicht braucht, bleibt leer ("optionen": [], "richtig": [], "min": 0, "max": 0, "links": "", "rechts": "", "einheit": "", "mehrfach": false, "wahr_bekannt": false, "wahr": 0).',
+        'Alle Felder sind Pflicht – was eine Art nicht braucht, bleibt leer ("optionen": [], "richtig": [], "min": 0, "max": 0, "links": "", "rechts": "", "einheit": "", "mehrfach": false, "wahr_bekannt": false, "wahr": 0).\n\n' +
+        'Antwort als JSON genau in diesem Aufbau (Feldnamen exakt so):\n' +
+        '{"titel": "…", "items": [{"art": "umfrage", "frage": "…", "optionen": ["…", "…"], "mehrfach": false, "richtig": [], "min": 0, "max": 0, "links": "", "rechts": "", "einheit": "", "wahr_bekannt": false, "wahr": 0}]}',
       schema: SCHEMA,
       zaehlen: { schluessel: 'frage', wort: 'Frage' },
     }, (e) => { if (e.art === 'hinweis') setHinweis(e.text); });
@@ -211,7 +233,10 @@ async function erstellen() {
     z.ansicht = 'start';
     return zeichnen();
   }
-  const runde = rundeAus({ titel: (r && r.json && r.json.titel) || thema, items: (r && r.json && r.json.items) || [], anonym: true, wand: true, teilen: true });
+  const j = (r && r.json) || {};
+  // Liste der Fragen auch unter anderen Namen finden
+  const roh = Array.isArray(j) ? j : j.items || j.fragen || j.umfragen || j.eintraege || j.questions || j.runde && (j.runde.items || j.runde.fragen) || Object.values(j).find((v) => Array.isArray(v) && v.length && typeof v[0] === 'object') || [];
+  const runde = rundeAus({ titel: j.titel || j.title || thema, items: roh, anonym: true, wand: true, teilen: true });
   if (runde.items.length < 2) {
     z.fehler = 'Die Runde ist nicht gelungen – bitte nochmal versuchen.';
     z.ansicht = 'start';
@@ -471,10 +496,11 @@ async function themenFinden() {
       lehrer: z.lehrer,
       system: 'Du fasst anonyme Antworten einer Gruppe zu wenigen Themen zusammen. Kurz, neutral, ohne Bewertung. Deutsch. Nur JSON.',
       prompt: `Frage: ${it.frage}\n\nAntworten (eine je Zeile):\n${texte.slice(-200).map((t) => '- ' + t.replace(/\n/g, ' ')).join('\n')}\n\n` +
-        'Fasse sie zu 2 bis 6 Themen zusammen. Je Thema: kurzer "titel" (2–5 Wörter), "anzahl" (wie viele Antworten dazu passen), "beispiel" (eine typische Antwort, wörtlich und kurz). Größte Themen zuerst.',
+        'Fasse sie zu 2 bis 6 Themen zusammen. Je Thema: kurzer "titel" (2–5 Wörter), "anzahl" (wie viele Antworten dazu passen), "beispiel" (eine typische Antwort, wörtlich und kurz). Größte Themen zuerst.\n\n' +
+        'Antwort als JSON genau in diesem Aufbau: {"themen": [{"titel": "…", "anzahl": 3, "beispiel": "…"}]}',
       schema: { type: 'object', additionalProperties: false, required: ['themen'], properties: { themen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['titel', 'anzahl', 'beispiel'], properties: { titel: { type: 'string' }, anzahl: { type: 'integer' }, beispiel: { type: 'string' } } } } } },
     });
-    const t = ((r && r.json && r.json.themen) || []).map((x) => ({ titel: text(x.titel).slice(0, 60), anzahl: Math.max(0, Math.min(texte.length, Number(x.anzahl) || 0)), beispiel: text(x.beispiel).slice(0, 140) })).filter((x) => x.titel).slice(0, 6);
+    const t = ((r && r.json && (r.json.themen || r.json.topics || r.json.gruppen)) || []).map((x) => ({ titel: text(x.titel).slice(0, 60), anzahl: Math.max(0, Math.min(texte.length, Number(x.anzahl) || 0)), beispiel: text(x.beispiel).slice(0, 140) })).filter((x) => x.titel).slice(0, 6);
     if (t.length) { L.themen[it.id] = t; sofortMelden(); }
   } catch (e) {
     if (!abgebrochen(e)) lyra.toast(meldung(e), 'fehler');

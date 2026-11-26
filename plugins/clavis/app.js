@@ -150,7 +150,11 @@ async function bauenMitKi() {
         '- "inhalt": nur die Felder der gewählten Mechanik füllen, alle anderen leer lassen ("" , [], 0). Wörter ohne Leerzeichen. Bei "richtig" der Index der richtigen Option (ab 0). Bei "tresor" in "zahl" drei Zahlen 0–39 wie "12-7-31". Bei "uhr" eine Zeit wie "7:45". Bei "lueckentext"-Sätzen "___" für die Lücke.\n' +
         '- "intro": 3–5 Sätze, die in die Lage werfen (warum bist du hier, warum ist die Tür zu, was steht auf dem Spiel). "outro": 2–3 Sätze, wie du entkommst. "finale_text": ein Satz zur Ausgangstür.\n' +
         '- "teaser": 3–5 sehr kurze, packende Sätze (je höchstens 8 Wörter) für ein Kino-Intro, das neugierig macht – wie ein Filmtrailer, ohne etwas zu verraten. Der letzte Satz macht Lust aufs Losspielen.\n' +
-        '- Ein guter Titel mit Atmosphäre.',
+        '- Ein guter Titel mit Atmosphäre.\n\n' +
+        'Antwort als JSON genau in diesem Aufbau (Feldnamen exakt so, je Station alle Felder von "inhalt"):\n' +
+        '{"titel": "…", "teaser": ["…"], "intro": "…", "outro": "…", "finale_text": "…", "loesungswort": "…", "szenen": [{"titel": "…", "text": "…", "stationen": [' +
+        '{"ort": "…", "symbol": "truhe", "titel": "…", "text": "…", "mech": "wortschloss", "tuer": false, "ereignis": "keins", "ereignis_text": "", "hinweise": ["…"], ' +
+        '"inhalt": {"wort": "…", "raetsel": "…", "zahl": "", "frage": "", "antwort": "", "optionen": [], "richtig": 0, "paare": [], "reihe": [], "zeit": "", "satz": "", "hinweis": "", "fragen": []}}]}]}',
       schema: SCHEMA,
       zaehlen: { schluessel: 'mech', wort: 'Station' },
     }, (e) => { if (e.art === 'hinweis') hinweisSetzen(e.text.replace(/Station (\d+)/, (_, x) => `Station ${x} von ${n}`)); });
@@ -166,7 +170,7 @@ async function bauenMitKi() {
     id: lyra.neueId(), welt, titel: text(j.titel) || (thema ? `Escape: ${thema}` : `Escape aus der ${w.name}`), stufe, thema,
     intro: text(j.intro), outro: text(j.outro), finaleText: text(j.finale_text), loesungswort: text(j.loesungswort), ki: true, erstellt: lyra.jetzt(), stimmung, alter,
     jumpscares: alter !== 'kinder' && !!z.einst.jumpscares, teaser: (j.teaser || []).map(text).filter(Boolean).slice(0, 5),
-    szenen: (j.szenen || []).map((s) => ({ titel: text(s.titel), text: text(s.text), stationen: (s.stationen || []).map((x) => ({
+    szenen: (j.szenen || j.raeume || j.scenes || []).map((s) => ({ titel: text(s.titel || s.title), text: text(s.text), stationen: (s.stationen || s.raetsel || s.stations || []).map((x) => ({
       ort: text(x.ort), symbol: x.symbol, titel: text(x.titel), text: text(x.text), mech: x.mech, tuer: !!x.tuer, hinweise: (x.hinweise || []).map(text).filter(Boolean).slice(0, 2),
       ereignis: x.ereignis && x.ereignis !== 'keins' ? { art: x.ereignis, text: text(x.ereignis_text) } : null, inhalt: x.inhalt || {},
     })) })).filter((s) => s.stationen.length),
