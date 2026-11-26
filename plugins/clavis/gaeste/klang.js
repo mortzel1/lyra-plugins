@@ -13,8 +13,12 @@ Clavis.klang = (() => {
   let musikAn = true;
   try { an = localStorage.getItem('clavis:ton') !== 'aus'; musikAn = localStorage.getItem('clavis:musik') !== 'aus'; } catch (_) {}
 
+  // Seite verdeckt (Plugin geschlossen, Tab im Hintergrund): kein Ton – auch keine einzelnen Effekte
+  let verdeckt = typeof document !== 'undefined' && document.hidden;
+  let warAn = false; // lief beim Verdecken Musik (oder sollte sie starten)?
+
   function bereit() {
-    if (!an) return false;
+    if (!an || verdeckt) return false;
     try {
       if (!ctx) {
         ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -341,6 +345,7 @@ Clavis.klang = (() => {
   function musik(welt, alter, stimmung) {
     aktuell = { welt, alter, stimmung };
     musikStoppen();
+    if (verdeckt && an && musikAn && welt) { warAn = true; return; }
     if (!an || !musikAn || !bereit() || !welt) return;
     const basis = MUSIK[(Clavis.WELTEN[welt] || {}).musik] || MUSIK.akademie;
     m = { ...basis };
@@ -369,9 +374,35 @@ Clavis.klang = (() => {
     if (!musikAn) musikStoppen(); else if (aktuell) musik(aktuell.welt, aktuell.alter, aktuell.stimmung);
   }
 
+  // Verdeckt: Musik anhalten und den Klang einfrieren; wieder sichtbar: weiter, falls noch ein Spiel läuft.
+  // Geschlossen (pagehide): alles aus.
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      verdeckt = document.hidden;
+      if (verdeckt) {
+        warAn = !!musikTakt;
+        musikStoppen();
+        if (ctx) ctx.suspend().catch(() => {});
+      } else {
+        if (ctx && an) ctx.resume().catch(() => {});
+        if (warAn && aktuell && document.querySelector('.cl-spiel')) musik(aktuell.welt, aktuell.alter, aktuell.stimmung);
+        warAn = false;
+      }
+    });
+    addEventListener('pagehide', () => {
+      warAn = false;
+      aktuell = null;
+      musikStoppen();
+      if (ctx) { try { ctx.close(); } catch (_) {} }
+      ctx = null;
+    });
+  }
+
   return {
     spielen, piep, bereit, musik, musikStoppen, intensitaet, schalten, musikSchalten,
     an: () => an, musikAn: () => musikAn,
+    /** Für Tests: läuft Musik, in welchem Zustand ist der Klang? */
+    zustand: () => ({ musik: !!musikTakt, klang: ctx ? ctx.state : 'keiner', verdeckt }),
     // Ältere Namen
     atmo: (welt, stimmung) => musik(welt, (aktuell && aktuell.alter) || 'ab14', stimmung), atmoStoppen: musikStoppen,
   };
