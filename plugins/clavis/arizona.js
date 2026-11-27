@@ -107,7 +107,7 @@ const ClavisArizona = (() => {
             if (gestoppt)
                 return;
             syncPause();
-            senden(stand(), null, true);
+            senden(stand(), null, !personal);
             if (personal)
                 for (const p of L.personen.values())
                     if (p.da)
