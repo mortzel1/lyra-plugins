@@ -140,7 +140,7 @@ function abwechslung(entwurf, anteil, { neue = 0, versatz = 0 } = {}) {
   return n;
 }
 // Auch die fertigen Räume: höchstens ein Drittel Wissen und je drei der neuen Rätsel zum Anfassen (jeder Raum andere)
-CLAVIS_VORLAGEN.forEach((v, i) => abwechslung(v, 1 / 3, { neue: 3, versatz: i * 3 }));
+CLAVIS_VORLAGEN.filter(v => !v.premium).forEach((v, i) => abwechslung(v, 1 / 3, { neue: 3, versatz: i * 3 }));
 
 function mechanikText(welt) {
   return Object.entries(M).filter(([k]) => !welt || Clavis.passtWelt(k, welt)).map(([k, m]) => {
@@ -374,6 +374,7 @@ async function spielFertig() {
   const S = z.spiel;
   if (!S) return;
   S.leiter.stoppen();
+  if (S.ansicht.destroy) S.ansicht.destroy();
   if (S.online) await S.online.beenden({ typ: 'vorbei' });
   Clavis.klang.atmoStoppen();
   z.spiel = null;
@@ -425,7 +426,7 @@ function cover(welt, gross = false) {
 
 function stufenWahl(id, standard) {
   const w = z.wahl[id] || standard || 'mittel';
-  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
+  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${id === 'v-wald17' ? { leicht: 60, mittel: 50, schwer: 42, experte: 35 }[k] : s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
 }
 
 function stimmungChips(e) {
@@ -453,6 +454,19 @@ function raumKarte(e) {
         h('button', { class: 'knopf tonal', onclick: () => spielen(e, stufe, true) }, 'Im Team'))));
 }
 
+function premiumKarte() {
+  const e = ClavisPremium.VORLAGE, stufe = z.wahl[e.id] || e.empfohlen;
+  const bild = h('div', { class: 'px-featured-art', 'aria-hidden': 'true' });
+  bild.innerHTML = Clavis.PremiumWelt.bild('hof');
+  return h('section', { class: 'px-featured' }, bild, h('div', { class: 'px-featured-shade' }),
+    h('div', { class: 'px-featured-copy' }, h('span', { class: 'px-eyebrow' }, 'CLAVIS PREMIUM · FORSTREVIER 17'),
+      h('h2', {}, 'Der Wald hört mit'), h('p', {}, 'Elf Tage ist Nora verschwunden. Heute Nacht ruft sie an. Ihre erste Bitte: Antworte nicht, wenn du meine Stimme hörst.'),
+      h('div', { class: 'px-featured-meta' }, '7 Schauplätze · 8 verbundene Rätsel · Entscheidungen mit Folgen · ab 14'),
+      stufenWahl(e.id, e.empfohlen),
+      h('div', { class: 'px-featured-actions' }, h('button', { class: 'px-button primary', onclick: () => spielen(e, stufe, false) }, 'In den Wald →'),
+        h('button', { class: 'px-button secondary', onclick: () => spielen(e, stufe, true) }, 'Gemeinsam aufbrechen'))));
+}
+
 function startAnsicht() {
   const k = z.kontext;
   return [
@@ -463,7 +477,8 @@ function startAnsicht() {
     k && k.inhalt && k.inhalt.typ === TYP ? h('div', { class: 'hinweis-band' }, `Aus „${k.raum.name}“ geöffnet: Wähle einen Raum und „Im Team“ – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
     h('div', { class: 'zeile zwischen-zeile' }, h('h2', { class: 'wachsen', style: { margin: 0 } }, 'Fertige Räume'),
       h('label', { class: 'schreck-schalter klein' }, h('input', { type: 'checkbox', checked: z.einst.schreckErlaubt !== false, onchange: (e) => { z.einst.schreckErlaubt = e.target.checked; lyra.speicher.schreiben('einstellungen', z.einst).catch(() => {}); } }), h('span', {}, '⚡ Jumpscares erlauben'))),
-    h('div', { class: 'raum-raster' }, CLAVIS_VORLAGEN.map(raumKarte)),
+    premiumKarte(),
+    h('div', { class: 'raum-raster' }, CLAVIS_VORLAGEN.filter(v => !v.premium).map(raumKarte)),
     h('h2', { class: 'zwischen' }, 'Einen Raum bauen lassen'),
     h('div', { class: 'panel' },
       h('div', { class: 'zeile', style: { gap: '10px' } },

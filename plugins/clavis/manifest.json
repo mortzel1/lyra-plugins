@@ -1,10 +1,10 @@
 {
   "kennung": "clavis",
   "name": "Clavis",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "untertitel": "Escape Rooms zum Rätseln und Lernen – allein oder im Team",
   "kategorie": "lernen",
-  "beschreibung": "Clavis sperrt dich ein – und du rätselst dich hinaus. Acht fertige Räume vom Kinder-Zirkus bis zum Horror-Sanatorium, oder ein Raum, den die KI dir aus einem Thema baut, gern aus deinen Unterlagen: Dann öffnen Fragen, Begriffe und Zusammenhänge aus deinem Stoff die Schlösser. 27 Rätsel-Mechaniken, 14 Welten mit eigenem Look und Soundtrack, ein Kino-Intro, das neugierig macht – und während du rätselst, passiert ständig etwas: Schreie, Anrufe, Stromausfall, ein Geheimfach mit Bonusrätsel, ein Countdown, ein verriegeltes Schloss. Altersstufe von Kinder bis ab 18, Regler für Spannung, Gefahr, Spuk und Grusel, Jumpscares zum Ein- und Ausschalten. Allein spielen oder im Team: per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, oder in Lyra Campus.",
+  "beschreibung": "Neu: Das Premium-Abenteuer „Der Wald hört mit“ führt dich in sieben Schauplätze im Forstrevier 17. Acht verbundene Rätsel, eine handgeschriebene Geschichte, Entscheidungen und mehrere Enden. Clavis sperrt dich ein – und du rätselst dich hinaus. Acht fertige Räume vom Kinder-Zirkus bis zum Horror-Sanatorium, oder ein Raum, den die KI dir aus einem Thema baut, gern aus deinen Unterlagen: Dann öffnen Fragen, Begriffe und Zusammenhänge aus deinem Stoff die Schlösser. 27 Rätsel-Mechaniken, 14 Welten mit eigenem Look und Soundtrack, ein Kino-Intro, das neugierig macht – und während du rätselst, passiert ständig etwas: Schreie, Anrufe, Stromausfall, ein Geheimfach mit Bonusrätsel, ein Countdown, ein verriegeltes Schloss. Altersstufe von Kinder bis ab 18, Regler für Spannung, Gefahr, Spuk und Grusel, Jumpscares zum Ein- und Ausschalten. Allein spielen oder im Team: per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, oder in Lyra Campus.",
   "farbe": "#C99A3B",
   "symbol": "<circle cx='7.5' cy='9' r='4.2' fill='none' stroke-width='1.9'/><path d='M10.6 11.8L20 21.2M15.8 17l2.4-2.4M18.2 19.4l2.4-2.4' stroke-width='1.9' fill='none'/>",
   "einstieg": "index.html",
@@ -17,6 +17,7 @@
   ],
   "datenhinweis": "beim Bauen dein Thema, Altersstufe, Stimmung und passende Auszüge aus deinen Unterlagen an die KI – mit „Lyra (lokal)“ bleibt alles auf deinem Mac; im Team-Spiel nur der Raum (ohne Lösungen), Namen und Spielzüge – über die Seite im Browser (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen; die Lösungen bleiben auf deinem Mac",
   "funktionen": [
+    "Premium: „Der Wald hört mit“ – sieben gezeichnete Schauplätze, acht verbundene Rätsel, Waldgeräusche, neun Filmsequenzen und Entscheidungen mit mehreren Enden; ab 14",
     "Acht fertige Räume in vier Schwierigkeiten – vom Zauberzirkus für Kinder bis zum Horror-Sanatorium ab 18",
     "Die KI baut Räume aus einem Thema oder deinen Unterlagen – Clavis macht daraus garantiert lösbare Rätsel",
     "Kino-Intro mit Teasern, Soundtrack je Welt und über 40 Soundeffekte – Schrei, Alarm, Regen, Telefon, Wolfsheulen …",
@@ -30,6 +31,14 @@
     "Eigene Räume im Editor bauen"
   ],
   "neuerungen": {
+    "1.3.0": [
+      "Ein Premium-Waldabenteuer: Der Wald hört mit – eine Nacht im Forstrevier 17",
+      "Acht verbundene Rätsel mit echten Geräten: Notnetz, Funk, Peilung, gekoppelte Ventile, Zeitrekonstruktion, Magnetbänder, zwei Relaisfelder und Leuchtfeuer",
+      "Handgeschriebenes Intro, sieben Zwischenszenen und entscheidungsabhängige Erfolgs- und Misserfolgs-Outros",
+      "Gemeinsames Einsatzbuch und Inventar; Entscheidungen über Rettung, Beweise und die letzte Funkverbindung",
+      "Eigenständige Waldkulisse mit lokal erzeugten Geräuschen, Regen, Nebel, Kamerafahrten und einstellbaren Jumpscares",
+      "Verbindlicher Countdown; Filmsequenzen pausieren die Zeit für alle. Vier Schwierigkeiten mit 35–60 Minuten."
+    ],
     "1.2.0": [
       "Ein Erzähler spricht wirklich – Intro, Szenen, Funde, Ereignisse, Wendungen und Outro; Anrufer klingen wie am Telefon, Funksprüche knistern, Geister flüstern tief und langsam (Stimmen des Geräts, nur lokal – kein Text verlässt das Gerät; über 🗣 abschaltbar)",
       "Weniger Text auf einmal: Die Anzeige zeigt nur den Satz, der gerade gesprochen wird",

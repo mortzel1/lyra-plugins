@@ -532,6 +532,8 @@ Clavis.klang = (() => {
 
   return {
     spielen, piep, bereit, musik, musikStoppen, intensitaet, schalten, musikSchalten, ambiente, ambienteStoppen, wetter, verfall, ducken, ambienteWelt: () => amb.welt,
+    /** Für die Geräusch-Bibliothek (geraeusche.js) */
+    intern: { ctx: () => ctx, haupt: () => haupt, hall: () => hall, ton: (...a) => ton(...a), rauschen: (...a) => rauschen(...a), rauschQuelle: () => rauschQuelle(), glocke: (...a) => glocke(...a), stimme: (...a) => stimme(...a), verdeckt: () => verdeckt },
     /** Eine Glocke mit Tonhöhe f (für Rätsel) */
     klingen: (f, dauer = 1.6) => { if (bereit()) try { glocke(f, 0, 0.08, hall, dauer); } catch (_) {} },
     /** Ein Ton mit Tonhöhe f, kurz (für Rätsel) */

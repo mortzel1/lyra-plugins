@@ -10,7 +10,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Arena** | 1.0.1 | Probeklausur unter echten Bedingungen |
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
-| **Clavis** | 1.2.0 | Escape Rooms zum Rätseln und Lernen – allein oder im Team |
+| **Clavis** | 1.3.0 | Escape Rooms zum Rätseln und Lernen – allein oder im Team |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
 | **Deep Dive** | 2.1.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |
