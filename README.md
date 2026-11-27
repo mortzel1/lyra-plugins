@@ -10,7 +10,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Arena** | 1.0.1 | Probeklausur unter echten Bedingungen |
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
-| **Clavis** | 1.5.0 | Drei Premium-Abenteuer – neu: NULLMEILE, ausschließlich im Team mit 2–8 Personen |
+| **Clavis** | 2.0.0 | Vier Premium-Escape-Rooms einschließlich Bankraub; neu: NACHTAKTE mit freien Ermittlungswegen, allein oder im Team |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
 | **Deep Dive** | 2.1.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |
@@ -54,3 +54,5 @@ installierst – von hier, aus dem neuesten Release:
 
 - `plugins/<kennung>/` – Quelltext je Plugin (`manifest.json`, `index.html`, `app.js`, `stil.css`)
 - Releases – die signierten Pakete (`<kennung>-<version>.lyraplugin`) und `katalog.json`
+
+Clavis 2.0: [Anleitung und Übersicht](dokumentation/clavis/README.md) · [NACHTAKTE](dokumentation/clavis/NACHTAKTE.md) · [Die Schwarze Reserve](dokumentation/clavis/SCHWARZE-RESERVE.md). Alle Räume gehören zur zentralen Clavis-Installation.
