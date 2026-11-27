@@ -1,10 +1,10 @@
 {
   "kennung": "clavis",
   "name": "Clavis",
-  "version": "1.6.0",
-  "untertitel": "Escape Rooms zum Rätseln und Lernen – allein oder im Team",
+  "version": "2.0.0",
+  "untertitel": "Escape Rooms und lebendige Ermittlungen – allein oder im Team",
   "kategorie": "lernen",
-  "beschreibung": "Drei handgeschriebene Premium-Abenteuer: NULLMEILE – Protokoll JANUS ist ein reiner Team-Escape-Room für 2–8 Personen mit getrennten Informationen, zufälligen Zweier- und Dreiergruppen und verbindlichen gemeinsamen Aufgaben in einem geheimen Labor unter Arizona. Dazu Mercy Creek – Die letzte Schicht in den Rocky Mountains und Der Wald hört mit im Forstrevier 17. Acht Standardräume, KI-Räume aus deinen Unterlagen, vier Schwierigkeiten, Filmsequenzen, Geräusche und optionale Jumpscares.",
+  "beschreibung": "Alle Abenteuer zentral in Clavis: vier Premium-Escape-Rooms einschließlich Die Schwarze Reserve mit persönlichen Festnahmen und geschützter Pause. Neu: NACHTAKTE – ein eigenständiger Ermittlungsmodus. Im ersten Fall verschwindet eine Frau am Black Alder Trail nahe Los Angeles. Freie Recherche, Zeugen, Kameras, Sachspuren und eigene Hypothesen führen über mehrere Wege zu einer Wahrheit oder in überprüfbare Sackgassen. Allein oder mit 2–8 Personen, eigenen Standorten und gemeinsamer Fallakte. Dazu acht Standardräume und KI-Räume.",
   "farbe": "#C99A3B",
   "symbol": "<circle cx='7.5' cy='9' r='4.2' fill='none' stroke-width='1.9'/><path d='M10.6 11.8L20 21.2M15.8 17l2.4-2.4M18.2 19.4l2.4-2.4' stroke-width='1.9' fill='none'/>",
   "einstieg": "index.html",
@@ -17,7 +17,10 @@
   ],
   "datenhinweis": "beim Bauen dein Thema, Altersstufe, Stimmung und passende Auszüge aus deinen Unterlagen an die KI – mit „Lyra (lokal)“ bleibt alles auf deinem Mac; im Team-Spiel nur der Raum (ohne Lösungen), Namen und Spielzüge – über die Seite im Browser (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen; die Lösungen bleiben auf deinem Mac",
   "funktionen": [
-    "Clavis Noir: Einstieg zum separat installierten Mega-Premium-Zusatzpaket „Die Schwarze Reserve“. Der Zusatzinhalt ist nicht im freien Clavis-Paket enthalten.",
+    "NACHTAKTE: Die Frau am Black Alder Trail. Eine eigenständige nichtlineare Ermittlung mit zwölf Filmlocations, sieben befragbaren Personen, Recherche im fiktiven Fallnetz, Originalaufnahmen, Laboraufträgen, eigenen Hypothesen und Zeitlinie.",
+    "Allein oder 2–8 Ermittler: eigene Standorte, parallele Maßnahmen, gemeinsame Belege, Teamfunk, Aufgabenabsprachen und getrennte Stimmen bei wichtigen Beschlüssen.",
+    "Mehrere unabhängige Lösungswege und spätere Sackgassen. Gesprächsführung, Öffentlichkeit, Fallzeit und Kontaktstrategie verändern den Verlauf und das Ende. Automatische lokale Sicherung und Wiederaufnahme.",
+    "Die Schwarze Reserve jetzt direkt in Clavis: zwölf Teamoperationen, vier Live-Kontrollen, sechzehn Filmbilder und dauerhafte persönliche Festnahmen. Keine zusätzliche Plugin-Installation.",
     "Premium III: NULLMEILE – Protokoll JANUS, ausschließlich für 2–8 Personen. Neun Filmkulissen, acht echte Teamoperationen, private Rollenblätter, wechselnde Zweier- und Dreiergruppen, Gruppenfunk, gemeinsame Rettung und einstimmiges Finale.",
     "Premium II: Mercy Creek – Die letzte Schicht: neun Schauplätze, zehn verbundene Geräte, selbst gespielte Entscheidungen, Minenfahrt und mehrere Enden; eigene Klangregie, Filmsequenzen und keine automatische Computerstimme",
     "Premium: „Der Wald hört mit“ – sieben gezeichnete Schauplätze, acht verbundene Rätsel, Waldgeräusche, neun Filmsequenzen und Entscheidungen mit mehreren Enden; ab 14",
@@ -34,6 +37,13 @@
     "Eigene Räume im Editor bauen"
   ],
   "neuerungen": {
+    "2.0.0": [
+      "Alle Räume in einer Installation. Die Schwarze Reserve öffnet direkt in Clavis; das separate Clavis-Noir-Plugin wird nicht mehr benötigt.",
+      "Neuer Spielbereich NACHTAKTE mit Fall 01: Die Frau am Black Alder Trail. Freie Ermittlungsreihenfolge, Recherche, Zeugen, Kameras, Quellenvergleich und zeitversetzte Laboraufträge.",
+      "Zwölf filmische Schauplätze, bedrohliche Waldbeobachtungen, überprüfbare Legenden und dynamische Ereignisse. Eigene Hypothesen, Verknüpfungen, Zeitlinie und verzweigte Fährten mit Widersprüchen und Sackgassen.",
+      "Einzelspiel und Teams von 2–8 Personen mit unabhängigen Standorten, gemeinsamer Fallakte, Teamfunk und Beschlüssen. Entscheidungen verändern Aufenthaltsorte, Kooperation und mehrere Schlussvarianten.",
+      "Automatische Sicherung und Fortsetzen; falsche oder offene Abschlüsse können wieder aufgenommen werden. Kein vorweggenommener Lösungszwang."
+    ],
     "1.6.0": [
       "Startkarte für Clavis Noir – Die Schwarze Reserve, ein separat installierbarer Mega-Premium-Teamraum. Clavis enthält ausschließlich den Einstieg; Bankraub-Code und Bilder bleiben im eigenen Zusatzpaket."
     ],

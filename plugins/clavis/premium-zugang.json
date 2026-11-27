@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "installation": "clavis",
+  "freischaltung": "noch-kein-zahlungsdienst-angebunden",
+  "raeume": {
+    "v-schwarze-reserve": {
+      "sku": "clavis.schwarze-reserve",
+      "aufschlag_spaeter": true
+    }
+  },
+  "hinweis": "Alle Räume sind in Clavis enthalten. Eine spätere raumbezogene Lizenzprüfung kann hier angebunden werden; aktuell gibt es keine sichere Bezahlfunktion."
+}
