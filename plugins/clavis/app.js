@@ -323,7 +323,7 @@ function spielen(entwurf, stufe, gruppe, { campus = false } = {}) {
   S.ansicht = Clavis.Spiel.erstellen(wurzel, {
     senden: (d) => S.leiter.eingang(ich, d),
     ich,
-    host: { starten: () => { if (S.leiter.starten() === false) return; S.einladenOffen = false; leisteMalen(); }, beenden: spielVerlassen, fertig: spielFertig },
+    host: { starten: () => { if (S.leiter.starten() === false) return; S.einladenOffen = false; leisteMalen(); }, beenden: spielVerlassen, fertig: spielFertig, einladung: () => S.online?.beitritt({ campusText: 'Weitere Personen können mit dem Link, QR-Code oder Campus beitreten.' }) },
   });
   if (gruppe) {
     S.online = LyraOnline.runde({

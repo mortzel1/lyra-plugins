@@ -104,7 +104,7 @@
             }
             const scene = a.scene;
             if (scene) {
-                if (z.modal !== 'manage') {
+                if (z.modal !== 'manage' && z.modal !== 'invite') {
                     if (z.scene?.id !== scene.id)
                         film(scene);
                     else
@@ -122,11 +122,11 @@
             }
             if (!a.scene && !z.scene) {
                 if (a.pausen.length) {
-                    if (z.modal !== 'settings' && z.modal !== 'manage' && (z.modal !== 'pause' || z.pauseSig !== JSON.stringify([a.fehlen, a.pausen])))
+                    if (z.modal !== 'settings' && z.modal !== 'manage' && z.modal !== 'invite' && (z.modal !== 'pause' || z.pauseSig !== JSON.stringify([a.fehlen, a.pausen])))
                         pause();
                 }
                 else if (a.vote) {
-                    if (z.modal !== 'settings' && z.modal !== 'manage' && z.modal !== 'chat' && (z.modal !== 'vote' || z.voteSig !== JSON.stringify(a.vote)))
+                    if (z.modal !== 'settings' && z.modal !== 'manage' && z.modal !== 'invite' && z.modal !== 'chat' && (z.modal !== 'vote' || z.voteSig !== JSON.stringify(a.vote)))
                         vote();
                 }
                 else if (z.modal === 'pause' || z.modal === 'vote')
@@ -151,7 +151,7 @@
             return panel;
         }
         function close() {
-            if (z.scene && z.modal === 'manage') {
+            if (z.scene && (z.modal === 'manage' || z.modal === 'invite')) {
                 z.modal = null;
                 if (z.sceneAck)
                     updateFilmWait();
@@ -344,16 +344,17 @@
             }, 'az-vote-option' + (v.stimmen[ich.id] === value ? ' selected' : ''), { disabled: spectator() }).appendChild(h('span', {}, h('b', {}, label), h('small', {}, text), h('em', {}, Object.values(v.stimmen).filter(x => x === value).length + ' STIMMEN'))).parentNode)), h('p', { class: 'az-vote-state' }, Object.keys(v.stimmen).length + '/' + A().roster.length + ' Personen haben abgestimmt.'), Object.keys(v.stimmen).length === A().roster.length ? h('p', { class: 'az-muted' }, v.einstimmig ? 'Ihr seid euch noch nicht einig. Sprecht miteinander; jede Person kann ihre Stimme ändern.' : 'Noch keine Mehrheit. Bei Gleichstand müsst ihr eure Stimmen abstimmen.') : null, btn('Im Teamfunk besprechen', () => chat('team'), 'ghost')), 'vote', true);
         }
         function pause() { z.pauseSig = JSON.stringify([A().fehlen, A().pausen]); modal('Eure Perspektiven fehlen', h('div', { class: 'az-pause' }, h('div', { class: 'az-pause-mark' }, 'Ⅱ'), h('p', { class: 'az-lead' }, A().fehlen.length ? 'Die gemeinsame Zeit ist angehalten, bis alle Referenzplätze wieder verbunden sind.' : 'Die Spielleitung hat eine Teampause eingelegt.'), h('p', {}, A().fehlen.map(p => p.name).join(' · ')), host ? btn('Referenzplätze verwalten', manage, 'ghost') : null, host ? btn('Teampause schalten', () => request({ typ: 'arizona_pause' }), 'primary') : null), 'pause'); }
+        function einladung() {
+            const inhalt = host?.einladung?.();
+            if (!inhalt) return toast('Öffne den bereits geteilten Einladungslink in einem neuen Spielerfenster.');
+            modal('Weitere Person einladen',h('div',{},h('p',{class:'az-muted'},'Der neue Gast tritt zunächst als Zuschauer bei. Danach kannst du ihm einen fehlenden Referenzplatz zuweisen.'),inhalt,btn('Zur Platzverwaltung',manage,'ghost')),'invite',true);
+        }
         function manage() {
-            modal('Referenzplätze verwalten', h('div', { class: 'az-management' }, h('p', { class: 'az-muted' }, 'Eine zurückkehrende Person behält ihre Rolle. Ist jemand dauerhaft weg, kann ein neu verbundener Gast den fehlenden Referenzplatz übernehmen. Laufende Impulse werden dabei zurückgesetzt.'), A().fehlen.length ? A().fehlen.map(old => h('div', { class: 'az-replace' }, h('h3', {}, old.name + ' · Verbindung fehlt'), A().spaet.length ? A().spaet.map(neu => btn('Mit ' + neu.name + ' besetzen', async () => {
-                const r = await request({ typ: 'arizona_ersatz', alt: old.id, neu: neu.id });
-                if (!r.richtig)
-                    toast(r.info, 'bad');
-                else {
-                    close();
-                    render(true);
-                }
-            }, 'ghost')) : h('p', {}, 'Noch kein neuer Gast verbunden. Öffne „Einladen“ in der Host-Leiste.'))) : h('p', {}, 'Alle Referenzplätze sind verbunden.')), 'manage', true);
+            modal('Referenzplätze verwalten',h('div',{class:'az-management'},
+                h('p',{class:'az-muted'},'Eine zurückkehrende Person behält ihre Rolle. Ist jemand dauerhaft weg, kann ein neu verbundener Gast den fehlenden Referenzplatz übernehmen. Laufende Impulse werden dabei zurückgesetzt.'),
+                host?.einladung?btn('Weitere Person einladen',einladung,'ghost'):null,
+                A().fehlen.length?A().fehlen.map(old=>h('div',{class:'az-replace'},h('h3',{},old.name+' · Verbindung fehlt'),
+                    A().spaet.length?A().spaet.map(neu=>btn('Mit '+neu.name+' besetzen',async()=>{const r=await request({typ:'arizona_ersatz',alt:old.id,neu:neu.id});if(!r.richtig)toast(r.info,'bad');else{close();render(true);}},'ghost')):h('p',{},'Noch kein neuer Gast verbunden. Verwende die Einladung oder den bereits geteilten Link.'))):h('p',{},'Alle Referenzplätze sind verbunden.')),'manage',true);
         }
         function settings() {
             const voices = S?.stimmen?.() || [];
