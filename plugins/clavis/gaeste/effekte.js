@@ -14,39 +14,127 @@
     }
   }
 
-  /** Überraschung zeigen; Ergebnis: Promise, wenn vorbei. opt: { alter, nurBild } */
+  // ---------------------------------------------------------------- Überraschungen – im Raum, animiert, nicht zu übersehen
+  // Sichtbares passiert im Raum (Regen fällt, Blitze zucken, Vögel fliegen vorbei, Rauch quillt herein). Der Text geht an den
+  // Erzähler (opt.sagen) und ins Notizbuch – er verschwindet nicht durch einen Klick. Telefon und Funk klingeln, bis man abnimmt.
+  const DAUER = { regen: 24000, gewitter: 16000, alarm: 16000, stromausfall: 11000, beben: 6000, explosion: 9000, kraehen: 6500, schritte: 8000, fluestern: 9000, glitch: 3200,
+    fackel: 7000, schrei: 3500, lachen: 5000, heulen: 9000, ketten: 9000, uhrschlag: 7500, spieluhr: 9000, konfetti: 4000, kichern: 4000, trommeln: 7000, glas: 5000, geheimtuer: 6000, tuerknall: 2600, brief: 4200 };
+
+  function tropfen(schicht, n, kinder) {
+    for (let e = 0; e < 3; e++) {
+      const l = el('div', { class: `cl-regen-ebene e${e}` });
+      schicht.append(l);
+    }
+    const pfuetzen = el('div', { class: 'cl-regen-boden' });
+    for (let i = 0; i < n; i++) pfuetzen.append(el('i', { style: { left: `${zufall(0, 100)}%`, top: `${zufall(5, 95)}%`, animationDelay: `${zufall(0, 1.4).toFixed(2)}s`, animationDuration: `${zufall(0.9, 1.5).toFixed(2)}s` } }));
+    schicht.append(pfuetzen, el('div', { class: 'cl-regen-nass' }));
+    if (kinder) schicht.append(el('div', { class: 'cl-regenbogen' }));
+  }
+  function blitz(schicht) {
+    const x = zufall(10, 90);
+    const pfad = (() => { let d = `M${x} 0`; let px = x; for (let y = 8; y <= 70; y += zufall(6, 12)) { px += zufall(-6, 6); d += ` L${px.toFixed(1)} ${y.toFixed(1)}`; } return d; })();
+    const b = el('div', { class: 'cl-blitz' });
+    b.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${pfad}" class="glut"/><path d="${pfad}" class="kern"/></svg>`;
+    schicht.append(b, el('div', { class: 'cl-blitz-licht' }));
+    setTimeout(() => { b.remove(); schicht.querySelectorAll('.cl-blitz-licht').forEach((x2) => x2.remove()); }, 900);
+  }
+  function voegel(schicht, n, kinder) {
+    for (let i = 0; i < n; i++) {
+      const v = el('div', { class: 'cl-vogel' + (kinder ? ' bunt' : ''), style: { top: `${zufall(8, 45)}%`, animationDelay: `${zufall(0, 1.8).toFixed(2)}s`, animationDuration: `${zufall(3.2, 5).toFixed(2)}s`, '--h': `${zufall(-18, 18).toFixed(0)}vh`, '--s': zufall(0.6, 1.3).toFixed(2) } });
+      v.innerHTML = '<svg viewBox="0 0 60 30"><path class="fluegel" d="M0 14 Q15 0 30 14 Q45 0 60 14 Q45 8 30 18 Q15 8 0 14 Z"/></svg>';
+      schicht.append(v);
+    }
+  }
+  function staub(schicht, n, klasse = 'staub') {
+    for (let i = 0; i < n; i++) schicht.append(el('i', { class: 'cl-' + klasse, style: { left: `${zufall(0, 100)}%`, animationDelay: `${zufall(0, 2.5).toFixed(2)}s`, animationDuration: `${zufall(1.6, 3.4).toFixed(2)}s`, '--g': `${zufall(2, 6).toFixed(1)}px` } }));
+  }
+  function ketten(schicht) {
+    for (let i = 0; i < 4; i++) {
+      const k2 = el('div', { class: 'cl-kette', style: { left: `${12 + i * 24 + zufall(-5, 5)}%`, animationDelay: `${zufall(0, 0.6).toFixed(2)}s`, '--l': `${zufall(30, 62).toFixed(0)}%` } });
+      k2.innerHTML = `<svg viewBox="0 0 20 300" preserveAspectRatio="xMidYMin slice">${Array.from({ length: 20 }, (_, j) => `<ellipse cx="10" cy="${j * 15 + 7}" rx="${j % 2 ? 3 : 6}" ry="8" fill="none" stroke="#8a8f94" stroke-width="2.4"/>`).join('')}</svg>`;
+      schicht.append(k2);
+    }
+  }
+
+  /** Telefon, Funk: klingelt, bis jemand abnimmt (spätestens nach 30 s läuft der Anrufbeantworter) */
+  function klingeln(buehne, art, text, opt) {
+    const funk = art === 'funkspruch';
+    let fertig = false;
+    let ring = null;
+    const ding = el('button', { class: 'cl-ev-ding ' + (funk ? 'funk' : 'telefon'), type: 'button', title: funk ? 'Funk annehmen' : 'Abnehmen' },
+      el('div', { class: 'cl-ev-ding-bild' }), el('i', { class: 'cl-ring' }), el('i', { class: 'cl-ring zwei' }), el('b', {}, funk ? 'Funk annehmen' : 'Abnehmen'));
+    ding.querySelector('.cl-ev-ding-bild').innerHTML = funk
+      ? '<svg viewBox="0 0 60 60"><rect x="8" y="20" width="44" height="32" rx="5" fill="#3a4448"/><rect x="14" y="26" width="18" height="10" fill="#5ad2ff" class="cl-a-blinken"/><circle cx="42" cy="31" r="5" fill="#222"/><circle cx="42" cy="44" r="4" fill="#222"/><path d="M14 42 h18 M14 46 h18" stroke="#222" stroke-width="2"/><line x1="44" y1="20" x2="50" y2="2" stroke="#3a4448" stroke-width="3"/></svg>'
+      : '<svg viewBox="0 0 60 60"><path d="M6 22 Q6 10 30 10 Q54 10 54 22 L46 26 L40 18 H20 L14 26 Z" fill="#1a1a1a"/><path d="M14 30 H46 L52 54 H8 Z" fill="#2a2a2a"/><circle cx="30" cy="40" r="9" fill="#e8dcc0"/><circle cx="30" cy="40" r="3" fill="#2a2a2a"/>' + Array.from({ length: 10 }, (_, i) => { const a = (i / 10) * Math.PI * 1.6 + 0.9; return `<circle cx="${(30 + Math.cos(a) * 6.3).toFixed(1)}" cy="${(40 + Math.sin(a) * 6.3).toFixed(1)}" r="1.1" fill="#2a2a2a"/>`; }).join('') + '</svg>';
+    const ende = (abgenommen) => {
+      if (fertig) return;
+      fertig = true;
+      clearInterval(ring);
+      ding.classList.add(abgenommen ? 'ab' : 'weg');
+      setTimeout(() => ding.remove(), 600);
+      if (abgenommen) { k.spielen(funk ? 'funk' : 'klick'); if (opt.sagen) opt.sagen(text, funk ? 'funk' : 'telefon'); }
+      else if (opt.sagen) opt.sagen((funk ? 'Der Funk rauscht – dann, ganz leise: ' : 'Der Anrufbeantworter springt an: ') + text, funk ? 'funk' : 'telefon');
+    };
+    ding.addEventListener('click', () => ende(true));
+    k.spielen(e2(art).ton || (funk ? 'funk' : 'telefon'));
+    ring = setInterval(() => { if (!ding.isConnected) return clearInterval(ring); k.spielen(funk ? 'funk' : 'telefon'); }, funk ? 2600 : 3200);
+    buehne.append(ding);
+    if (opt.sagen) opt.sagen(funk ? 'Der Funk knistert. Jemand will dich sprechen – nimm an!' : 'Das Telefon klingelt! Geh ran – unten rechts.', 'hilfe');
+    setTimeout(() => ende(false), 30000);
+  }
+  const e2 = (art) => Clavis.EREIGNISSE[art] || {};
+
+  /** Überraschung zeigen; Ergebnis: Promise, wenn vorbei. opt: { alter, raum (Element), sagen(text, art), stark } */
   Clavis.effekt = (buehne, art, text, opt = {}) => new Promise((fertig) => {
-    const e = Clavis.EREIGNISSE[art] || {};
+    const e = e2(art);
     const kinder = opt.alter === 'kinder';
     const anzeigen = text || Clavis.ereignisText(art, opt.alter || 'ab14', false) || e.text || '';
-    const schicht = el('div', { class: 'cl-effekt ' + art + (kinder ? ' kinder' : '') });
-    const karte = (symbol) => el('div', { class: 'cl-effekt-karte' }, symbol ? el('div', { class: 'cl-effekt-symbol' }, symbol) : null, el('div', { class: 'cl-effekt-text' }, anzeigen));
-    let dauer = 3800;
-    if (e.ton) k.spielen(kinder && art === 'explosion' ? 'konfetti' : e.ton === 'spieluhr' && !kinder && opt.stark ? 'spieluhrSchief' : e.ton);
-    const wackeln = (ms) => { buehne.classList.add('cl-wackeln'); setTimeout(() => buehne.classList.remove('cl-wackeln'), ms); };
-    switch (art) {
-      case 'stromausfall': dauer = 4200; if (!kinder) { buehne.classList.add('cl-notlicht'); setTimeout(() => buehne.classList.remove('cl-notlicht'), 25000); } schicht.append(karte()); break;
-      case 'alarm': schicht.append(karte(kinder ? '⏰' : '!')); break;
-      case 'brief': dauer = 6500; schicht.append(el('div', { class: 'cl-brief' }, el('div', { class: 'cl-brief-siegel' }), el('div', { class: 'cl-brief-text' }, anzeigen))); break;
-      case 'anruf': case 'funkspruch': dauer = 6000; schicht.append(karte(art === 'anruf' ? '☏' : '📡')); break;
-      case 'geheimtuer': case 'tuerknall': case 'beben': case 'ketten': wackeln(art === 'beben' ? 1800 : 900); schicht.append(karte()); break;
-      case 'glitch': buehne.classList.add('cl-glitch'); setTimeout(() => buehne.classList.remove('cl-glitch'), 1400); schicht.append(karte()); break;
-      case 'explosion': if (kinder) Clavis.konfetti(buehne); else wackeln(1400); schicht.append(karte(kinder ? '🎉' : null)); break;
-      case 'glas': for (let i = 0; i < 18; i++) schicht.append(el('div', { class: 'cl-scherbe', style: { left: `${zufall(35, 65)}%`, top: `${zufall(35, 60)}%`, '--dx': `${zufall(-45, 45)}vw`, '--dy': `${zufall(-30, 50)}vh`, '--r': `${zufall(-400, 400)}deg` } })); schicht.append(karte()); break;
-      case 'regen': schicht.append(el('div', { class: 'cl-regenguss' }), karte(kinder ? '🌈' : null)); dauer = 4800; break;
-      case 'kraehen': schwarm(schicht, kinder ? '🦜' : '🐦‍⬛', kinder ? 3 : 9, 'flug'); schicht.append(karte()); break;
-      case 'spieluhr': schwarm(schicht, '♪', 10, 'noten'); schicht.append(karte()); dauer = 4800; break;
-      case 'konfetti': case 'kichern': Clavis.konfetti(buehne); schicht.append(karte(art === 'kichern' ? '✨' : '🎉')); break;
-      case 'trommeln': schicht.append(karte('🥁')); break;
-      case 'uhrschlag': schicht.append(karte('🕰')); dauer = 4400; break;
-      case 'heulen': schicht.append(karte('🌕')); dauer = 4400; break;
-      case 'schrei': case 'lachen': wackeln(500); schicht.append(karte()); dauer = 4200; break;
-      default: schicht.append(karte());
+    const ort = opt.raum && opt.raum.isConnected ? opt.raum : buehne;
+    if ((art === 'anruf' || art === 'funkspruch') && !opt.stumm) { klingeln(buehne, art, anzeigen, opt); return fertig(); }
+    if (art === 'anruf' || art === 'funkspruch') {
+      // Bei einer Wendung erklärt die Karte alles – nur kurz klingeln lassen, ohne Abnehmen
+      k.spielen(art === 'funkspruch' ? 'funk' : 'telefon');
+      const kurz = el('div', { class: 'cl-ev-ding kurz ' + (art === 'funkspruch' ? 'funk' : 'telefon') }, el('div', { class: 'cl-ev-ding-bild' }, art === 'funkspruch' ? '📡' : '☎'), el('i', { class: 'cl-ring' }));
+      buehne.append(kurz);
+      setTimeout(() => { kurz.classList.add('weg'); setTimeout(() => kurz.remove(), 600); }, 3200);
+      return fertig();
     }
-    buehne.append(schicht);
-    const weg = () => { schicht.classList.add('weg'); setTimeout(() => { schicht.remove(); fertig(); }, 450); };
-    const t = setTimeout(weg, dauer);
-    schicht.addEventListener('click', () => { clearTimeout(t); weg(); });
+    const schicht = el('div', { class: 'cl-ev ev-' + art + (kinder ? ' kinder' : '') });
+    const dauer = DAUER[art] || 5000;
+    const wackeln = (ms) => { ort.classList.remove('cl-wackeln'); void ort.offsetWidth; ort.classList.add('cl-wackeln'); setTimeout(() => ort.classList.remove('cl-wackeln'), ms); };
+    const nochmal = (ton, alle, bis) => { const t = setInterval(() => { if (!schicht.isConnected) return clearInterval(t); k.spielen(ton); }, alle); setTimeout(() => clearInterval(t), bis); };
+    if (e.ton) k.spielen(kinder && art === 'explosion' ? 'konfetti' : e.ton === 'spieluhr' && !kinder && opt.stark ? 'spieluhrSchief' : e.ton);
+    switch (art) {
+      case 'regen': tropfen(schicht, 26, kinder); nochmal('regen', 3300, dauer - 3000); break;
+      case 'gewitter': tropfen(schicht, 18, false); setTimeout(() => blitz(schicht), 80); [4200, 9500].forEach((t) => setTimeout(() => { if (schicht.isConnected) { blitz(schicht); k.spielen('gewitter'); } }, t)); nochmal('regen', 3300, dauer - 3000); break;
+      case 'alarm': schicht.append(el('div', { class: 'cl-rundumlicht links' }), el('div', { class: 'cl-rundumlicht rechts' }), el('div', { class: 'cl-alarm-rot' })); nochmal(kinder ? 'plopp' : 'alarm', 2300, 9000); break;
+      case 'stromausfall': schicht.append(el('div', { class: 'cl-stromlos' })); ort.classList.add('ev-strom-aus'); setTimeout(() => ort.classList.remove('ev-strom-aus'), dauer - 800); break;
+      case 'beben': wackeln(2200); staub(schicht, 60); staub(schicht, 8, 'brocken'); break;
+      case 'explosion': if (kinder) { Clavis.konfetti(buehne); schicht.append(el('div', { class: 'cl-puff' })); } else { wackeln(1400); schicht.append(el('div', { class: 'cl-explosion-licht' }), el('div', { class: 'cl-rauch' }), el('div', { class: 'cl-rauch zwei' })); staub(schicht, 30, 'brocken'); } break;
+      case 'glas': for (let i = 0; i < 22; i++) schicht.append(el('div', { class: 'cl-scherbe', style: { left: `${zufall(30, 70)}%`, top: `${zufall(20, 45)}%`, '--dx': `${zufall(-35, 35)}vw`, '--dy': `${zufall(20, 60)}vh`, '--r': `${zufall(-400, 400)}deg`, animationDelay: `${zufall(0, 0.2).toFixed(2)}s` } })); break;
+      case 'kraehen': voegel(schicht, kinder ? 4 : 11, kinder); break;
+      case 'schritte': schicht.append(el('div', { class: 'cl-tuerschlitz' }, el('i', { class: 'fuss' }), el('i', { class: 'fuss zwei' }))); break;
+      case 'fluestern': schicht.append(el('div', { class: 'cl-kaltnebel' }), el('div', { class: 'cl-kaltnebel zwei' })); break;
+      case 'glitch': ort.classList.add('cl-glitch'); setTimeout(() => ort.classList.remove('cl-glitch'), 1600); schicht.append(el('div', { class: 'cl-glitch-streifen' })); break;
+      case 'fackel': schicht.append(el('div', { class: 'cl-aufflammen' })); ort.classList.add('ev-flammen'); setTimeout(() => ort.classList.remove('ev-flammen'), dauer); break;
+      case 'schrei': wackeln(500); schicht.append(el('div', { class: 'cl-schrei-rot' })); break;
+      case 'lachen': wackeln(300); schicht.append(el('div', { class: 'cl-echo' }, anzeigen)); break;
+      case 'heulen': schicht.append(el('div', { class: 'cl-vollmond' }, el('i'))); break;
+      case 'ketten': ketten(schicht); nochmal('ketten', 2400, 6000); break;
+      case 'uhrschlag': { const u = el('div', { class: 'cl-grosse-uhr' }); u.innerHTML = '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2"/>' + Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return `<line x1="${50 + Math.sin(a) * 38}" y1="${50 - Math.cos(a) * 38}" x2="${50 + Math.sin(a) * 44}" y2="${50 - Math.cos(a) * 44}" stroke="currentColor" stroke-width="2"/>`; }).join('') + '<line class="zeiger gross" x1="50" y1="50" x2="50" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line class="zeiger klein" x1="50" y1="50" x2="50" y2="26" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>'; schicht.append(u); break; }
+      case 'spieluhr': schwarm(schicht, '♪', 14, 'noten'); schwarm(schicht, '♫', 6, 'noten'); break;
+      case 'konfetti': case 'kichern': Clavis.konfetti(buehne); schwarm(schicht, '✨', 8, 'noten'); break;
+      case 'trommeln': for (let i = 0; i < 10; i++) setTimeout(() => { if (!schicht.isConnected) return; ort.classList.remove('ev-schlag'); void ort.offsetWidth; ort.classList.add('ev-schlag'); }, i * (340 - i * 20)); break;
+      case 'geheimtuer': wackeln(900); staub(schicht, 30); schicht.append(el('div', { class: 'cl-wand-schiebt' })); break;
+      case 'tuerknall': wackeln(700); schicht.append(el('div', { class: 'cl-luftzug' })); ort.classList.add('ev-flackern'); setTimeout(() => ort.classList.remove('ev-flackern'), 1800); break;
+      case 'brief': schicht.append(el('div', { class: 'cl-umschlag-rutscht' })); break;
+      default:
+    }
+    ort.append(schicht);
+    if (opt.sagen) { if (anzeigen) setTimeout(() => opt.sagen(anzeigen, 'ereignis'), art === 'stromausfall' ? 1400 : 500); }
+    else if (!opt.stumm && anzeigen) schicht.append(el('div', { class: 'cl-ev-text' }, anzeigen));
+    const weg = () => { schicht.classList.add('weg'); setTimeout(() => { schicht.remove(); fertig(); }, 1400); };
+    setTimeout(weg, dauer);
   });
 
   // ---------------------------------------------------------------- Jumpscares

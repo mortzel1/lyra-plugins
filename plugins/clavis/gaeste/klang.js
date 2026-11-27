@@ -199,6 +199,10 @@ Clavis.klang = (() => {
     fanfare: () => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => { ton(f, 0.35, { typ: 'sawtooth', laut: 0.03, ab: i * 0.14 }); ton(f, 0.4, { typ: 'triangle', laut: 0.06, ab: i * 0.14 }); }),
     zischen: () => rauschen(1.1, { laut: 0.1, filter: 'highpass', f: 4000 }),
     tropfen: () => ton(1400, 0.1, { laut: 0.06, gleit: 650, ziel: hall }),
+    klopf: () => { ton(150, 0.1, { laut: 0.34, gleit: 80, angriff: 0.002 }); rauschen(0.06, { laut: 0.16, filter: 'lowpass', f: 700, angriff: 0.002 }); },
+    zuenden: () => { rauschen(0.5, { laut: 0.12, f: 1400, q: 0.8, f2: 600, angriff: 0.01 }); ton(220, 0.3, { laut: 0.03, gleit: 330, ab: 0.05 }); },
+    strahl: () => { ton(880, 0.5, { typ: 'triangle', laut: 0.05, gleit: 1760 }); ton(1320, 0.6, { laut: 0.03, ab: 0.08, gleit: 2640 }); },
+    einrasten: () => { ton(320, 0.06, { typ: 'square', laut: 0.08, angriff: 0.002 }); ton(640, 0.12, { laut: 0.06, ab: 0.05 }); },
     tueroeffnen: () => { EFFEKTE.tuer(); rauschen(1.6, { laut: 0.06, f: 200, q: 0.6, ab: 0.4, f2: 900 }); },
   };
 

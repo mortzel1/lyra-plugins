@@ -82,8 +82,8 @@ const SCHEMA = {
   type: 'object', additionalProperties: false, required: ['finale_text', 'intro', 'loesungswort', 'outro', 'szenen', 'teaser', 'titel'],
   properties: {
     titel: { type: 'string' }, teaser: { type: 'array', items: { type: 'string' } }, intro: { type: 'string' }, outro: { type: 'string' }, finale_text: { type: 'string' }, loesungswort: { type: 'string' },
-    szenen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['stationen', 'text', 'titel'], properties: {
-      titel: { type: 'string' }, text: { type: 'string' },
+    szenen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['art', 'stationen', 'text', 'titel'], properties: {
+      titel: { type: 'string' }, text: { type: 'string' }, art: { type: 'string', enum: ['zimmer', 'keller', 'halle', 'gang', 'oben', 'technik'] },
       stationen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['ereignis', 'ereignis_text', 'hinweise', 'inhalt', 'mech', 'ort', 'symbol', 'text', 'titel', 'tuer'], properties: {
         ort: { type: 'string' }, symbol: { type: 'string', enum: Object.keys(Clavis.ICONS).filter((x) => x !== 'ausgang') }, titel: { type: 'string' }, text: { type: 'string' },
         mech: { type: 'string', enum: Object.keys(M) }, tuer: { type: 'boolean' },
@@ -94,8 +94,41 @@ const SCHEMA = {
   },
 };
 
+/** Zu viele Wissensaufgaben? Die überzähligen werden zu Rätseln zum Anfassen (Ort und Gegenstand bleiben).
+ *  neue: so viele der neuen Rätsel zum Anfassen sollen mindestens drin sein; versatz: damit jeder Raum andere bekommt. */
+const WISSEN_ZUERST = ['wissen', 'verhoer', 'luecke', 'terminal', 'kabel', 'binaer', 'tresor', 'uhr', 'zahlenschloss', 'wortschloss', 'reihenfolge'];
+const NEU_ZUM_ANFASSEN = ['raumcode', 'fehlteil', 'spiegel', 'timing', 'veraendert', 'klopfzeichen', 'waage'];
+function abwechslung(entwurf, anteil, { neue = 0, versatz = 0 } = {}) {
+  const alle = (entwurf.szenen || []).flatMap((sz) => sz.stationen || []);
+  const max = anteil >= 0.5 ? Math.ceil(alle.length * anteil) : Math.max(1, Math.floor(alle.length * anteil));
+  const rang = (s) => (WISSEN_ZUERST.includes(s.mech) ? WISSEN_ZUERST.indexOf(s.mech) : 50);
+  const wissen = alle.filter((s) => M[s.mech] && M[s.mech].art === 'wissen').sort((a, b) => rang(a) - rang(b));
+  const neuReihe = NEU_ZUM_ANFASSEN.slice(versatz % NEU_ZUM_ANFASSEN.length).concat(NEU_ZUM_ANFASSEN.slice(0, versatz % NEU_ZUM_ANFASSEN.length)).filter((x) => M[x]);
+  const vorrat = () => {
+    const benutzt = new Set(alle.map((s) => s.mech));
+    return neuReihe.filter((x) => !benutzt.has(x)).concat(Clavis.ZUM_ANFASSEN.filter((x) => M[x] && !benutzt.has(x)), neuReihe);
+  };
+  const tauschen = (s) => { const neu = vorrat()[0]; Object.assign(s, { mech: neu, inhalt: {}, hinweise: [], titel: M[neu].name, text: M[neu].kurz }); };
+  let n = 0;
+  for (const s of wissen.slice(0, Math.max(0, wissen.length - max))) { tauschen(s); n++; }
+  // Mindestens ein paar neue: erst weitere Wissensfragen, dann doppelte Mechaniken, dann Buchstabensalat und Zahlenschlösser
+  const zahlNeu = () => alle.filter((s) => NEU_ZUM_ANFASSEN.includes(s.mech)).length;
+  const kandidaten = () => {
+    const zaehler = {};
+    alle.forEach((s) => { zaehler[s.mech] = (zaehler[s.mech] || 0) + 1; });
+    return alle.filter((s) => !NEU_ZUM_ANFASSEN.includes(s.mech)).sort((a, b) => {
+      const wert = (x) => (M[x.mech] && M[x.mech].art === 'wissen' ? 0 : zaehler[x.mech] > 1 ? 1 : ['anagramm', 'zahlenschloss', 'binaer'].includes(x.mech) ? 2 : 3);
+      return wert(a) - wert(b);
+    });
+  };
+  while (zahlNeu() < neue) { const k = kandidaten()[0]; if (!k) break; tauschen(k); n++; }
+  return n;
+}
+// Auch die fertigen Räume: höchstens ein Drittel Wissen und je drei der neuen Rätsel zum Anfassen (jeder Raum andere)
+CLAVIS_VORLAGEN.forEach((v, i) => abwechslung(v, 1 / 3, { neue: 3, versatz: i * 3 }));
+
 function mechanikText() {
-  return Object.entries(M).map(([k, m]) => `- "${k}" (${m.name}${m.stoff ? ', kann Lernstoff tragen' : ''}): ${m.kurz} Inhalt: ${m.felder.length ? m.felder.map((f) => `"${f.k}" = ${f.titel}`).join('; ') : 'keiner – baut sich selbst'}${m.ohneInhalt ? ' (ohne Inhalt baut es sich selbst)' : ''}.`).join('\n');
+  return Object.entries(M).map(([k, m]) => `- "${k}" (${m.name}; Art: ${(Clavis.ARTEN || {})[m.art] || 'Sonstiges'}${m.stoff ? '; kann Lernstoff tragen' : ''}): ${m.kurz} Inhalt: ${m.felder.length ? m.felder.map((f) => `"${f.k}" = ${f.titel}`).join('; ') : 'keiner – baut sich selbst'}${m.ohneInhalt ? ' (ohne Inhalt baut es sich selbst)' : ''}.`).join('\n');
 }
 
 async function bauenMitKi() {
@@ -139,8 +172,11 @@ async function bauenMitKi() {
         `\nBaue einen Escape Room mit genau ${nSzenen} Szene${nSzenen > 1 ? 'n' : ''} und insgesamt genau ${n} Stationen (gleichmäßig verteilt).\n` +
         `Mechaniken (Feld "mech"):\n${mechanikText()}\n\n` +
         'Regeln:\n' +
-        (thema ? `- Mindestens ${Math.ceil(n * 0.6)} Stationen nutzen Mechaniken mit Lernstoff zum Thema – echte Fragen, Begriffe, Reihenfolgen, Zuordnungen aus dem Stoff.\n` : '') +
-        '- Abwechslung: keine Mechanik öfter als zweimal; passende Mechaniken zur Welt.\n' +
+        (thema ? `- Etwa die Hälfte, höchstens ${Math.ceil(n * 0.5)} Stationen, sind Aufgaben der Art „Wissen“ mit echtem Lernstoff zum Thema (Fragen, Begriffe, Reihenfolgen, Zuordnungen). Der Rest sind Rätsel zum Anfassen.\n`
+          : `- Höchstens ${Math.max(1, Math.floor(n * 0.25))} Station${Math.floor(n * 0.25) > 1 ? 'en' : ''} der Art „Wissen“ – ein Escape Room ist kein Quiz. Der Rest sind Rätsel zum Anfassen.\n`) +
+        `- Rätsel zum Anfassen: Erkunden (raumcode, fehlteil – man durchsucht den Raum), Geschick (timing, rohre, labyrinth), Logik (spiegel, waage, schalter, farbcode, akte), Beobachten (veraendert, suchbild, karte), Hören (klopfzeichen, melodie), Entschlüsseln (morse, runen, caesar, taschenlampe, geheimtinte, anagramm). Mische mindestens ${Math.min(5, n)} verschiedene Arten${n > 3 ? '; mindestens eine Station der Art „Erkunden“' : ''}.\n` +
+        '- Abwechslung: keine Mechanik öfter als einmal (bei mehr als 8 Stationen höchstens zweimal); passende Mechaniken zur Welt, und der Gegenstand („symbol“, „ort“) passt zur Mechanik (Waage, Spiegel, Tür zum Klopfen, Schloss …).\n' +
+        '- "art" je Szene: was für ein Ort es ist – zimmer, keller, halle, gang, oben (Dach, Turm, Deck) oder technik (Maschinen, Labor).\n' +
         (nSzenen > 1 ? '- In jeder Szene außer der letzten hat genau eine Station "tuer": true – sie öffnet den Weg in die nächste Szene. Sonst "tuer": false.\n' : '- Alle Stationen "tuer": false.\n') +
         `- "loesungswort": ein Wort, das zur Geschichte passt, nur Buchstaben A–Z (Umlaute als AE, OE, UE), Länge ${f} bis ${f + 3}.\n` +
         `- "ereignis": bei einigen Stationen (siehe Anzahl oben) eine Überraschung nach dem Lösen (${w.ereignisse.join(', ')} passen gut) mit kurzem "ereignis_text"; sonst "keins".\n` +
@@ -152,7 +188,7 @@ async function bauenMitKi() {
         '- "teaser": 3–5 sehr kurze, packende Sätze (je höchstens 8 Wörter) für ein Kino-Intro, das neugierig macht – wie ein Filmtrailer, ohne etwas zu verraten. Der letzte Satz macht Lust aufs Losspielen.\n' +
         '- Ein guter Titel mit Atmosphäre.\n\n' +
         'Antwort als JSON genau in diesem Aufbau (Feldnamen exakt so, je Station alle Felder von "inhalt"):\n' +
-        '{"titel": "…", "teaser": ["…"], "intro": "…", "outro": "…", "finale_text": "…", "loesungswort": "…", "szenen": [{"titel": "…", "text": "…", "stationen": [' +
+        '{"titel": "…", "teaser": ["…"], "intro": "…", "outro": "…", "finale_text": "…", "loesungswort": "…", "szenen": [{"titel": "…", "text": "…", "art": "zimmer", "stationen": [' +
         '{"ort": "…", "symbol": "truhe", "titel": "…", "text": "…", "mech": "wortschloss", "tuer": false, "ereignis": "keins", "ereignis_text": "", "hinweise": ["…"], ' +
         '"inhalt": {"wort": "…", "raetsel": "…", "zahl": "", "frage": "", "antwort": "", "optionen": [], "richtig": 0, "paare": [], "reihe": [], "zeit": "", "satz": "", "hinweis": "", "fragen": []}}]}]}',
       schema: SCHEMA,
@@ -170,11 +206,12 @@ async function bauenMitKi() {
     id: lyra.neueId(), welt, titel: text(j.titel) || (thema ? `Escape: ${thema}` : `Escape aus der ${w.name}`), stufe, thema,
     intro: text(j.intro), outro: text(j.outro), finaleText: text(j.finale_text), loesungswort: text(j.loesungswort), ki: true, erstellt: lyra.jetzt(), stimmung, alter,
     jumpscares: alter !== 'kinder' && !!z.einst.jumpscares, teaser: (j.teaser || []).map(text).filter(Boolean).slice(0, 5),
-    szenen: (j.szenen || j.raeume || j.scenes || []).map((s) => ({ titel: text(s.titel || s.title), text: text(s.text), stationen: (s.stationen || s.raetsel || s.stations || []).map((x) => ({
+    szenen: (j.szenen || j.raeume || j.scenes || []).map((s) => ({ titel: text(s.titel || s.title), text: text(s.text), art: text(s.art || s.typ || ''), stationen: (s.stationen || s.raetsel || s.stations || []).map((x) => ({
       ort: text(x.ort), symbol: x.symbol, titel: text(x.titel), text: text(x.text), mech: x.mech, tuer: !!x.tuer, hinweise: (x.hinweise || []).map(text).filter(Boolean).slice(0, 2),
       ereignis: x.ereignis && x.ereignis !== 'keins' ? { art: x.ereignis, text: text(x.ereignis_text) } : null, inhalt: x.inhalt || {},
     })) })).filter((s) => s.stationen.length),
   };
+  abwechslung(entwurf, thema ? 0.5 : 0.25, { neue: n >= 4 ? 1 : 0, versatz: Math.floor(Math.random() * 7) });
   let probe = null;
   try { probe = ClavisLeiter.bauen(entwurf, stufe, 1); } catch (e) { probe = null; }
   if (!probe || !entwurf.intro) {

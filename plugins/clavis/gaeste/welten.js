@@ -307,3 +307,67 @@ Clavis.WENDUNGEN = {
     normal: ['Die Uhr springt vor! Jemand hat dir Zeit gestohlen.'],
     dunkel: ['Die Zeiger rasen. Als sie stehen bleiben, fehlt dir eine Minute deines Lebens.'] } },
 };
+
+// ================================================================== Inszenierung im Raum
+/** Wo ein Gegenstand im Raum steht: an der Wand, auf einem Tisch oder auf dem Boden */
+Clavis.PLATZ = {
+  wand: ['bild', 'portraet', 'wandbild', 'spiegel', 'tafel', 'karte', 'monitor', 'schaltkasten', 'luke', 'steuerrad', 'stern', 'hufeisen', 'telefon'],
+  tisch: ['schreibmaschine', 'mikroskop', 'reagenz', 'kerze', 'globus', 'buch', 'kompass', 'flasche', 'laterne', 'lampe', 'radio', 'computer', 'spieluhr', 'muschel',
+    'taucherhelm', 'wuerfel', 'vase', 'schluessel', 'spritze', 'akte', 'funk', 'zylinder', 'beamer'],
+};
+Clavis.platzVon = (icon) => (Clavis.PLATZ.wand.includes(icon) ? 'wand' : Clavis.PLATZ.tisch.includes(icon) ? 'tisch' : 'boden');
+
+/** Material der Nahansicht – so sieht das Rätsel aus der Nähe aus */
+Clavis.MATERIAL = {
+  metall: ['tresor', 'schaltkasten', 'steuerpult', 'luke', 'reaktor', 'kuehlschrank', 'funk', 'radio', 'kanone', 'roboter', 'raumanzug', 'taucherhelm', 'rollstuhl', 'anker', 'zug'],
+  papier: ['akte', 'buch', 'karte', 'schreibmaschine', 'lesepult', 'regal', 'bild', 'portraet'],
+  stein: ['statue', 'sarkophag', 'wandbild', 'altar', 'vase', 'totem', 'kamin'],
+  bildschirm: ['computer', 'monitor', 'beamer', 'tafel', 'telefon'],
+  glas: ['reagenz', 'flasche', 'spiegel', 'laterne', 'lampe', 'kerze', 'globus', 'kompass', 'ballon', 'muschel', 'mikroskop', 'spritze'],
+};
+Clavis.materialVon = (icon) => Object.keys(Clavis.MATERIAL).find((m) => Clavis.MATERIAL[m].includes(icon)) || 'holz';
+
+/** Dinge im Raum, die keine Rätsel sind – aber etwas erzählen */
+Clavis.DEKO = {
+  krimi: [['lampe', 'Die Schreibtischlampe flackert. Wer hier saß, hat lange gearbeitet.'], ['schrank', 'Ein Mantel mit nassen Schultern. Sein Besitzer kann nicht weit sein.'], ['flasche', 'Ein halb leerer Whisky. Zwei Gläser – eins mit Lippenstift.']],
+  labor: [['reagenz', 'Eine Probe blubbert vor sich hin. Das Etikett: „NICHT ÖFFNEN“.'], ['kuehlschrank', 'Im Kühlschrank: Proben, ein Joghurt und eine Notiz „Meins! – L.“'], ['computer', 'Auf dem Bildschirm läuft ein Countdown, der bei 00:00 stehen geblieben ist.']],
+  grab: [['vase', 'Die Krüge sind leer. Nur Sand rieselt heraus.'], ['fackel', 'Die Fackel brennt – seit Jahrtausenden? Unmöglich.'], ['statue', 'Ein Wächter aus Stein. Er scheint dich anzusehen.']],
+  station: [['raumanzug', 'Ein Raumanzug, ordentlich aufgehängt. Das Namensschild ist abgerissen.'], ['monitor', 'Die Sauerstoffanzeige: GELB. Noch.'], ['funk', 'Nur Rauschen auf allen Kanälen.']],
+  spuk: [['portraet', 'Ein Porträt des alten Lords. Hat er gerade gezwinkert?'], ['kerze', 'Die Kerze brennt, obwohl hier niemand ist.'], ['klavier', 'Eine Taste ist eingedrückt, als hätte jemand eben gespielt.']],
+  bibliothek: [['regal', 'Tausende Bücher. Eines steht verkehrt herum.'], ['globus', 'Auf dem Globus ist eine Stadt mit Tinte eingekreist.'], ['kerze', 'Wachs ist auf den Lesetisch getropft – noch warm.']],
+  pirat: [['fass', 'Ein Fass Rum. Leer, natürlich.'], ['anker', 'Ein schwerer Anker. Daran hängt Seetang – frisch.'], ['laterne', 'Die Laterne schaukelt, obwohl das Schiff stillsteht.']],
+  akademie: [['beamer', 'Der Beamer zeigt noch die letzte Folie: „Fragen?“'], ['pult', 'Auf dem Pult: kalter Kaffee und ein vergessener Schal.'], ['buch', 'Ein Lehrbuch voller Notizen am Rand. Jemand hat hier viel gelernt.']],
+  zirkus: [['ballon', 'Ein Luftballon schwebt an die Decke und winkt dir zu.'], ['zylinder', 'Aus dem Zylinder lugt ein Kaninchenohr – und verschwindet.'], ['kanone', 'Die Kanone ist mit Konfetti geladen. Bitte nicht anfassen!']],
+  dschungel: [['pflanze', 'Eine riesige Blüte öffnet sich, als du näherkommst.'], ['totem', 'Die Gesichter am Totem sind alle unterschiedlich. Eins lächelt.'], ['vase', 'Im Krug wohnt ein Frosch. Er quakt empört.']],
+  unterwasser: [['muschel', 'Eine Muschel, so groß wie ein Teller. Sie ist geschlossen.'], ['taucherhelm', 'Ein Taucherhelm. Das Glas ist von innen beschlagen.'], ['monitor', 'Draußen gleitet ein Schatten am Bullauge vorbei. Ein großer.']],
+  spielzeug: [['teddy', 'Ein Teddy mit einem Knopfauge. Er sieht freundlich aus. Meistens.'], ['zug', 'Die Spielzeugeisenbahn fährt eine Runde – ganz von allein.'], ['wuerfel', 'Ein Würfel, der immer eine Sechs zeigt.']],
+  western: [['fass', 'Ein Fass voller Nägel. Und Patronenhülsen.'], ['kaktus', 'Ein Kaktus. Er war schon hier, bevor die Stadt gebaut wurde.'], ['laterne', 'Die Laterne quietscht im Wind.']],
+  sanatorium: [['bett', 'Ein Bett mit Lederriemen. Die Matratze ist noch warm.'], ['rollstuhl', 'Der Rollstuhl rollt ein Stück – von selbst.'], ['spritze', 'Eine Spritze. Leer. Was war darin?']],
+};
+
+/** Was der Erzähler sagt, wenn ein Rätsel gelöst ist */
+Clavis.ERFOLG = {
+  zahlenschloss: 'Klick – das Zahlenschloss springt auf.', wortschloss: 'Die letzte Rolle rastet ein – das Schloss gibt nach.', caesar: 'Die Botschaft ergibt endlich Sinn.',
+  morse: 'Der Funkspruch ist entschlüsselt.', runen: 'Die Zeichen geben ihr Geheimnis preis.', schalter: 'Alle Lichter brennen – irgendwo klackt ein Riegel.',
+  kabel: 'Funken sprühen – der Strom fließt!', schiebepuzzle: 'Das letzte Teil rastet ein.', reihenfolge: 'Alles in der richtigen Ordnung – ein Fach gleitet auf.',
+  suchbild: 'Alle Spuren gefunden!', taschenlampe: 'Im Lichtkegel liest du das Wort – geschafft.', geheimtinte: 'Unter dem UV-Licht leuchtet die Botschaft auf.',
+  terminal: 'ZUGANG GEWÄHRT. Irgendwo surrt ein Laufwerk.', akte: 'Der Fall ist klar.', verhoer: 'Ein widerwilliges Nicken – du bekommst, was bewacht wurde.',
+  tresor: 'Das Drehrad rastet ein, die Tür schwingt schwer auf.', melodie: 'Die Melodie verklingt – und ein Mechanismus springt an.', uhr: 'Die Uhr schlägt. Im Gehäuse öffnet sich ein Fach.',
+  anagramm: 'Die Buchstaben fügen sich zusammen.', karte: 'Genau hier! Du gräbst – und stößt auf etwas.', binaer: 'Die Lampen leuchten im richtigen Muster.',
+  wissen: 'Richtig! Irgendwo öffnet sich etwas.', luecke: 'Der Satz ist vollständig – ein Schloss klickt.', labyrinth: 'Raus aus dem Irrgarten!',
+  memory: 'Alle Paare gefunden!', rohre: 'Es rauscht – der Fluss erreicht sein Ziel!', farbcode: 'Die Kristalle leuchten auf, einer nach dem anderen.',
+};
+
+/** Was bei einer Wendung zu tun ist – klar und einfach. {ort}, {n}, {b} werden ersetzt */
+Clavis.AUFGABE = {
+  tipp: { titel: 'Ein Hinweis!', tun: 'Sieh dir „{ort}“ an – dort wartet ein neuer Hinweis. Er kostet dich nichts.' },
+  buchstabe: { titel: 'Ein Buchstabe!', tun: 'Der {n}. Buchstabe ist „{b}“ – er steht jetzt unten in deinem Lösungswort.' },
+  zeitplus: { titel: 'Mehr Zeit!', tun: 'Du hast zwei Minuten mehr Zeit. Nichts weiter zu tun.' },
+  geheimfach: { titel: 'Ein Geheimfach!', tun: 'Neu im Raum: „{ort}“ (es leuchtet). Löse es für einen Bonus – einen Buchstaben oder Zeit.' },
+  dunkel: { titel: 'Stromausfall!', tun: 'Beweg die Maus – oder den Finger – über den Raum: Deine Taschenlampe zeigt, wohin du leuchtest. In 60 Sekunden geht das Licht wieder an. Rätsel öffnen geht weiterhin.' },
+  nebel: { titel: 'Nebel!', tun: 'Du siehst kaum etwas – aber du kannst weiter Rätsel öffnen. In 45 Sekunden verzieht sich der Nebel.' },
+  countdown: { titel: 'Countdown!', tun: 'Löse IRGENDEIN Rätsel, bevor die Zeit oben abläuft (90 Sekunden). Schaffst du es nicht, verlierst du 2 Minuten.',
+    kinder: 'Löse schnell IRGENDEIN Rätsel, bevor die Rakete startet (90 Sekunden) – dann fliegt sie weg. Sonst stibitzt sie dir 2 Minuten.' },
+  blockiert: { titel: 'Verriegelt!', tun: '„{ort}“ ist für 60 Sekunden verriegelt (Ketten). Kümmere dich solange um etwas anderes.' },
+  zeitminus: { titel: 'Zeit gestohlen!', tun: 'Dir fehlt jetzt eine Minute. Beeil dich!' },
+};

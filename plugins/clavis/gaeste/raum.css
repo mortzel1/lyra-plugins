@@ -1,0 +1,768 @@
+/* Clavis – der begehbare Raum: Panorama mit Tiefe, gebaute Welten, Licht, Verfall, Ereignisse im Raum, Nahansicht im Material,
+   Erzähler, Aufträge, Kino-Intro mit Bildern und die Rätsel zum Anfassen. Ergänzt welten.css. */
+
+/* ================================================================ Grundgerüst */
+.cl-spiel { --horizont: 62%; --horizont-unten: 38%; }
+.cl-raum { position: relative; flex: 1; min-height: 380px; overflow: hidden; background: #000; touch-action: pan-y; user-select: none; -webkit-user-select: none; --hell: 0.5; --bx: 0; }
+.cl-kamera { position: absolute; inset: 0; transition: transform 0.65s cubic-bezier(0.3, 0.7, 0.2, 1), filter 0.6s; will-change: transform; }
+.cl-kamera.zoom { transform: scale(2.3); filter: blur(4px) brightness(0.45); }
+.cl-kamera.zoom.sofort { transition: none; }
+.cl-kamera.gehen { transform: scale(1.6); filter: blur(10px) brightness(0); transition: transform 0.65s cubic-bezier(0.6, 0, 0.8, 0.4), filter 0.6s; }
+.cl-panorama { position: absolute; top: 0; bottom: 0; left: 0; will-change: transform; animation: cl-raum-ein 0.9s ease-out both; }
+@keyframes cl-raum-ein { from { filter: brightness(0) blur(6px); } }
+.cl-wand { position: absolute; inset: 0; will-change: transform; }
+.cl-wand-bau { position: absolute; inset: 0; }
+.cl-wand-muster { position: absolute; inset: 0 0 var(--horizont-unten) 0; }
+.cl-wand-bau::after { content: ''; position: absolute; inset: 0 0 var(--horizont-unten) 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 22%, transparent 70%, rgba(0, 0, 0, 0.45)), radial-gradient(ellipse 70% 90% at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.5)); }
+.cl-wand-licht { position: absolute; inset: 0; pointer-events: none; background: #000; opacity: calc((1 - var(--hell)) * 0.75); transition: opacity 1.4s; z-index: 1; }
+.cl-module { position: absolute; inset: 0; }
+.cl-modul { position: absolute; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.55)); }
+.cl-modul.haengt { transform: translateX(-50%) rotate(var(--neig)); transform-origin: 50% 0; transition: transform 1s; }
+.cl-modul-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.cl-ort-schicht { position: absolute; inset: 0 0 var(--horizont-unten) 0; pointer-events: none; }
+.cl-raum[data-ort="keller"] .cl-wand-bau { filter: brightness(0.72) saturate(0.85); }
+.cl-raum[data-ort="keller"] .cl-ort-schicht { background: repeating-linear-gradient(90deg, transparent 0 22%, rgba(0, 0, 0, 0.35) 22% 23%), radial-gradient(ellipse 60% 30% at 50% 0, rgba(0, 0, 0, 0.6), transparent); }
+.cl-raum[data-ort="halle"] .cl-wand-bau { filter: brightness(1.08); }
+.cl-raum[data-ort="halle"] .cl-ort-schicht { background: radial-gradient(ellipse 50% 40% at 50% 10%, rgba(255, 230, 180, 0.12), transparent 70%); }
+.cl-raum[data-ort="gang"] .cl-ort-schicht { background: linear-gradient(90deg, rgba(0, 0, 0, 0.45), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.45)); }
+.cl-raum[data-ort="oben"] .cl-ort-schicht { background: linear-gradient(180deg, rgba(150, 180, 255, 0.1), transparent 60%); }
+.cl-raum[data-ort="technik"] .cl-wand-bau { filter: hue-rotate(-8deg) saturate(1.1); }
+
+/* Seitenwände (Raumecke) */
+.cl-seitenwand { position: absolute; top: 0; bottom: 0; width: 6%; overflow: hidden; z-index: 2; filter: brightness(0.5); pointer-events: none; }
+.cl-seitenwand .cl-wand-muster { inset: 0; }
+.cl-seitenwand.links { left: 0; clip-path: polygon(0 0, 100% 10%, 100% var(--horizont), 0 100%); }
+.cl-seitenwand.rechts { right: 0; clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 var(--horizont)); }
+
+/* Decke */
+.cl-decke { position: absolute; left: 0; right: 0; top: 0; height: 13%; z-index: 1; pointer-events: none; }
+.cl-decke.d-balken { background: repeating-linear-gradient(90deg, transparent 0 220px, #22150b 220px 260px), linear-gradient(#1a0f07, #2a1a0c 80%, #120a04); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6); }
+.cl-decke.d-stein { background: repeating-linear-gradient(90deg, #3a2a18 0 160px, #2a1c10 160px 164px), linear-gradient(#1a1208, #3a2a18); }
+.cl-decke.d-stein::after { content: ''; position: absolute; left: 6%; top: 100%; width: 90px; height: 70px; background: radial-gradient(circle at 0 0, transparent 30%, rgba(230, 230, 230, 0.16) 31% 32%, transparent 33%), radial-gradient(circle at 0 0, transparent 55%, rgba(230, 230, 230, 0.12) 56% 57%, transparent 58%), linear-gradient(45deg, transparent 49%, rgba(230, 230, 230, 0.14) 50%, transparent 51%); }
+.cl-decke.d-gewoelbe { height: 16%; background: radial-gradient(ellipse 18% 100% at 25% 0, transparent 60%, rgba(0, 0, 0, 0.5) 62%, transparent 75%), radial-gradient(ellipse 18% 100% at 75% 0, transparent 60%, rgba(0, 0, 0, 0.5) 62%, transparent 75%), linear-gradient(#0c0912, transparent); }
+.cl-decke.d-roehren { background: linear-gradient(#20262a, #11161a); }
+.cl-decke.d-roehren::before { content: ''; position: absolute; left: 0; right: 0; top: 60%; height: 7px; background: repeating-linear-gradient(90deg, transparent 0 8%, #e8f6ff 8% 22%, transparent 22% 33%); box-shadow: 0 0 22px 6px rgba(220, 245, 255, calc(var(--hell) * 0.35)); animation: cl-roehre 7s steps(1) infinite; }
+@keyframes cl-roehre { 0%, 100% { opacity: 1; } 41% { opacity: 0.3; } 42% { opacity: 1; } 43% { opacity: 0.5; } 44% { opacity: 1; } }
+.cl-decke.d-leitungen { background: linear-gradient(180deg, #111622 0 40%, transparent 40%), repeating-linear-gradient(180deg, transparent 0 14px, #2c3440 14px 22px); }
+.cl-decke.d-leitungen::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: repeating-linear-gradient(90deg, #ff9f1c 0 30px, #1a1a1a 30px 60px); opacity: 0.6; }
+.cl-decke.d-zelt { height: 20%; background: repeating-conic-gradient(from 180deg at 50% -40%, #b8213a 0 3deg, #f4efe6 3deg 6deg); mask-image: linear-gradient(#000 40%, transparent); -webkit-mask-image: linear-gradient(#000 40%, transparent); }
+.cl-decke.d-lianen, .cl-decke.d-girlande { height: 18%; }
+.cl-decke.d-girlande { background: linear-gradient(#2a3175, transparent); }
+.cl-decke.d-ventilator { background: linear-gradient(#0a0806, transparent); }
+.cl-girlande, .cl-lianen { position: absolute; inset: 0; }
+.cl-girlande svg, .cl-lianen svg { width: 100%; height: 100%; }
+.cl-birnchen { fill: #555; transition: fill 0.6s; }
+.cl-raum .cl-birnchen { fill: #ffe7a0; opacity: calc(0.3 + var(--hell) * 0.7); animation: cl-a-blinken 2.6s ease-in-out infinite; }
+.cl-kronleuchter { position: absolute; left: 50%; top: 0; width: 170px; height: 125px; transform: translateX(-50%); transform-origin: 50% 0; animation: cl-a-schwingen-k 7s ease-in-out infinite; filter: drop-shadow(0 0 18px rgba(255, 190, 100, calc(var(--hell) * 0.6))); }
+.cl-ventilator { position: absolute; left: 50%; top: 0; width: 180px; transform: translateX(-50%); }
+@keyframes cl-a-schwingen-k { 50% { transform: translateX(-50%) rotate(1.5deg); } 0%, 100% { transform: translateX(-50%) rotate(-1.5deg); } }
+
+/* Boden mit Perspektive */
+.cl-boden-bau { position: absolute; left: 0; right: 0; top: var(--horizont); bottom: 0; overflow: hidden; perspective: 420px; perspective-origin: 50% -60%; z-index: 1; }
+.cl-boden-flaeche { position: absolute; left: -40%; right: -40%; top: 0; height: 320%; transform-origin: 50% 0; transform: rotateX(66deg); }
+.cl-boden-glanz { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.15) 45%, rgba(0, 0, 0, 0.35)); }
+.cl-boden-bau::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: rgba(0, 0, 0, 0.6); z-index: 2; box-shadow: 0 0 18px 6px rgba(0, 0, 0, 0.6); }
+.b-dielen .cl-boden-flaeche { background: repeating-linear-gradient(90deg, #3a2414 0 70px, #2a190d 70px 73px), #3a2414; }
+.b-dielen-alt .cl-boden-flaeche { background: linear-gradient(90deg, transparent 38%, #4a1426 38% 62%, transparent 62%), repeating-linear-gradient(90deg, #2a1d1a 0 70px, #1a120f 70px 73px); }
+.b-dielen-hell .cl-boden-flaeche { background: repeating-linear-gradient(90deg, #8a5a32 0 64px, #6a4224 64px 67px); }
+.b-parkett .cl-boden-flaeche { background: linear-gradient(90deg, transparent 30%, #5a1a1a 30% 70%, transparent 70%), repeating-linear-gradient(45deg, #5a3a22 0 30px, #4a2e1a 30px 32px), #5a3a22; }
+.b-planken .cl-boden-flaeche { background: radial-gradient(circle 2px at 50% 10px, #111 99%, transparent), repeating-linear-gradient(90deg, #4a2e18 0 90px, #2a1a0c 90px 94px); background-size: 94px 120px, auto; }
+.b-fliesen .cl-boden-flaeche { background: linear-gradient(#c9d6d6 2px, transparent 2px) 0 0 / 70px 70px, linear-gradient(90deg, #c9d6d6 2px, transparent 2px) 0 0 / 70px 70px, #e8eeee; }
+.b-fliesen-alt .cl-boden-flaeche { background: repeating-conic-gradient(#8a9a8c 0 25%, #c9d2c8 0 50%) 0 0 / 140px 140px; filter: sepia(0.3) brightness(0.8); }
+.b-sandstein .cl-boden-flaeche { background: linear-gradient(#8a6a3a 3px, transparent 3px) 0 0 / 160px 110px, linear-gradient(90deg, #8a6a3a 3px, transparent 3px) 0 0 / 160px 110px, #b8945a; }
+.b-gitter .cl-boden-flaeche { background: repeating-linear-gradient(45deg, #3a4452 0 3px, transparent 3px 16px), repeating-linear-gradient(-45deg, #3a4452 0 3px, transparent 3px 16px), #151a24; }
+.b-linoleum .cl-boden-flaeche { background: radial-gradient(#9aa8b0 1px, transparent 1.5px) 0 0 / 22px 22px, #6a7a84; }
+.b-manege .cl-boden-flaeche { background: radial-gradient(ellipse 34% 14% at 50% 18%, #c9a26a 70%, #d6455b 71% 76%, #f4efe6 77% 80%, #d6455b 81% 84%, transparent 85%), #8a6a42; }
+.b-moos .cl-boden-flaeche { background: radial-gradient(circle at 20% 30%, #3a5a2a 0 8%, transparent 9%) 0 0 / 120px 120px, radial-gradient(circle at 70% 60%, #2a4a1f 0 10%, transparent 11%) 0 0 / 160px 160px, #3a3020; }
+.b-karo .cl-boden-flaeche { background: repeating-conic-gradient(#ffcf8a 0 25%, #ff9fae 0 50%) 0 0 / 120px 120px; }
+
+/* Wände der Welten */
+.w-tapete-streifen .cl-wand-muster { background: linear-gradient(180deg, transparent 68%, #2a1c10 68% 69%, #3a2618 69%), repeating-linear-gradient(90deg, #3d3a2a 0 26px, #35321f 26px 52px); }
+.w-kacheln-gruen .cl-wand-muster { background: linear-gradient(#0a2024 2px, transparent 2px) 0 0 / 40px 30px, linear-gradient(90deg, #0a2024 2px, transparent 2px) 0 0 / 40px 30px, linear-gradient(180deg, #123a3a, #0c2a2c); }
+.w-quader .cl-wand-muster { background: linear-gradient(#6a4a26 3px, transparent 3px) 0 0 / 150px 70px, linear-gradient(90deg, #6a4a26 3px, transparent 3px) 0 0 / 150px 140px, linear-gradient(90deg, #6a4a26 3px, transparent 3px) 75px 70px / 150px 140px, linear-gradient(180deg, #a07a46, #7a5a30); }
+.w-paneele .cl-wand-muster { background: radial-gradient(circle 2.5px at 10px 10px, #8a98a8 99%, transparent) 0 0 / 120px 90px, linear-gradient(#0a0e18 2px, transparent 2px) 0 0 / 120px 90px, linear-gradient(90deg, #0a0e18 3px, transparent 3px) 0 0 / 120px 90px, linear-gradient(180deg, #2a3348, #1a2032); }
+.w-tapete-damast .cl-wand-muster { background: linear-gradient(180deg, transparent 66%, #1a1022 66% 67%, #2a1a26 67%), radial-gradient(ellipse 10px 16px at 50% 50%, rgba(160, 120, 200, 0.16) 99%, transparent) 0 0 / 50px 60px, radial-gradient(circle 4px at 0 0, rgba(160, 120, 200, 0.14) 99%, transparent) 0 0 / 50px 60px, linear-gradient(180deg, #2a1f3a, #1c1428); }
+.w-holztaefel .cl-wand-muster { background: linear-gradient(180deg, transparent 60%, #2a1a0c 60% 61%, transparent 61%), repeating-linear-gradient(90deg, #4a2e18 0 120px, #3a2412 120px 124px), linear-gradient(180deg, #5a3a22, #3a2414); }
+.w-schiffsplanken .cl-wand-muster { background: repeating-linear-gradient(180deg, #3a2414 0 36px, #24160a 36px 39px), linear-gradient(90deg, rgba(0, 0, 0, 0.3), transparent 20%, transparent 80%, rgba(0, 0, 0, 0.3)); }
+.w-putz .cl-wand-muster { background: linear-gradient(180deg, transparent 64%, #31504c 64%), radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 1.5px) 0 0 / 7px 7px, linear-gradient(180deg, #8a968e, #6a766e); }
+.w-zeltbahnen .cl-wand-muster { background: repeating-linear-gradient(90deg, #a81e34 0 70px, #efe4d2 70px 140px); box-shadow: inset 0 40px 80px rgba(0, 0, 0, 0.5); }
+.w-tempelstein .cl-wand-muster { background: radial-gradient(ellipse 30px 12px at 30% 0, #3f7a3a 99%, transparent) 0 0 / 140px 70px, linear-gradient(#3a3a2a 3px, transparent 3px) 0 0 / 140px 70px, linear-gradient(90deg, #3a3a2a 3px, transparent 3px) 0 0 / 140px 70px, linear-gradient(180deg, #6b6a55, #4a4a3a); }
+.w-stahl .cl-wand-muster { background: radial-gradient(circle 3px at 12px 12px, #9aa8b8 99%, transparent) 0 0 / 160px 110px, linear-gradient(#0a121c 3px, transparent 3px) 0 0 / 160px 110px, linear-gradient(90deg, #0a121c 3px, transparent 3px) 0 0 / 160px 110px, linear-gradient(180deg, #2c4458, #1a2a38); }
+.w-tapete-sterne .cl-wand-muster { background: linear-gradient(180deg, transparent 66%, #ffb4c8 66% 68%, #8ad4ff 68%), radial-gradient(circle 3px, #ffd166 99%, transparent) 0 0 / 46px 46px, radial-gradient(circle 2px, #fff 99%, transparent) 23px 23px / 46px 46px, linear-gradient(180deg, #6a7ae8, #4a5ac8); }
+.w-bretter .cl-wand-muster { background: repeating-linear-gradient(90deg, #8a5a32 0 46px, #6a4222 46px 49px), linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3)); }
+.w-kacheln-alt .cl-wand-muster { background: linear-gradient(180deg, transparent 55%, #5a6a5c 55% 56%, transparent 56%), linear-gradient(transparent 56%, #8a9a8c 56%) 0 0 / 100% 100%, linear-gradient(#5a6a5c 2px, transparent 2px) 0 0 / 34px 30px, linear-gradient(90deg, #5a6a5c 2px, transparent 2px) 0 0 / 34px 30px, linear-gradient(180deg, #8a9284, #a8b0a2); }
+.w-kacheln-alt .cl-wand-muster::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 6% 20% at 30% 40%, rgba(80, 70, 30, 0.35), transparent), radial-gradient(ellipse 4% 26% at 72% 30%, rgba(60, 50, 20, 0.3), transparent); }
+
+/* Lichter: eins je Rätsel – gehen beim Lösen an */
+.cl-lichter { position: absolute; left: 0; right: 0; top: 0; height: 30%; z-index: 2; pointer-events: none; }
+.cl-licht-punkt { position: absolute; top: 15%; width: 30px; transform: translateX(-50%); }
+.cl-licht-punkt svg { width: 100%; display: block; overflow: visible; }
+.cl-lichter.birne .cl-licht-punkt, .cl-lichter.laterne .cl-licht-punkt, .cl-lichter.lampion .cl-licht-punkt, .cl-lichter.scheinwerfer .cl-licht-punkt { top: 0; }
+.cl-lichter.neon .cl-licht-punkt, .cl-lichter.roehre .cl-licht-punkt { top: 8%; width: 70px; }
+.cl-lichter.kerze .cl-licht-punkt { top: 30%; width: 34px; }
+.cl-lichter.status .cl-licht-punkt { top: 26%; width: 26px; }
+.cl-lichter.scheinwerfer .cl-licht-punkt { width: 40px; }
+.cl-flamme { opacity: 0.18; transition: opacity 0.8s; transform-box: fill-box; transform-origin: 50% 100%; }
+.cl-licht-punkt.an .cl-flamme { opacity: 1; animation: cl-flamme 0.9s ease-in-out infinite alternate; }
+.cl-lichter.birne .cl-licht-punkt.an .cl-flamme, .cl-lichter.neon .cl-licht-punkt.an .cl-flamme, .cl-lichter.roehre .cl-licht-punkt.an .cl-flamme, .cl-lichter.scheinwerfer .cl-licht-punkt.an .cl-flamme { animation: none; }
+@keyframes cl-flamme { from { transform: scale(1, 1); } to { transform: scale(0.92, 1.1); } }
+.cl-led { fill: #ff3d5a; animation: cl-a-blinken 1.2s steps(2) infinite; }
+.cl-licht-punkt.an .cl-led { fill: #5fd39a; animation: none; }
+.cl-licht-schein { position: absolute; left: 50%; top: 40%; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 1.2s;
+  background: radial-gradient(circle, rgba(255, 196, 110, 0.34), rgba(255, 170, 80, 0.1) 40%, transparent 70%); mix-blend-mode: screen; }
+.cl-lichter.neon .cl-licht-schein, .cl-lichter.status .cl-licht-schein { background: radial-gradient(circle, rgba(120, 255, 220, 0.28), transparent 65%); }
+.cl-lichter.roehre .cl-licht-schein { background: radial-gradient(circle, rgba(230, 245, 255, 0.3), transparent 65%); }
+.cl-lichter.lampion .cl-licht-schein { background: radial-gradient(circle, rgba(255, 170, 90, 0.36), transparent 65%); }
+.cl-licht-punkt.an .cl-licht-schein { opacity: 1; animation: cl-schein 3.2s ease-in-out infinite; }
+@keyframes cl-schein { 50% { opacity: 0.8; transform: scale(0.96); } }
+.cl-licht-kegel { position: absolute; left: 50%; top: 80%; width: 260px; height: 520px; margin-left: -130px; pointer-events: none; opacity: 0; transition: opacity 1s;
+  background: linear-gradient(180deg, rgba(255, 246, 214, 0.32), rgba(255, 246, 214, 0.02)); clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); transform-origin: 50% 0; mix-blend-mode: screen; }
+.cl-licht-punkt.an .cl-licht-kegel { opacity: 1; animation: cl-kegel 9s ease-in-out infinite; }
+.cl-licht-punkt:nth-child(2n) .cl-licht-kegel { animation-delay: -4s; }
+@keyframes cl-kegel { 50% { transform: rotate(9deg); } 0%, 100% { transform: rotate(-9deg); } }
+.cl-licht-punkt.zuendet { animation: cl-zuenden 1.2s ease-out; }
+@keyframes cl-zuenden { 0% { filter: brightness(3) drop-shadow(0 0 30px #fff3c4); transform: translateX(-50%) scale(1.5); } 100% { filter: none; transform: translateX(-50%); } }
+.cl-raum.frei .cl-licht-punkt.an .cl-licht-schein { animation: cl-frei 2.4s ease-in-out infinite; }
+@keyframes cl-frei { 50% { opacity: 1; transform: scale(1.2); } }
+.cl-raum.ev-strom-aus .cl-licht-punkt .cl-flamme, .cl-raum.ev-strom-aus .cl-licht-schein, .cl-raum.ev-strom-aus .cl-licht-kegel { opacity: 0.05 !important; transition: opacity 0.2s; }
+.cl-raum.ev-flackern .cl-lichter, .cl-raum.ev-flackern .cl-wand-licht { animation: cl-moment-flackern 0.9s steps(1) 2; }
+.cl-raum.ev-flammen .cl-licht-punkt .cl-flamme { opacity: 1; transform: scale(1.5); filter: drop-shadow(0 0 8px #ff8a1a); }
+.cl-raum.ev-flammen .cl-licht-schein { opacity: 1; }
+.cl-raum.ev-schlag { animation: cl-schlag 0.25s ease-out; }
+@keyframes cl-schlag { 30% { transform: scale(1.012); filter: brightness(1.2); } }
+
+/* Spuren von Ereignissen (bleiben in der Szene) */
+.cl-risse { position: absolute; inset: 0 0 var(--horizont-unten) 0; pointer-events: none; opacity: 0; transition: opacity 2s;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Cg fill='none' stroke='%23000' stroke-opacity='.75' stroke-width='2.2'%3E%3Cpath d='M40 0 L60 40 L48 70 L80 120 L70 160 L96 200'/%3E%3Cpath d='M60 40 L96 52 M80 120 L118 112 L140 140'/%3E%3Cpath d='M300 300 L290 250 L318 210 L300 170 L330 120 L322 90'/%3E%3Cpath d='M318 210 L350 220 M300 170 L268 160'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 520px 100% repeat-x; }
+.cl-raum.spur-risse .cl-risse, .cl-raum.verfall-risse[data-zeit="1"] .cl-risse { opacity: 0.45; }
+.cl-raum.verfall-risse[data-zeit="2"] .cl-risse { opacity: 0.8; }
+.cl-raum.verfall-risse[data-zeit="3"] .cl-risse { opacity: 1; animation: cl-wackeln-leicht 4s infinite; }
+@keyframes cl-wackeln-leicht { 2%, 6% { transform: translateX(-2px); } 4% { transform: translateX(2px); } 8% { transform: none; } }
+.cl-glasriss { opacity: 0; transition: opacity 0.4s; }
+.cl-raum.spur-glas .cl-glasriss { opacity: 0.9; }
+.cl-raum.spur-schief .cl-modul.haengt { transform: translateX(-50%) rotate(calc(var(--neig) * 6)); }
+.cl-raum.spur-regen .cl-modul.m-fenster::after { content: ''; position: absolute; inset: 6% 8%; pointer-events: none; background: repeating-linear-gradient(100deg, transparent 0 6px, rgba(190, 210, 240, 0.35) 6px 7px); background-size: 120px 120px; animation: cl-regen-fall 0.5s linear infinite; mix-blend-mode: screen; }
+.cl-raum.spur-geheimtuer .cl-ort-schicht::after { content: ''; position: absolute; left: 63%; bottom: 0; width: 7%; height: 34%; background: linear-gradient(90deg, #000, #0a0a0a 60%, #1a1a1a); box-shadow: inset -12px 0 18px rgba(0, 0, 0, 0.9), 0 0 0 4px rgba(0, 0, 0, 0.4); }
+.cl-fenster-blitz { transition: opacity 0.1s; }
+.cl-raum:has(.ev-gewitter) .cl-fenster-blitz { animation: cl-fensterblitz 4.6s steps(1) infinite; }
+@keyframes cl-fensterblitz { 0% { opacity: 0.9; } 3% { opacity: 0; } 5% { opacity: 0.7; } 8%, 100% { opacity: 0; } }
+
+/* Verfall, wenn die Zeit knapp wird */
+.cl-verfall { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.cl-verfall i { position: absolute; display: block; transition: all 3s ease-in-out; }
+.v-wasser .v1 { left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(180deg, rgba(110, 180, 220, 0.55), rgba(20, 60, 90, 0.8)); border-top: 2px solid rgba(200, 235, 255, 0.6); }
+.v-wasser .v1::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 12px; background: radial-gradient(ellipse 30px 8px at 50% 100%, rgba(170, 220, 250, 0.6) 98%, transparent) 0 0 / 60px 12px repeat-x; animation: cl-wellen 2.4s linear infinite; }
+.v-wasser .v2 { left: 30%; top: 0; width: 4px; height: 0; background: linear-gradient(rgba(170, 220, 250, 0.7), transparent); }
+.cl-raum[data-zeit="1"] .v-wasser .v1 { height: 5%; }
+.cl-raum[data-zeit="2"] .v-wasser .v1 { height: 12%; }
+.cl-raum[data-zeit="3"] .v-wasser .v1 { height: 21%; }
+.cl-raum[data-zeit="2"] .v-wasser .v2, .cl-raum[data-zeit="3"] .v-wasser .v2 { height: 62%; animation: cl-tropfen 1.2s linear infinite; }
+@keyframes cl-wellen { to { background-position: 60px 0; } }
+@keyframes cl-tropfen { 50% { opacity: 0.5; } }
+.v-sand .v1, .v-sand .v2 { bottom: 0; width: 0; height: 0; background: radial-gradient(ellipse at 50% 100%, #c9a26a 60%, transparent 62%); }
+.v-sand .v1 { left: -4%; } .v-sand .v2 { right: -4%; }
+.v-sand .v3 { left: 40%; top: 0; width: 6px; height: 0; background: repeating-linear-gradient(180deg, rgba(220, 180, 120, 0.8) 0 3px, transparent 3px 6px); animation: cl-sandfall 0.4s linear infinite; }
+@keyframes cl-sandfall { to { background-position: 0 6px; } }
+.cl-raum[data-zeit="1"] .v-sand .v1, .cl-raum[data-zeit="1"] .v-sand .v2 { width: 16%; height: 10%; }
+.cl-raum[data-zeit="2"] .v-sand .v1, .cl-raum[data-zeit="2"] .v-sand .v2 { width: 26%; height: 18%; }
+.cl-raum[data-zeit="3"] .v-sand .v1, .cl-raum[data-zeit="3"] .v-sand .v2 { width: 38%; height: 28%; }
+.cl-raum[data-zeit="2"] .v-sand .v3, .cl-raum[data-zeit="3"] .v-sand .v3 { height: 70%; }
+.v-funken i { width: 4px; height: 4px; border-radius: 50%; background: #ffe08a; opacity: 0; box-shadow: 0 0 10px 3px #ff9f1c; }
+.v-funken .v1 { left: 22%; top: 18%; } .v-funken .v2 { left: 61%; top: 26%; } .v-funken .v3 { left: 84%; top: 14%; }
+.cl-raum[data-zeit="1"] .v-funken .v1, .cl-raum[data-zeit="2"] .v-funken i, .cl-raum[data-zeit="3"] .v-funken i { animation: cl-funke 1.6s steps(1) infinite; }
+.v-funken .v2 { animation-delay: -0.6s !important; } .v-funken .v3 { animation-delay: -1.1s !important; }
+@keyframes cl-funke { 0% { opacity: 1; transform: none; box-shadow: 0 0 10px 3px #ff9f1c, 8px 12px 0 -1px #ffe08a, -10px 16px 0 -1px #ffe08a, 4px 26px 0 -2px #ff9f1c; } 12% { opacity: 0; } }
+.cl-raum.verfall-funken[data-zeit="2"] .cl-wand-licht, .cl-raum.verfall-funken[data-zeit="3"] .cl-wand-licht { background: #3a0000; animation: cl-rotlicht 1.6s ease-in-out infinite; }
+@keyframes cl-rotlicht { 50% { opacity: 0.25; } }
+.cl-ranken-wachsen { position: absolute; inset: 0 0 var(--horizont-unten) 0; pointer-events: none; opacity: 0; transition: opacity 2s, transform 4s; transform: scaleY(0.2); transform-origin: 50% 0;
+  background: radial-gradient(ellipse 18px 9px at 50% 50%, #2f6a2f 98%, transparent) 0 0 / 60px 48px, repeating-linear-gradient(95deg, transparent 0 56px, #24501f 56px 60px); mask-image: linear-gradient(180deg, #000 30%, transparent); -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent); }
+.cl-raum.verfall-ranken[data-zeit="1"] .cl-ranken-wachsen { opacity: 0.5; transform: scaleY(0.4); }
+.cl-raum.verfall-ranken[data-zeit="2"] .cl-ranken-wachsen { opacity: 0.75; transform: scaleY(0.7); }
+.cl-raum.verfall-ranken[data-zeit="3"] .cl-ranken-wachsen { opacity: 0.95; transform: scaleY(1); }
+.cl-raum.verfall-flackern[data-zeit="1"] .cl-lichter { animation: cl-moment-flackern 5s steps(1) infinite; }
+.cl-raum.verfall-flackern[data-zeit="2"] .cl-lichter, .cl-raum.verfall-flackern[data-zeit="3"] .cl-lichter { animation: cl-moment-flackern 2s steps(1) infinite; }
+.cl-raum.verfall-spielzeug[data-zeit="1"] .m-regal, .cl-raum.verfall-spielzeug[data-zeit="2"] .cl-modul, .cl-raum.verfall-spielzeug[data-zeit="3"] .cl-modul { animation: cl-tanzen 1.4s ease-in-out infinite; }
+@keyframes cl-tanzen { 50% { transform: translateX(-50%) translateY(-4px) rotate(2deg); } }
+
+/* Atmosphäre (fest, über dem Panorama) */
+.cl-atmo { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.cl-atmo .cl-deko { position: absolute; inset: 0; }
+.cl-deko.funkeln { background-image: radial-gradient(2px 2px at 12% 20%, #fff, transparent), radial-gradient(2px 2px at 80% 30%, #ffd166, transparent), radial-gradient(2px 2px at 40% 70%, #fff, transparent), radial-gradient(2px 2px at 66% 12%, #b388ff, transparent); animation: cl-a-blinken 3s ease-in-out infinite; }
+.cl-raum.schemen .cl-schemen, .cl-raum.schemen .cl-schemen-fenster { animation: cl-schemen 3.3s ease-in-out; }
+.cl-schemen { opacity: 0; }
+@keyframes cl-schemen { 0% { opacity: 0; transform: translateX(-30px); } 30%, 60% { opacity: 0.9; } 100% { opacity: 0; transform: translateX(30px); } }
+.cl-portraet-augen.folgen { transform: translateX(calc(var(--bx) * 1.6px)); transition: transform 0.4s; }
+.cl-portraet-augen.folgen circle { filter: drop-shadow(0 0 2px #ff3a2a); }
+.cl-tuerspalt { animation: cl-a-blinken 6s ease-in-out infinite; }
+
+/* Blick, Titel, Umsehen */
+.cl-szenen-titel { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 6; font-family: var(--cl-titel); font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cl-leise); text-shadow: 0 2px 8px #000; pointer-events: none; opacity: 0.8; }
+.cl-umsehen { position: absolute; top: 40%; z-index: 7; width: 44px; height: 88px; display: flex; align-items: center; justify-content: center; font-size: 44px; color: rgba(255, 255, 255, 0.75); cursor: pointer; text-shadow: 0 2px 12px #000;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), transparent); transition: opacity 0.4s; animation: cl-umsehen 2.4s ease-in-out infinite; }
+.cl-umsehen.links { left: 0; border-radius: 0 40px 40px 0; }
+.cl-umsehen.rechts { right: 0; border-radius: 40px 0 0 40px; background: linear-gradient(270deg, rgba(0, 0, 0, 0.4), transparent); animation-name: cl-umsehen-r; }
+.cl-umsehen.weg { opacity: 0; pointer-events: none; }
+@keyframes cl-umsehen { 50% { transform: translateX(-4px); } }
+@keyframes cl-umsehen-r { 50% { transform: translateX(4px); } }
+.cl-vordergrund { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.cl-vg { position: absolute; bottom: -6%; width: 34%; height: 40%; background: radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.85), transparent 70%); filter: blur(6px); }
+.cl-vg.links { left: -10%; } .cl-vg.rechts { right: -10%; }
+.cl-raum .cl-taschenlampe, .cl-raum .cl-nebelschicht { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.8s; }
+.cl-raum.dunkel .cl-taschenlampe { opacity: 1; background: radial-gradient(circle 130px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(0, 0, 0, 0.55) 60%, rgba(0, 0, 0, 0.97) 100%); }
+.cl-spiel[data-alter="kinder"] .cl-raum.dunkel .cl-taschenlampe { background: radial-gradient(circle 180px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(20, 20, 70, 0.5) 60%, rgba(20, 20, 70, 0.9) 100%); }
+.cl-raum.vernebelt .cl-nebelschicht { opacity: 1; background: radial-gradient(ellipse 70% 40% at 30% 70%, rgba(210, 210, 225, 0.7), transparent 70%), radial-gradient(ellipse 60% 40% at 75% 40%, rgba(210, 210, 225, 0.6), transparent 70%), rgba(190, 190, 205, 0.42); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); animation: cl-nebel-ziehen 9s ease-in-out infinite alternate; }
+@keyframes cl-nebel-ziehen { to { background-position: 60px 0, -60px 0, 0 0; } }
+.cl-alarmlicht { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.6s; }
+.cl-raum.alarm .cl-alarmlicht { opacity: 1; box-shadow: inset 0 0 120px rgba(255, 0, 0, 0.5); animation: cl-alarm-puls 1s ease-in-out infinite; }
+.cl-alarmlicht i { position: absolute; top: -40px; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, #ff3d3d 30%, rgba(255, 61, 61, 0.3) 60%, transparent 70%); }
+.cl-alarmlicht i:first-child { left: 8%; } .cl-alarmlicht i:last-child { right: 8%; }
+.cl-alarmlicht i::after { content: ''; position: absolute; left: 50%; top: 50%; width: 900px; height: 160px; margin: -80px 0 0 0; transform-origin: 0 50%; background: linear-gradient(90deg, rgba(255, 50, 50, 0.4), transparent); clip-path: polygon(0 45%, 100% 0, 100% 100%, 0 55%); animation: cl-rundum 1.4s linear infinite; }
+@keyframes cl-alarm-puls { 50% { box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.25); } }
+@keyframes cl-rundum { to { transform: rotate(360deg); } }
+.cl-raum.cl-wackeln { animation: cl-beben 0.12s linear 8; }
+.cl-raum.cl-glitch { animation: cl-glitch 0.18s steps(2) 7; }
+
+/* ================================================================ Requisiten im Raum */
+.cl-requisiten { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.cl-requisiten > * { pointer-events: auto; }
+.cl-req { position: absolute; width: 104px; padding: 0; border: 0; background: none; color: var(--cl-text); cursor: pointer; transform: translate(-50%, -62%) scale(var(--s, 1)); display: flex; flex-direction: column; align-items: center; transition: filter 0.3s; -webkit-tap-highlight-color: transparent; }
+.cl-req-bild { position: relative; width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.cl-req-svg { width: 100%; height: 100%; overflow: visible; color: color-mix(in srgb, var(--cl-akzent) 70%, #fff); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px var(--cl-glanz)); }
+.cl-req-svg .f { fill: color-mix(in srgb, var(--cl-akzent) 22%, #1a1a1a); stroke: none; opacity: 0.9; }
+.cl-req.wand .cl-req-bild { width: 64px; height: 64px; }
+.cl-req-schatten { position: absolute; left: 50%; top: 62px; width: 70px; height: 14px; margin-left: -35px; border-radius: 50%; background: radial-gradient(rgba(0, 0, 0, 0.75), transparent 70%); }
+.cl-req.wand .cl-req-schatten { display: none; }
+.cl-req.tisch .cl-req-schatten { display: none; }
+.cl-tischchen { position: absolute; left: 50%; top: 66px; width: 108px; height: 54px; margin-left: -54px; }
+.cl-tischchen::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 11px; border-radius: 3px; background: linear-gradient(#7a4b2a, #4a2c18); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); }
+.cl-tischchen i { position: absolute; top: 9px; width: 7px; height: 45px; background: linear-gradient(90deg, #3a2414, #5a3a20); }
+.cl-tischchen i:first-child { left: 10px; } .cl-tischchen i:last-child { right: 10px; }
+.cl-spiel[data-welt="labor"] .cl-tischchen::before, .cl-spiel[data-welt="station"] .cl-tischchen::before, .cl-spiel[data-welt="unterwasser"] .cl-tischchen::before { background: linear-gradient(#8a98a8, #4c5a6c); }
+.cl-spiel[data-welt="labor"] .cl-tischchen i, .cl-spiel[data-welt="station"] .cl-tischchen i, .cl-spiel[data-welt="unterwasser"] .cl-tischchen i { background: #3a4452; }
+.cl-spiel[data-welt="grab"] .cl-tischchen::before, .cl-spiel[data-welt="dschungel"] .cl-tischchen::before { background: linear-gradient(#a88a58, #6a5030); height: 16px; }
+.cl-spiel[data-welt="grab"] .cl-tischchen i, .cl-spiel[data-welt="dschungel"] .cl-tischchen i { width: 70px; left: 19px !important; right: auto !important; background: linear-gradient(90deg, #6a5030, #8a6a42); }
+.cl-rahmen { position: absolute; left: 50%; top: -6px; width: 84px; height: 84px; margin-left: -42px; border: 7px solid #8a6a3a; border-radius: 3px; background: rgba(0, 0, 0, 0.45); box-shadow: inset 0 0 12px #000, 0 6px 12px rgba(0, 0, 0, 0.6); }
+.cl-req-schild { margin-top: 6px; max-width: 130px; padding: 3px 9px; border-radius: 999px; background: rgba(8, 8, 12, 0.78); border: 1px solid var(--cl-rand); font-size: 12.5px; font-weight: 650; line-height: 1.25; text-align: center;
+  opacity: 0; transform: translateY(-4px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-req.tisch .cl-req-schild { margin-top: 48px; }
+.cl-req:hover .cl-req-schild, .cl-req:focus-visible .cl-req-schild, .cl-req.markiert .cl-req-schild, .cl-req.dringend .cl-req-schild { opacity: 1; transform: none; }
+@media (hover: none) { .cl-req.station .cl-req-schild { opacity: 0.92; transform: none; } }
+.cl-req:hover .cl-req-bild { transform: translateY(-6px) scale(1.08); }
+.cl-req:hover { filter: brightness(1.25); }
+.cl-req-funkeln { position: absolute; left: 50%; top: 8px; width: 10px; height: 10px; margin-left: 18px; pointer-events: none; animation: cl-funkeln 3.2s ease-in-out infinite; animation-delay: var(--d); }
+.cl-req-funkeln::before, .cl-req-funkeln::after { content: ''; position: absolute; left: 50%; top: 50%; background: #fff; border-radius: 2px; box-shadow: 0 0 8px 2px var(--cl-akzent); }
+.cl-req-funkeln::before { width: 2px; height: 14px; margin: -7px 0 0 -1px; } .cl-req-funkeln::after { width: 14px; height: 2px; margin: -1px 0 0 -7px; }
+@keyframes cl-funkeln { 0%, 70%, 100% { opacity: 0; transform: scale(0.3) rotate(0); } 80% { opacity: 1; transform: scale(1) rotate(45deg); } }
+.cl-req-marke { position: absolute; top: -4px; right: 10px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+.cl-req-marke.ok { background: var(--cl-ok); color: #06210f; }
+.cl-req-marke.tipp { right: auto; left: 10px; background: var(--cl-akzent2); color: #fff; }
+.cl-req-kette { position: absolute; top: 14px; font-size: 34px; filter: drop-shadow(0 2px 4px #000); animation: cl-wackeln 0.6s; }
+.cl-req-neu { position: absolute; top: -14px; padding: 2px 8px; border-radius: 999px; background: var(--cl-akzent); color: #14110a; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; animation: cl-puls 1.4s infinite; }
+.cl-req.fertig .cl-req-svg { color: color-mix(in srgb, var(--cl-ok) 50%, #aaa); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7)) saturate(0.6); }
+.cl-req.fertig .cl-req-bild::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; background: radial-gradient(circle, rgba(95, 211, 154, 0.25), transparent 70%); }
+.cl-req.oeffnet .cl-req-bild { animation: cl-oeffnet 1.4s cubic-bezier(0.3, 1.5, 0.5, 1); }
+@keyframes cl-oeffnet { 0% { transform: scale(1); } 20% { transform: scale(1.35) rotate(-6deg); filter: brightness(2.2) drop-shadow(0 0 24px #fff); } 40% { transform: scale(0.9) rotate(4deg); } 100% { transform: none; } }
+.cl-req.oeffnet::after { content: ''; position: absolute; left: 50%; top: 30px; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 0 rgba(255, 230, 150, 0.9); animation: cl-ring-aus 1.2s ease-out; pointer-events: none; }
+@keyframes cl-ring-aus { to { box-shadow: 0 0 0 90px rgba(255, 230, 150, 0); } }
+.cl-req.markiert .cl-req-bild::before { content: ''; position: absolute; inset: -18px; border-radius: 50%; border: 3px solid var(--cl-akzent); animation: cl-markieren 1.3s ease-out infinite; }
+@keyframes cl-markieren { from { transform: scale(0.7); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+.cl-req.dringend .cl-req-bild::before { content: ''; position: absolute; inset: -16px; border-radius: 50%; border: 3px solid #ff4d4d; animation: cl-markieren 0.8s ease-out infinite; }
+.cl-req.dringend .cl-req-schild { border-color: #ff4d4d; color: #ffd0d0; }
+.cl-req.blockiert { filter: grayscale(0.7) brightness(0.7); }
+.cl-req.blockiert .cl-req-funkeln { display: none; }
+.cl-req.wackel .cl-req-bild { animation: cl-wackel 0.6s; }
+@keyframes cl-wackel { 20% { transform: rotate(-8deg); } 40% { transform: rotate(6deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(2deg); } }
+.cl-req.zittern .cl-req-bild { animation: cl-wackel 0.25s 5; }
+.cl-req.deko .cl-req-svg { color: color-mix(in srgb, var(--cl-text) 55%, #000); filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7)); }
+.cl-req.deko .cl-req-svg .f { fill: rgba(0, 0, 0, 0.4); }
+.cl-req.deko.versteckt .cl-req-bild::after { content: ''; position: absolute; right: 4px; bottom: 6px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px 3px var(--cl-akzent); animation: cl-funkeln 4.5s ease-in-out infinite 1s; }
+.cl-req.schluessel-station .cl-req-bild::after { content: '⇢'; position: absolute; right: -4px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; background: var(--cl-akzent); color: #14110a; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+.cl-req.schluessel-station.fertig .cl-req-bild::after { display: none; }
+
+/* Fundstellen: versteckte Zeichen und Teile */
+.cl-fund { position: absolute; transform: translate(-50%, -50%); width: 46px; height: 46px; border: 0; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; }
+.cl-fund-zeichen { font-size: 22px; color: rgba(255, 255, 255, 0.16); text-shadow: 0 0 2px rgba(0, 0, 0, 0.8); font-family: var(--cl-mono); transition: color 0.4s, transform 0.3s; animation: cl-schimmern 5s ease-in-out infinite; animation-delay: var(--d); white-space: nowrap; }
+@keyframes cl-schimmern { 0%, 82%, 100% { color: rgba(255, 255, 255, 0.14); } 90% { color: rgba(255, 240, 200, 0.55); text-shadow: 0 0 10px var(--cl-glanz); } }
+.cl-fund:hover .cl-fund-zeichen { color: rgba(255, 245, 210, 0.75); transform: scale(1.2); }
+.cl-fund.gefunden .cl-fund-zeichen { color: var(--cl-akzent); animation: none; text-shadow: 0 0 10px var(--cl-glanz), 0 1px 2px #000; }
+.cl-fund.gefunden .cl-fund-zeichen b { color: #fff; }
+.cl-fund.boden .cl-fund-zeichen { transform: scaleY(0.6); }
+.cl-fund-glanz { width: 12px; height: 12px; position: relative; animation: cl-funkeln 3.6s ease-in-out infinite; animation-delay: var(--d); }
+.cl-fund-glanz::before, .cl-fund-glanz::after { content: ''; position: absolute; left: 50%; top: 50%; background: #fff; box-shadow: 0 0 8px 2px #ffe7a0; }
+.cl-fund-glanz::before { width: 2px; height: 16px; margin: -8px 0 0 -1px; } .cl-fund-glanz::after { width: 16px; height: 2px; margin: -1px 0 0 -8px; }
+.cl-fund.teil:hover .cl-fund-glanz { animation-duration: 0.8s; }
+.cl-brief-fund { position: absolute; width: 58px; height: 38px; transform: translate(-50%, -50%) rotate(-8deg); border: 0; padding: 0; cursor: pointer; background: linear-gradient(160deg, #f4ead2, #d8c8a0); border-radius: 3px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6); animation: cl-brief-liegt 2s ease-in-out infinite; z-index: 3; }
+.cl-brief-fund i { position: absolute; inset: 0; background: linear-gradient(150deg, transparent 49%, rgba(90, 60, 30, 0.4) 50%, transparent 51%), linear-gradient(30deg, transparent 49%, rgba(90, 60, 30, 0.4) 50%, transparent 51%); }
+.cl-brief-fund i::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; margin: -6px; border-radius: 50%; background: #9c2b2b; }
+.cl-brief-fund:not(.gelesen) { box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6), 0 0 18px 4px var(--cl-glanz); }
+.cl-brief-fund.gelesen { animation: none; opacity: 0.7; }
+@keyframes cl-brief-liegt { 50% { transform: translate(-50%, -54%) rotate(-6deg); } }
+.cl-brief-karte .cl-brief-papier { position: relative; margin-top: 14px; padding: 30px 24px 22px; background: var(--cl-papier); color: var(--cl-papier-text); border-radius: 4px; font-family: "Bradley Hand", "Snell Roundhand", Georgia, serif; font-size: 19px; line-height: 1.55; transform: rotate(-0.6deg); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.cl-brief-karte .cl-brief-papier p { margin: 0; white-space: pre-line; }
+
+/* Türen */
+.cl-tueren-lage { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.cl-durchgang { position: absolute; bottom: var(--horizont-unten); width: 7.5%; min-width: 74px; height: 44%; border: 0; padding: 0; background: none; cursor: pointer; pointer-events: auto; color: var(--cl-text); }
+.cl-durchgang.weiter, .cl-durchgang.ausgang { right: 1.5%; }
+.cl-durchgang.zurueck { left: 1.5%; }
+.cl-tuer-rahmen { position: absolute; inset: 0; border: 8px solid #2a1a0c; border-bottom: 0; border-radius: 6px 6px 0 0; background: #050403; perspective: 600px; overflow: hidden; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5), inset 0 0 30px #000; }
+.cl-spiel[data-welt="station"] .cl-tuer-rahmen, .cl-spiel[data-welt="unterwasser"] .cl-tuer-rahmen, .cl-spiel[data-welt="labor"] .cl-tuer-rahmen { border-color: #4c5a6c; border-radius: 22px 22px 0 0; }
+.cl-spiel[data-welt="grab"] .cl-tuer-rahmen, .cl-spiel[data-welt="dschungel"] .cl-tuer-rahmen { border-color: #6a5030; border-width: 12px; border-radius: 40% 40% 0 0 / 22% 22% 0 0; }
+.cl-tuer-licht { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 70%, rgba(255, 220, 150, 0.85), rgba(255, 180, 90, 0.25) 50%, transparent 75%); opacity: 0; transition: opacity 1s; }
+.cl-tuer-blatt { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #5a3a1c 0 14px, #4a2e16 14px 16px), #5a3a1c; transform-origin: 0 50%; transition: transform 1.4s cubic-bezier(0.5, 0, 0.2, 1); box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6); }
+.cl-spiel[data-welt="station"] .cl-tuer-blatt, .cl-spiel[data-welt="unterwasser"] .cl-tuer-blatt, .cl-spiel[data-welt="labor"] .cl-tuer-blatt { background: repeating-linear-gradient(135deg, #ff9f1c 0 10px, #1a1a1a 10px 20px) 0 85% / 100% 10% no-repeat, linear-gradient(90deg, #5d6a7c, #3c4858); }
+.cl-spiel[data-welt="grab"] .cl-tuer-blatt, .cl-spiel[data-welt="dschungel"] .cl-tuer-blatt { background: linear-gradient(#8a6a3a 2px, transparent 2px) 0 0 / 100% 30px, #a07a46; }
+.cl-tuer-griff { position: absolute; right: 12%; top: 52%; width: 8px; height: 8px; border-radius: 50%; background: #d9a84a; box-shadow: 0 0 4px #000; }
+.cl-durchgang.offen .cl-tuer-blatt { transform: rotateY(-78deg); }
+.cl-durchgang.offen .cl-tuer-licht { opacity: 1; animation: cl-schein 2.4s ease-in-out infinite; }
+.cl-durchgang.zurueck .cl-tuer-licht { background: radial-gradient(ellipse at 50% 70%, rgba(180, 200, 255, 0.35), transparent 75%); }
+.cl-durchgang.oeffnet .cl-tuer-blatt { transition-duration: 2.2s; }
+.cl-durchgang.offen.weiter::after, .cl-durchgang.offen.ausgang::after { content: ''; position: absolute; left: -60%; right: -60%; bottom: -36%; height: 40%; background: radial-gradient(ellipse at 50% 0, rgba(255, 210, 140, 0.35), transparent 70%); pointer-events: none; }
+.cl-durchgang.wackel { animation: cl-wackel 0.5s; }
+.cl-tuer-schild { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; white-space: nowrap; background: rgba(8, 8, 12, 0.82); border: 1px solid var(--cl-rand); font-size: 12.5px; font-weight: 700; }
+.cl-durchgang.offen .cl-tuer-schild { border-color: var(--cl-akzent); color: var(--cl-akzent); box-shadow: 0 0 14px var(--cl-glanz); animation: cl-puls 1.6s infinite; }
+.cl-durchgang.ausgang .cl-tuer-rahmen { border-color: color-mix(in srgb, var(--cl-akzent) 60%, #2a1a0c); }
+.cl-durchgang.ausgang .cl-tuer-blatt::after { content: ''; position: absolute; left: 50%; top: 44%; width: 26px; height: 32px; margin-left: -13px; border-radius: 4px; background: linear-gradient(#d9a84a, #8a6a2a); box-shadow: 0 0 12px var(--cl-glanz); }
+
+/* ================================================================ Kopf: Ort, Lageplan, Ziel */
+.cl-ort-anzeige { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.cl-ort-anzeige b { font-family: var(--cl-titel); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-ort-anzeige small { font-size: 11.5px; color: var(--cl-leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-hud-titel { align-items: center !important; }
+.cl-lageplan { display: flex; align-items: center; gap: 4px; flex: none; }
+.cl-lageplan i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--cl-rand); background: transparent; }
+.cl-lageplan i.offen { border-color: var(--cl-leise); }
+.cl-lageplan i + i { position: relative; margin-left: 8px; }
+.cl-lageplan i + i::before { content: ''; position: absolute; right: 100%; top: 50%; width: 10px; height: 1.5px; margin-right: 1px; background: var(--cl-rand); }
+.cl-lageplan i.hier { background: var(--cl-akzent); border-color: var(--cl-akzent); box-shadow: 0 0 8px var(--cl-glanz); }
+.cl-ziel { flex: 2; min-width: 200px; text-align: center; padding: 7px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--cl-rand); font-size: 13.5px; font-weight: 650; color: var(--cl-text); }
+.cl-ziel.gut { border-color: var(--cl-ok); color: #c9f5dd; box-shadow: 0 0 14px rgba(95, 211, 154, 0.3); }
+.cl-ziel.warnung { border-color: #ffb347; color: #ffe0b0; }
+.cl-ziel.dringend { border-color: #ff4d4d; color: #fff; background: rgba(160, 0, 0, 0.55); animation: cl-ziel-dringend 1s ease-in-out infinite; font-size: 14.5px; }
+@keyframes cl-ziel-dringend { 50% { box-shadow: 0 0 22px rgba(255, 60, 60, 0.7); transform: scale(1.03); } }
+
+/* Unten: Dabei + Lösungswort */
+.cl-unten { position: relative; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; padding: 9px 14px 11px; background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.65)); border-top: 1px solid var(--cl-rand); }
+.cl-wort-tafel, .cl-inventar { display: flex; align-items: center; gap: 10px; }
+.cl-wort-titel { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cl-leise); font-weight: 700; }
+.cl-unten .cl-wort-feld { width: 30px; height: 38px; font-size: 19px; }
+.cl-inventar-liste { display: flex; gap: 6px; }
+.cl-inventar-ding { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--cl-akzent); box-shadow: 0 0 10px var(--cl-glanz); animation: cl-landen 0.7s cubic-bezier(0.2, 1.4, 0.4, 1); }
+
+/* Fliegende Buchstaben und Dinge, Ortskarte */
+.cl-flug { position: absolute; left: 0; top: 0; z-index: 60; width: 40px; height: 40px; margin: -20px 0 0 -20px; display: flex; align-items: center; justify-content: center; border-radius: 10px; pointer-events: none;
+  font-family: var(--cl-mono); font-size: 24px; font-weight: 900; color: #14110a; background: linear-gradient(160deg, #ffe7a0, var(--cl-akzent)); box-shadow: 0 0 24px var(--cl-glanz), 0 0 60px var(--cl-glanz); }
+.cl-flug.ding { background: none; box-shadow: none; font-size: 30px; filter: drop-shadow(0 0 12px var(--cl-glanz)); }
+.cl-ort-karte { position: absolute; left: 50%; top: 40%; z-index: 30; transform: translate(-50%, -50%); text-align: center; pointer-events: none; animation: cl-ortkarte 2.6s ease-out forwards; }
+.cl-ort-karte small { display: block; font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--cl-akzent); }
+.cl-ort-karte b { display: block; font-family: var(--cl-titel); font-size: clamp(28px, 5vw, 48px); text-shadow: 0 4px 30px #000, 0 0 40px var(--cl-glanz); }
+@keyframes cl-ortkarte { 0% { opacity: 0; letter-spacing: 0.4em; filter: blur(8px); } 20%, 70% { opacity: 1; letter-spacing: normal; filter: none; } 100% { opacity: 0; transform: translate(-50%, -60%); } }
+
+/* ================================================================ Erzähler */
+.cl-erzaehler { position: absolute; left: 50%; bottom: 76px; z-index: 25; transform: translate(-50%, 20px); width: min(760px, calc(100% - 24px)); display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 18px; border-radius: 16px; background: rgba(6, 6, 10, 0.86); border: 1px solid var(--cl-rand); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-family: var(--cl-titel); font-size: 17px; line-height: 1.45; opacity: 0; pointer-events: none; transition: opacity 0.35s, transform 0.35s; cursor: pointer; }
+.cl-erzaehler.an { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.cl-spiel:has(.cl-nah) .cl-erzaehler, .cl-spiel:has(.cl-auftrag) .cl-erzaehler { bottom: auto; top: 6px; padding: 7px 14px; font-size: 14.5px; z-index: 45; }
+.cl-spiel:has(.cl-erzaehler.an) .cl-nah { padding-top: 64px; }
+.cl-erz-text { flex: 1; min-height: 1.45em; }
+.cl-erz-symbol { flex: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; background: rgba(255, 255, 255, 0.08); font-family: var(--cl-schrift); }
+.cl-erz-mehr { flex: none; align-self: center; font-size: 11px; color: var(--cl-leise); font-family: var(--cl-schrift); }
+.cl-erzaehler.ereignis { border-color: var(--cl-akzent); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 24px var(--cl-glanz); font-size: 18px; }
+.cl-erzaehler.ereignis .cl-erz-symbol { background: var(--cl-akzent); color: #14110a; font-weight: 900; }
+.cl-erzaehler.telefon, .cl-erzaehler.funk { border-color: #9ad1ff; font-family: var(--cl-mono); font-size: 15.5px; }
+.cl-erzaehler.telefon .cl-erz-text::before, .cl-erzaehler.funk .cl-erz-text::before { content: '„'; } .cl-erzaehler.telefon .cl-erz-text::after, .cl-erzaehler.funk .cl-erz-text::after { content: '“'; }
+.cl-erzaehler.erfolg { border-color: var(--cl-ok); } .cl-erzaehler.erfolg .cl-erz-symbol { background: var(--cl-ok); color: #06210f; }
+.cl-erzaehler.warnung { border-color: #ff6b6b; } .cl-erzaehler.warnung .cl-erz-symbol { background: #ff6b6b; color: #2a0000; }
+.cl-erzaehler.hilfe { font-family: var(--cl-schrift); font-size: 15px; }
+.cl-erzaehler.fund { border-color: var(--cl-akzent); font-family: var(--cl-schrift); font-size: 15.5px; }
+.cl-erzaehler.fund .cl-erz-symbol { color: var(--cl-akzent); }
+
+/* ================================================================ Auftrag (Wendung: was ist zu tun?) */
+.cl-auftrag { position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: 16px; background: radial-gradient(circle, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)); animation: cl-ein 0.3s; }
+.cl-auftrag.weg { animation: cl-aus 0.3s forwards; }
+.cl-auftrag-karte { position: relative; width: min(500px, 100%); text-align: center; padding: 26px 24px 22px; border-radius: 22px; background: linear-gradient(170deg, #1d1a14, #0e0c09); border: 2px solid var(--cl-akzent); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 50px var(--cl-glanz); animation: cl-auftrag 0.6s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.cl-auftrag.schlecht .cl-auftrag-karte { border-color: #ff5a5a; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 50px rgba(255, 60, 60, 0.4); animation: cl-auftrag 0.6s cubic-bezier(0.2, 1.4, 0.4, 1), cl-wackeln 0.5s 0.6s; }
+.cl-auftrag.gut .cl-auftrag-karte { border-color: var(--cl-ok); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 50px rgba(95, 211, 154, 0.4); }
+@keyframes cl-auftrag { from { transform: translateY(-60px) scale(0.8); opacity: 0; } }
+.cl-auftrag-symbol { width: 74px; height: 74px; margin: -62px auto 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; background: #0e0c09; border: 2px solid currentColor; color: var(--cl-akzent); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); }
+.cl-auftrag.schlecht .cl-auftrag-symbol { color: #ff5a5a; animation: cl-puls 0.9s infinite; }
+.cl-auftrag.gut .cl-auftrag-symbol { color: var(--cl-ok); }
+.cl-auftrag-titel { font-family: var(--cl-titel); font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.cl-auftrag-text { color: var(--cl-leise); margin: 0 0 14px; font-size: 15.5px; }
+.cl-auftrag-tun { margin: 0 0 18px; padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px dashed var(--cl-rand); }
+.cl-auftrag-tun small { display: block; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cl-akzent); font-weight: 800; margin-bottom: 4px; }
+.cl-auftrag.schlecht .cl-auftrag-tun small { color: #ff8a8a; }
+.cl-auftrag-tun b { font-size: 17px; line-height: 1.4; }
+
+/* ================================================================ Nahansicht im Material */
+.cl-nah { align-items: center; background: radial-gradient(circle, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.6)); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.cl-nah-rahmen { position: relative; width: min(800px, 100%); margin: auto; padding: 14px; border-radius: 26px; }
+.cl-nah-rahmen.auf { animation: cl-heran 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+@keyframes cl-heran { from { transform: scale(0.35); opacity: 0; filter: blur(10px); } }
+.cl-nah-rahmen.wackeln { animation: cl-wackeln 0.45s; }
+.cl-nah-rahmen .cl-nah-karte { width: 100%; border-radius: 16px; }
+.material-holz { background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 10%, transparent 90%, rgba(0, 0, 0, 0.2)), repeating-linear-gradient(92deg, #5a3a1c 0 9px, #4e3118 9px 15px, #61401f 15px 22px); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #7a5228, inset 0 0 30px rgba(0, 0, 0, 0.5); }
+.material-metall { background: radial-gradient(circle 4px at 14px 14px, #c9d3de 60%, #3c4858 70%, transparent 75%), radial-gradient(circle 4px at calc(100% - 14px) 14px, #c9d3de 60%, #3c4858 70%, transparent 75%), radial-gradient(circle 4px at 14px calc(100% - 14px), #c9d3de 60%, #3c4858 70%, transparent 75%), radial-gradient(circle 4px at calc(100% - 14px) calc(100% - 14px), #c9d3de 60%, #3c4858 70%, transparent 75%), repeating-linear-gradient(90deg, #6c7888 0 2px, #7a8696 2px 4px); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #9aa8b8, inset 0 0 24px rgba(0, 0, 0, 0.5); border-radius: 18px; }
+.material-papier { background: #e8dcbc; border-radius: 6px; transform: rotate(-0.4deg); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(120, 90, 40, 0.35); }
+.material-papier::before { content: ''; position: absolute; top: -10px; left: 50%; width: 90px; height: 22px; margin-left: -45px; background: rgba(255, 255, 230, 0.6); transform: rotate(-3deg); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+.material-stein { background: radial-gradient(ellipse at 30% 20%, #9a8a6a, #6a5a40 60%, #4a3e2a); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 0 3px #3a3020, inset 0 6px 10px rgba(255, 255, 255, 0.15), inset 0 -8px 14px rgba(0, 0, 0, 0.45); border-radius: 10px; }
+.material-bildschirm { background: linear-gradient(170deg, #2a2e36, #14161c); border-radius: 28px; padding: 22px 22px 34px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #3a3f4a; }
+.material-bildschirm::after { content: ''; position: absolute; right: 30px; bottom: 13px; width: 8px; height: 8px; border-radius: 50%; background: #5fd39a; box-shadow: 0 0 8px #5fd39a; }
+.material-bildschirm .cl-nah-karte { background: radial-gradient(ellipse at 50% 40%, #0d1f1c, #050c0b); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8); }
+.material-bildschirm .cl-nah-karte::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px); }
+.material-glas { background: linear-gradient(135deg, rgba(200, 235, 255, 0.35), rgba(120, 180, 220, 0.12) 40%, rgba(200, 235, 255, 0.28)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.5); }
+.cl-zurueck { flex: none; border: 1px solid var(--cl-rand); background: rgba(255, 255, 255, 0.06); color: var(--cl-text); border-radius: 999px; padding: 8px 14px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.cl-zurueck:hover { border-color: var(--cl-akzent); color: var(--cl-akzent); }
+
+/* ================================================================ Ereignisse im Raum */
+.cl-ev { position: absolute; inset: 0; z-index: 8; pointer-events: none; overflow: hidden; animation: cl-ein 0.8s; }
+.cl-ev.weg { animation: cl-aus 1.4s forwards; }
+.cl-ev-text { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); max-width: 80%; text-align: center; font-family: var(--cl-titel); font-size: 22px; text-shadow: 0 2px 20px #000; }
+/* Regen */
+.cl-regen-ebene { position: absolute; inset: -20% -10%; background-repeat: repeat; animation: cl-regen-fall linear infinite; }
+.cl-regen-ebene.e0 { background-image: repeating-linear-gradient(100deg, transparent 0 22px, rgba(180, 200, 235, 0.16) 22px 23px); background-size: 240px 240px; animation-duration: 0.9s; filter: blur(0.6px); }
+.cl-regen-ebene.e1 { background-image: repeating-linear-gradient(102deg, transparent 0 34px, rgba(200, 220, 245, 0.28) 34px 35.5px); background-size: 300px 300px; animation-duration: 0.55s; }
+.cl-regen-ebene.e2 { background-image: repeating-linear-gradient(104deg, transparent 0 60px, rgba(220, 235, 255, 0.4) 60px 62px); background-size: 420px 420px; animation-duration: 0.36s; }
+@keyframes cl-regen-fall { from { background-position: 0 0; } to { background-position: -60px 300px; } }
+.cl-regen-ebene.e0 { --dy: 240px; } .cl-regen-ebene.e2 { --dy: 420px; }
+.cl-regen-boden { position: absolute; left: 0; right: 0; bottom: 0; height: 38%; }
+.cl-regen-boden i { position: absolute; width: 22px; height: 6px; margin-left: -11px; border-radius: 50%; border: 1.5px solid rgba(210, 230, 255, 0.55); animation: cl-platsch 1.2s ease-out infinite; }
+@keyframes cl-platsch { from { transform: scale(0.2); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+.cl-regen-nass { position: absolute; left: 0; right: 0; bottom: 0; height: 38%; background: linear-gradient(180deg, rgba(140, 170, 210, 0.05), rgba(140, 170, 210, 0.22)); mix-blend-mode: screen; animation: cl-ein 6s; }
+.cl-ev.ev-regen, .cl-ev.ev-gewitter { background: linear-gradient(180deg, rgba(20, 30, 50, 0.35), rgba(20, 30, 50, 0.15)); }
+.cl-regenbogen { position: absolute; left: 50%; bottom: 20%; width: 80%; aspect-ratio: 2; transform: translateX(-50%); border-radius: 50% 50% 0 0 / 100% 100% 0 0; opacity: 0; animation: cl-regenbogen 8s 10s ease-in-out forwards;
+  background: radial-gradient(circle at 50% 100%, transparent 54%, rgba(255, 0, 0, 0.22) 55%, rgba(255, 165, 0, 0.22) 59%, rgba(255, 255, 0, 0.22) 63%, rgba(0, 200, 0, 0.22) 67%, rgba(0, 120, 255, 0.22) 71%, rgba(140, 0, 255, 0.22) 75%, transparent 76%); }
+@keyframes cl-regenbogen { 30%, 80% { opacity: 1; } }
+/* Gewitter */
+.cl-blitz { position: absolute; inset: 0 0 30% 0; animation: cl-blitzen 0.8s steps(1) forwards; }
+.cl-blitz svg { width: 100%; height: 100%; }
+.cl-blitz .glut { fill: none; stroke: rgba(200, 220, 255, 0.6); stroke-width: 2.4; filter: blur(2px); vector-effect: non-scaling-stroke; }
+.cl-blitz .kern { fill: none; stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.cl-blitz-licht { position: absolute; inset: 0; background: #e8f0ff; animation: cl-blitzen 0.8s steps(1) forwards; mix-blend-mode: screen; }
+@keyframes cl-blitzen { 0% { opacity: 0.9; } 10% { opacity: 0; } 18% { opacity: 0.7; } 26%, 100% { opacity: 0; } }
+/* Alarm */
+.cl-rundumlicht { position: absolute; top: -30px; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #ff3d3d 35%, rgba(255, 61, 61, 0.2) 65%, transparent 70%); }
+.cl-rundumlicht.links { left: 12%; } .cl-rundumlicht.rechts { right: 12%; }
+.cl-rundumlicht::after { content: ''; position: absolute; left: 50%; top: 50%; width: 1400px; height: 220px; margin-top: -110px; transform-origin: 0 50%; background: linear-gradient(90deg, rgba(255, 40, 40, 0.45), transparent 70%); clip-path: polygon(0 47%, 100% 0, 100% 100%, 0 53%); animation: cl-rundum 1.2s linear infinite; }
+.cl-rundumlicht.rechts::after { animation-direction: reverse; }
+.cl-alarm-rot { position: absolute; inset: 0; animation: cl-alarm-rot 1.2s ease-in-out infinite; }
+@keyframes cl-alarm-rot { 50% { background: rgba(255, 0, 0, 0.16); box-shadow: inset 0 0 160px rgba(255, 0, 0, 0.5); } }
+.cl-ev.kinder .cl-rundumlicht { background: radial-gradient(circle, #ffd166 35%, transparent 70%); }
+.cl-ev.kinder .cl-rundumlicht::after { background: linear-gradient(90deg, rgba(255, 210, 100, 0.4), transparent 70%); }
+.cl-ev.kinder .cl-alarm-rot { animation: none; }
+/* Stromausfall */
+.cl-stromlos { position: absolute; inset: 0; background: radial-gradient(circle 150px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(0, 0, 0, 0.6) 55%, rgba(0, 0, 0, 0.96) 100%); animation: cl-stromaus-neu 1.4s steps(1) both; }
+@keyframes cl-stromaus-neu { 0% { opacity: 0; } 15% { opacity: 1; } 25% { opacity: 0.2; } 35% { opacity: 1; } 45% { opacity: 0.4; } 55%, 100% { opacity: 1; } }
+.cl-ev.kinder .cl-stromlos { background: radial-gradient(circle 190px at var(--lx, 50%) var(--ly, 50%), transparent 0, rgba(20, 20, 70, 0.55) 55%, rgba(20, 20, 70, 0.88) 100%); }
+/* Beben, Explosion */
+.cl-staub { position: absolute; top: -10px; width: var(--g); height: var(--g); border-radius: 50%; background: rgba(220, 200, 170, 0.7); animation: cl-rieseln linear infinite; }
+.cl-brocken { position: absolute; top: -20px; width: calc(var(--g) * 2.4); height: calc(var(--g) * 2); background: #6a5a48; border-radius: 30% 50% 40% 60%; animation: cl-rieseln cubic-bezier(0.5, 0, 1, 1) 1 forwards; }
+@keyframes cl-rieseln { to { transform: translateY(105vh) rotate(260deg); } }
+.cl-explosion-licht { position: absolute; inset: 0; background: radial-gradient(circle at 50% 70%, rgba(255, 230, 160, 0.95), rgba(255, 120, 30, 0.5) 30%, transparent 70%); animation: cl-aus 1.2s ease-out forwards; }
+.cl-rauch { position: absolute; left: -20%; right: -20%; bottom: -30%; height: 80%; background: radial-gradient(ellipse 30% 40% at 30% 70%, rgba(60, 60, 60, 0.8), transparent 70%), radial-gradient(ellipse 30% 40% at 70% 60%, rgba(80, 80, 80, 0.7), transparent 70%), radial-gradient(ellipse 40% 30% at 50% 90%, rgba(40, 40, 40, 0.85), transparent 70%); filter: blur(8px); animation: cl-rauch 9s ease-out forwards; }
+.cl-rauch.zwei { animation-delay: 0.8s; transform: scaleX(-1); }
+@keyframes cl-rauch { from { transform: translateY(40%) scale(0.6); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(-30%) scale(1.3); opacity: 0.3; } }
+.cl-puff { position: absolute; left: 50%; top: 50%; width: 300px; height: 300px; margin: -150px; border-radius: 50%; background: radial-gradient(circle, #fff, #ffd166 30%, #ff9fbe 55%, transparent 70%); animation: cl-puff 1.4s ease-out forwards; }
+@keyframes cl-puff { from { transform: scale(0.1); opacity: 1; } to { transform: scale(2.5); opacity: 0; } }
+/* Vögel */
+.cl-vogel { position: absolute; left: -8%; width: calc(70px * var(--s)); animation: cl-vogel linear forwards; }
+.cl-vogel svg { width: 100%; overflow: visible; }
+.cl-vogel .fluegel { fill: #0a0a0e; animation: cl-flattern 0.22s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 60%; }
+.cl-vogel.bunt .fluegel { fill: #ff6b35; }
+@keyframes cl-flattern { to { transform: scaleY(-0.5); } }
+@keyframes cl-vogel { 0% { transform: translate(0, 0); } 50% { transform: translate(60vw, var(--h)); } 100% { transform: translate(125vw, calc(var(--h) * -0.5)); } }
+/* Schritte vor der Tür, Flüstern, Glitch */
+.cl-tuerschlitz { position: absolute; left: 20%; right: 20%; bottom: 0; height: 10px; background: linear-gradient(90deg, transparent, rgba(255, 220, 150, 0.8), transparent); box-shadow: 0 0 30px 10px rgba(255, 220, 150, 0.25); overflow: hidden; }
+.cl-tuerschlitz .fuss { position: absolute; top: 0; left: -10%; width: 9%; height: 100%; background: #000; filter: blur(2px); animation: cl-fuss 8s ease-in-out forwards; }
+.cl-tuerschlitz .fuss.zwei { animation-delay: 0.35s; }
+@keyframes cl-fuss { 0% { left: -10%; } 45%, 70% { left: 46%; } 100% { left: 110%; } }
+.cl-kaltnebel { position: absolute; left: -30%; right: -30%; bottom: -8%; height: 46%; background: radial-gradient(ellipse 25% 50% at 30% 80%, rgba(200, 215, 240, 0.5), transparent 70%), radial-gradient(ellipse 30% 40% at 70% 90%, rgba(200, 215, 240, 0.45), transparent 70%); filter: blur(10px); animation: cl-kaltnebel 9s ease-in-out forwards; }
+.cl-kaltnebel.zwei { animation-delay: 1.2s; transform: scaleX(-1); }
+@keyframes cl-kaltnebel { from { transform: translateX(-30%); opacity: 0; } 30%, 70% { opacity: 1; } to { transform: translateX(25%); opacity: 0; } }
+.cl-glitch-streifen { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(57, 245, 198, 0.12) 14px 16px, transparent 16px 40px, rgba(255, 61, 139, 0.12) 40px 42px); animation: cl-glitch-streifen 0.25s steps(3) infinite; }
+@keyframes cl-glitch-streifen { 50% { transform: translateY(-12px); } }
+.cl-aufflammen { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255, 150, 50, 0.35), transparent 70%); animation: cl-flackern 0.8s infinite; }
+.cl-schrei-rot { position: absolute; inset: 0; background: radial-gradient(circle, transparent 25%, rgba(140, 0, 0, 0.6)); animation: cl-schrei-puls 0.7s ease-out 3; }
+@keyframes cl-schrei-puls { 50% { opacity: 0.3; } }
+.cl-echo { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); font-family: var(--cl-titel); font-size: 26px; color: rgba(255, 255, 255, 0.3); text-shadow: 6px 0 rgba(255, 255, 255, 0.15), -6px 0 rgba(255, 255, 255, 0.1); white-space: nowrap; animation: cl-verschwimmen 1s ease-in-out infinite alternate; }
+.cl-vollmond { position: absolute; right: 8%; top: 6%; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #fffbe8, #e8d9a8 60%, #c9b880); box-shadow: 0 0 80px 20px rgba(255, 240, 200, 0.35); animation: cl-mond-auf 9s ease-out forwards; }
+.cl-vollmond i { position: absolute; left: -60%; bottom: -10%; width: 80px; height: 90px; background: #000; clip-path: polygon(30% 100%, 35% 60%, 20% 40%, 28% 20%, 40% 30%, 55% 0, 58% 30%, 70% 45%, 66% 100%); }
+@keyframes cl-mond-auf { from { transform: translateY(60px); opacity: 0; } 20%, 80% { opacity: 1; transform: none; } to { opacity: 0; } }
+.cl-kette { position: absolute; top: -70%; width: 26px; height: var(--l); animation: cl-kette 9s ease-in-out forwards; transform-origin: 50% 0; }
+.cl-kette svg { width: 100%; height: 100%; }
+@keyframes cl-kette { 0% { top: -70%; } 20% { top: 0; transform: rotate(0); } 40% { transform: rotate(6deg); } 60% { transform: rotate(-5deg); } 80% { transform: rotate(3deg); top: 0; } 100% { top: -70%; } }
+.cl-grosse-uhr { position: absolute; left: 50%; top: 45%; width: 260px; height: 260px; margin: -130px; color: rgba(255, 240, 200, 0.55); filter: drop-shadow(0 0 20px rgba(255, 220, 150, 0.4)); animation: cl-uhr-erscheint 7.5s ease-in-out forwards; }
+.cl-grosse-uhr .zeiger { transform-origin: 50px 50px; animation: cl-rundum 3.8s linear 2; }
+.cl-grosse-uhr .zeiger.klein { animation-duration: 7.6s; animation-iteration-count: 1; }
+@keyframes cl-uhr-erscheint { 0% { opacity: 0; transform: scale(0.6); } 15%, 80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+.cl-wand-schiebt { position: absolute; left: 58%; top: 26%; width: 14%; height: 36%; background: #000; box-shadow: inset 0 0 30px #000, 0 0 0 6px rgba(0, 0, 0, 0.4); animation: cl-schieben 4s ease-in-out forwards; }
+@keyframes cl-schieben { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+.cl-luftzug { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent); animation: cl-luftzug 1s ease-out forwards; }
+@keyframes cl-luftzug { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.cl-umschlag-rutscht { position: absolute; left: 50%; bottom: 6%; width: 90px; height: 58px; margin-left: -45px; background: linear-gradient(160deg, #f4ead2, #d8c8a0); border-radius: 3px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 30px var(--cl-glanz); animation: cl-umschlag 3.6s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+.cl-umschlag-rutscht::after { content: ''; position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px; border-radius: 50%; background: #9c2b2b; }
+@keyframes cl-umschlag { 0% { transform: translateX(42vw) rotate(0); opacity: 0; } 10% { opacity: 1; } 60% { transform: translateX(0) rotate(-10deg); } 85% { opacity: 1; } 100% { transform: translateX(0) rotate(-8deg) scale(0.6); opacity: 0; } }
+/* Telefon, Funk – klingeln, bis man abnimmt */
+.cl-ev-ding { position: absolute; right: 18px; bottom: 84px; z-index: 32; width: 118px; padding: 12px 8px 10px; border-radius: 20px; border: 2px solid var(--cl-akzent); background: rgba(10, 10, 14, 0.92); color: var(--cl-text); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 30px var(--cl-glanz); animation: cl-ding-rein 0.6s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.cl-ev-ding b { font-size: 13px; }
+.cl-ev-ding-bild { width: 64px; height: 64px; animation: cl-klingeln-neu 0.12s linear infinite alternate; }
+.cl-ev-ding.funk .cl-ev-ding-bild { animation-duration: 0.3s; }
+.cl-ev-ding-bild svg { width: 100%; height: 100%; }
+.cl-ring { position: absolute; left: 50%; top: 42px; width: 60px; height: 60px; margin: -30px; border-radius: 50%; border: 2px solid var(--cl-akzent); animation: cl-ring 1.4s ease-out infinite; pointer-events: none; }
+.cl-ring.zwei { animation-delay: 0.7s; }
+@keyframes cl-ring { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+@keyframes cl-klingeln-neu { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@keyframes cl-ding-rein { from { transform: translateY(40px) scale(0.6); opacity: 0; } }
+.cl-ev-ding.ab { animation: cl-aus 0.5s forwards; } .cl-ev-ding.ab .cl-ev-ding-bild, .cl-ev-ding.weg .cl-ev-ding-bild { animation: none; }
+.cl-ev-ding.weg { animation: cl-aus 0.6s forwards; }
+.cl-ev-ding.kurz { pointer-events: none; width: 84px; padding: 10px 6px; }
+.cl-ev-ding.kurz .cl-ev-ding-bild { width: 46px; height: 46px; font-size: 34px; display: flex; align-items: center; justify-content: center; }
+
+/* ================================================================ Kino-Intro mit Bildern */
+.cl-kino { background: #000; }
+.cl-kino-flaeche { position: absolute !important; inset: 0; width: auto !important; min-height: 0 !important; z-index: 1; display: block !important; }
+.cl-kino-flaeche > * { animation: none; }
+.cl-film { position: absolute; inset: 0; overflow: hidden; background: #000; opacity: 0; transition: opacity 1.4s; }
+.cl-film.an { opacity: 1; }
+.cl-film-bild { position: absolute; inset: 0; }
+.cl-film-bild.aussen { animation: cl-film-heran 22s linear forwards; transition: transform 1.3s cubic-bezier(0.6, 0, 0.9, 0.5), filter 1.3s; }
+.cl-film-bild.aussen.heran { transform: scale(3.6); filter: brightness(1.6) blur(5px); }
+.cl-film-bild.aussen.titel { transform: scale(1.12); filter: blur(7px) brightness(0.32); transition: transform 2s, filter 2s; animation: none; }
+@keyframes cl-film-heran { from { transform: scale(1.02); } to { transform: scale(1.22); } }
+.cl-aussen { width: 100%; height: 100%; display: block; }
+.cl-film.kinder .cl-aussen, .cl-intro-hinten.kinder .cl-aussen { filter: saturate(1.25) brightness(1.18); }
+.cl-film-bild.innen { opacity: 0; transition: opacity 1s; background: #000; z-index: 3; }
+.cl-film::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42%; z-index: 4; pointer-events: none; background: linear-gradient(transparent, rgba(0, 0, 0, 0.72)); }
+.cl-film-bild.innen.an { opacity: 1; }
+.cl-film-bild.innen.weg { opacity: 0; transition: opacity 1.2s; }
+.cl-film-raum { position: absolute; top: 0; bottom: 0; left: 0; width: 180%; animation: cl-film-schwenk 12s ease-in-out forwards; }
+.cl-film-raum .cl-wand { position: absolute; inset: 0; }
+@keyframes cl-film-schwenk { from { transform: translateX(0); } to { transform: translateX(-44.4%); } }
+.cl-film-lampe { position: absolute; inset: 0; background: radial-gradient(circle 22vmin at var(--fx, 20%) 52%, transparent 0, rgba(0, 0, 0, 0.6) 55%, rgba(0, 0, 0, 0.96) 100%); animation: cl-film-lampe 9s ease-in-out forwards; }
+@property --fx { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
+@keyframes cl-film-lampe { 0% { --fx: 15%; } 35% { --fx: 70%; } 60% { --fx: 40%; } 100% { --fx: 80%; } }
+.cl-film.kinder .cl-film-lampe { background: radial-gradient(circle 34vmin at var(--fx, 20%) 52%, transparent 0, rgba(30, 30, 90, 0.4) 55%, rgba(30, 30, 90, 0.75) 100%); }
+.cl-film-balken { position: absolute; left: 0; right: 0; height: 9%; background: #000; z-index: 4; transition: height 1s; }
+.cl-film-balken.oben { top: 0; } .cl-film-balken.unten { bottom: 0; }
+.cl-film-zeile { position: absolute; left: 0; right: 0; bottom: 14%; z-index: 5; display: flex; justify-content: center; padding: 0 20px; text-align: center; pointer-events: none; }
+.cl-film-text { font-family: var(--cl-titel); font-size: clamp(22px, 4vw, 44px); line-height: 1.2; color: #fff; text-shadow: 0 2px 24px #000, 0 0 40px rgba(0, 0, 0, 0.8); max-width: 1000px; }
+.cl-film-text i { font-style: normal; display: inline-block; animation: cl-film-buchstabe 0.5s both; animation-delay: calc(var(--j) * 28ms); }
+@keyframes cl-film-buchstabe { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } }
+.cl-film-vorspann { font-size: 13px; letter-spacing: 0.55em; text-transform: uppercase; color: var(--cl-akzent); text-shadow: 0 2px 10px #000; animation: cl-kino-rein 1.4s both; }
+.cl-film-titel { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; padding: 20px; animation: cl-kino-rein 1.2s both; }
+/* Wetter im Film und hinter der Einleitung */
+.cl-film-wetter { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.cl-film-wetter.w-regen { background: repeating-linear-gradient(103deg, transparent 0 40px, rgba(200, 215, 240, 0.25) 40px 41.5px); background-size: 300px 300px; animation: cl-regen-fall 0.45s linear infinite; }
+.cl-film-wetter.w-regen::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(100deg, transparent 0 24px, rgba(200, 215, 240, 0.14) 24px 25px); background-size: 200px 200px; animation: cl-regen-fall 0.8s linear infinite; }
+.cl-film-wetter.w-gewitter { animation: cl-fensterblitz 6s steps(1) infinite; background: #dfe8ff; mix-blend-mode: overlay; }
+.cl-film-wetter.w-nebel { background: radial-gradient(ellipse 50% 22% at 30% 80%, rgba(200, 220, 220, 0.35), transparent 70%), radial-gradient(ellipse 60% 20% at 80% 85%, rgba(200, 220, 220, 0.3), transparent 70%); filter: blur(10px); animation: cl-nebel-wogen 14s ease-in-out infinite alternate; }
+@keyframes cl-nebel-wogen { to { transform: translateX(8%); } }
+.cl-film-wetter.w-sand { background-image: radial-gradient(rgba(255, 220, 160, 0.5) 1px, transparent 1.5px); background-size: 70px 50px; animation: cl-sand-weht 3s linear infinite; }
+@keyframes cl-sand-weht { to { background-position: -280px 40px; } }
+.cl-film-wetter.w-schnee { background-image: radial-gradient(circle 2px, rgba(255, 255, 255, 0.9) 99%, transparent), radial-gradient(circle 1.5px, rgba(255, 255, 255, 0.7) 99%, transparent); background-size: 90px 90px, 60px 60px; background-position: 0 0, 30px 20px; animation: cl-schneien 6s linear infinite; }
+@keyframes cl-schneien { to { background-position: 30px 90px, 50px 80px; } }
+.cl-film-wetter.w-blaetter { background-image: radial-gradient(ellipse 4px 2px, rgba(200, 130, 60, 0.8) 99%, transparent); background-size: 160px 140px; animation: cl-blaetter 8s linear infinite; }
+@keyframes cl-blaetter { to { background-position: -160px 280px; } }
+.cl-film-wetter.w-gluehwuermchen { background-image: radial-gradient(circle 2px, #e9ff8a 99%, transparent); background-size: 130px 110px; animation: cl-gluehwurm 7s ease-in-out infinite alternate, cl-a-blinken 2.4s ease-in-out infinite; }
+@keyframes cl-gluehwurm { to { background-position: 40px -50px; } }
+.cl-film-wetter.w-blasen { background-image: radial-gradient(circle 3px, transparent 60%, rgba(200, 240, 255, 0.6) 70%, transparent 80%); background-size: 110px 120px; animation: cl-blasen-steigen 6s linear infinite; }
+@keyframes cl-blasen-steigen { to { background-position: 20px -240px; } }
+.cl-film-wetter.w-konfetti { background-image: radial-gradient(circle 2px, #ffd166 99%, transparent), radial-gradient(circle 2px, #ff5d73 99%, transparent), radial-gradient(circle 2px, #4cc9f0 99%, transparent); background-size: 140px 120px, 110px 150px, 170px 130px; animation: cl-schneien 7s linear infinite; }
+.cl-film-wetter.w-staub { background-image: radial-gradient(rgba(255, 210, 150, 0.4) 1px, transparent 1.5px); background-size: 90px 60px; animation: cl-sand-weht 5s linear infinite; }
+.cl-film-wetter.w-sterne { background: none; }
+/* Einleitung und Ende: Außenansicht im Hintergrund */
+.cl-intro { background: #000; overflow: hidden; }
+.cl-intro-hinten { position: absolute; inset: 0; z-index: 0; }
+.cl-intro-bild { position: absolute; inset: 0; animation: cl-intro-drift 40s ease-in-out infinite alternate; filter: brightness(0.55); }
+@keyframes cl-intro-drift { from { transform: scale(1.08) translateX(-1.5%); } to { transform: scale(1.18) translateX(1.5%); } }
+.cl-intro-hinten::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15) 70%, rgba(0, 0, 0, 0.6)); }
+.cl-intro .cl-intro-karte { padding: 26px 26px 24px; border-radius: 24px; background: rgba(6, 6, 10, 0.62); border: 1px solid var(--cl-rand); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); animation: cl-heran 0.9s cubic-bezier(0.2, 1, 0.3, 1); }
+.cl-intro.ende.geschafft .cl-intro-bild { filter: brightness(0.75) saturate(1.1); }
+.cl-intro.ende.geschafft .cl-intro-hinten::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgba(255, 170, 80, 0.35), rgba(255, 200, 140, 0.1) 50%, transparent); animation: cl-ein 4s; }
+
+/* SVG-Bewegungen in Kulissen und Bildern */
+.cl-a-funkeln { animation: cl-a-blinken 3.4s ease-in-out infinite; }
+@keyframes cl-a-blinken { 50% { opacity: 0.25; } }
+.cl-a-blinken { animation: cl-a-blinken 1.4s ease-in-out infinite; }
+.cl-a-regen { animation: cl-a-regen 0.6s linear infinite; }
+@keyframes cl-a-regen { from { transform: translate(0, -100px); } to { transform: translate(-6px, 0); } }
+.cl-a-neon { animation: cl-a-neon 5s steps(1) infinite; }
+@keyframes cl-a-neon { 0%, 100% { opacity: 1; } 47% { opacity: 0.2; } 49% { opacity: 1; } 51% { opacity: 0.4; } 53% { opacity: 1; } }
+.cl-a-wolke, .cl-a-wolke-gross { animation: cl-a-wolke 30s ease-in-out infinite alternate; }
+@keyframes cl-a-wolke { to { transform: translateX(-60px); } }
+.cl-a-drehen-langsam { animation: cl-rundum 240s linear infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+.cl-a-welle { animation: cl-a-welle 3s linear infinite; }
+@keyframes cl-a-welle { to { transform: translateX(40px); } }
+.cl-a-welle-gross { animation: cl-a-welle-gross 4s linear infinite; }
+.cl-a-welle-gross.zwei { animation-duration: 3s; animation-direction: reverse; }
+@keyframes cl-a-welle-gross { to { transform: translateX(200px); } }
+.cl-a-nebel { animation: cl-a-blinken 8s ease-in-out infinite; }
+.cl-a-fisch { animation: cl-a-fisch 20s linear infinite; }
+@keyframes cl-a-fisch { from { transform: translateX(-30%); } to { transform: translateX(130%); } }
+.cl-aussen .cl-a-fisch { animation-name: cl-a-fisch-gross; }
+@keyframes cl-a-fisch-gross { from { transform: translateX(-200px); } to { transform: translateX(1800px); } }
+.cl-a-strahlen { animation: cl-a-blinken 7s ease-in-out infinite; }
+.cl-a-tang { animation: cl-a-tang 4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes cl-a-tang { from { transform: skewX(-6deg); } to { transform: skewX(6deg); } }
+.cl-a-blasen, .cl-a-blasen-auf { animation: cl-a-blasen 5s linear infinite; }
+@keyframes cl-a-blasen { from { transform: translateY(20px); opacity: 0; } 20% { opacity: 1; } to { transform: translateY(-60px); opacity: 0; } }
+.cl-a-schnee { animation: cl-a-schnee 7s linear infinite; }
+@keyframes cl-a-schnee { from { transform: translateY(-100px); } to { transform: translateY(0); } }
+.cl-a-gluehen { animation: cl-a-gluehen 2.6s ease-in-out infinite; }
+@keyframes cl-a-gluehen { 50% { opacity: 0.55; } }
+.cl-a-feuer { animation: cl-a-feuer 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes cl-a-feuer { from { transform: scale(1, 1); } to { transform: scale(0.94, 1.12) skewX(2deg); } }
+.cl-a-pendel { animation: cl-a-pendel 2s ease-in-out infinite alternate; }
+@keyframes cl-a-pendel { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+.cl-a-schweben { animation: cl-a-schweben 4s ease-in-out infinite alternate; }
+@keyframes cl-a-schweben { to { transform: translateY(-8px); } }
+.cl-a-schweben-langsam { animation: cl-a-schweben-l 9s ease-in-out infinite alternate; }
+@keyframes cl-a-schweben-l { to { transform: translateY(-16px); } }
+.cl-a-drehen-ring { animation: cl-a-ring 6s ease-in-out infinite alternate; }
+@keyframes cl-a-ring { to { transform: rotate(4deg); } }
+.cl-a-zeiger { animation: cl-a-zeiger 1.6s ease-in-out infinite alternate; }
+@keyframes cl-a-zeiger { from { transform: rotate(-30deg); } to { transform: rotate(20deg); } }
+.cl-a-dampf { animation: cl-a-dampf 2.4s ease-out infinite; }
+@keyframes cl-a-dampf { from { transform: translateY(10px); opacity: 0; } 40% { opacity: 0.4; } to { transform: translateY(-14px); opacity: 0; } }
+.cl-a-welle-bild { animation: cl-a-welle-bild 2s linear infinite; }
+@keyframes cl-a-welle-bild { 50% { transform: translateX(-6px) scaleY(0.6); } }
+.cl-a-fallen { animation: cl-a-fallen 0.8s linear infinite; }
+@keyframes cl-a-fallen { to { transform: translateY(160px); } }
+.cl-a-schwingen { animation: cl-a-schwingen 4s ease-in-out infinite alternate; }
+@keyframes cl-a-schwingen { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+.cl-a-schwingen-langsam { animation: cl-a-schwingen 5s ease-in-out infinite alternate; }
+.cl-a-pendeln { animation: cl-a-pendeln 3s ease-in-out infinite alternate; }
+@keyframes cl-a-pendeln { from { transform: scaleX(1); } to { transform: scaleX(0.8); } }
+.cl-a-tippen { animation: cl-a-blinken 1.1s steps(2) infinite; }
+.cl-a-kuckuck { animation: cl-a-kuckuck 8s ease-in-out infinite; }
+@keyframes cl-a-kuckuck { 0%, 90%, 100% { transform: translateY(0); } 93%, 97% { transform: translateY(-8px); } }
+.cl-a-schaukeln { animation: cl-a-pendel 2.4s ease-in-out infinite alternate; }
+.cl-a-drehen { animation: cl-rundum 1.2s linear infinite; }
+.cl-a-flackern { animation: cl-a-neon 3.6s steps(1) infinite; }
+.cl-a-flackern-sanft { animation: cl-a-gluehen 1.8s ease-in-out infinite; }
+.cl-a-suchlicht { animation: cl-a-such 8s ease-in-out infinite alternate; }
+.cl-a-suchlicht.zwei { animation-delay: -4s; }
+@keyframes cl-a-such { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.cl-a-flagge { animation: cl-a-flagge 0.8s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 0 50%; }
+@keyframes cl-a-flagge { to { transform: scaleX(0.82) skewY(4deg); } }
+.cl-a-kreisen { animation: cl-rundum 12s linear infinite; }
+.cl-a-rollen { animation: cl-a-rollen 9s linear infinite; }
+@keyframes cl-a-rollen { from { transform: translateX(-80px) rotate(0); } to { transform: translateX(1700px) rotate(1440deg); } }
+.cl-a-rollen circle { transform-box: fill-box; transform-origin: 50% 50%; }
+.cl-glyphe { opacity: 0.8; }
+.cl-schemen-fenster { opacity: 0; }
+.cl-film .cl-schemen-fenster { animation: cl-schemen 3.3s ease-in-out 5s 2; }
+
+/* ================================================================ Rätsel zum Anfassen */
+/* Versteckte Zeichen */
+.cl-raumcode-funde { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
+.cl-raumcode-liste { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.cl-raumcode-fund { padding: 5px 12px; border-radius: 999px; border: 1px dashed var(--cl-rand); font-family: var(--cl-mono); font-size: 15px; color: var(--cl-leise); }
+.cl-raumcode-fund.ja { border-style: solid; border-color: var(--cl-akzent); color: var(--cl-text); }
+.cl-raumcode-fund i { font-style: normal; color: var(--cl-akzent); }
+.cl-rolle-zeichen { font-size: 22px; color: var(--cl-akzent); height: 30px; display: flex; align-items: center; }
+.cl-mech.raumcode .cl-rollen { align-self: center; }
+.cl-mech.raumcode > .cl-knopf { align-self: center; }
+/* Lichtstrahl */
+.cl-spiegel-rahmen { position: relative; align-self: center; width: min(420px, calc(100% - 84px)); aspect-ratio: 1; margin: 6px 42px; }
+.cl-spiegel-feld { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 3px; padding: 0; background: rgba(0, 0, 0, 0.35); border-radius: 10px; }
+.cl-spiegel-zelle { border: 0; border-radius: 6px; background: rgba(255, 255, 255, 0.05); position: relative; cursor: default; }
+.cl-spiegel-zelle[data-t="a"], .cl-spiegel-zelle[data-t="b"] { cursor: pointer; background: rgba(255, 255, 255, 0.1); }
+.cl-spiegel-zelle[data-t="a"]::after, .cl-spiegel-zelle[data-t="b"]::after { content: ''; position: absolute; left: 50%; top: 8%; width: 7px; height: 84%; margin-left: -3.5px; border-radius: 3px; background: linear-gradient(90deg, #d8e6f4, #8aa0b8); box-shadow: 0 0 8px rgba(200, 230, 255, 0.6); transition: transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.cl-spiegel-zelle[data-t="a"]::after { transform: rotate(45deg); } .cl-spiegel-zelle[data-t="b"]::after { transform: rotate(-45deg); }
+.cl-spiegel-zelle[data-t="a"]:hover, .cl-spiegel-zelle[data-t="b"]:hover { background: rgba(255, 255, 255, 0.18); }
+.cl-spiegel-strahl { position: absolute; top: 0; height: 100%; pointer-events: none; overflow: visible; }
+.cl-spiegel-strahl polyline { fill: none; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.cl-spiegel-strahl .glut { stroke: rgba(255, 80, 80, 0.45); stroke-width: 10; filter: blur(3px); }
+.cl-spiegel-strahl .kern { stroke: #ffd0d0; stroke-width: 2.5; }
+.cl-spiegel-quelle, .cl-spiegel-ziel { position: absolute; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; }
+.cl-spiegel-quelle { left: -38px; background: radial-gradient(circle, #fff, #ff5a5a 50%, transparent 70%); box-shadow: 0 0 20px #ff5a5a; }
+.cl-spiegel-ziel { right: -38px; background: linear-gradient(160deg, #b9f3ff, #3fb7d0); clip-path: polygon(50% 0, 100% 40%, 80% 100%, 20% 100%, 0 40%); }
+.cl-spiegel-feld.treffer ~ .cl-spiegel-ziel, .cl-spiegel-rahmen:has(.treffer) .cl-spiegel-ziel { filter: drop-shadow(0 0 16px #b9f3ff) brightness(1.5); animation: cl-puls 0.6s infinite; }
+/* Im richtigen Moment */
+.cl-timing-balken { position: relative; height: 46px; border-radius: 12px; background: linear-gradient(180deg, #1a1a20, #0c0c10); border: 2px solid var(--cl-rand); overflow: hidden; }
+.cl-timing-zone { position: absolute; top: 0; bottom: 0; background: linear-gradient(180deg, rgba(95, 211, 154, 0.55), rgba(95, 211, 154, 0.3)); box-shadow: inset 0 0 0 2px var(--cl-ok); transition: left 0.3s, width 0.3s; }
+.cl-timing-zeiger { position: absolute; top: -4px; bottom: -4px; width: 6px; margin-left: -3px; background: #fff; box-shadow: 0 0 12px #fff; border-radius: 3px; }
+.cl-timing-balken.getroffen { box-shadow: 0 0 24px rgba(95, 211, 154, 0.8); }
+.cl-timing-balken.daneben { box-shadow: 0 0 24px rgba(255, 80, 80, 0.8); animation: cl-wackeln 0.4s; }
+.cl-timing-punkte { display: flex; gap: 8px; justify-content: center; }
+.cl-timing-punkte span { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--cl-rand); }
+.cl-timing-punkte span.voll { background: var(--cl-ok); border-color: var(--cl-ok); box-shadow: 0 0 10px var(--cl-ok); }
+.cl-mech.timing > .cl-knopf { align-self: center; }
+/* Was hat sich verändert? */
+.cl-veraendert-raster { display: grid; gap: 10px; align-self: center; width: min(460px, 100%); transition: filter 0.4s; }
+.cl-veraendert-raster.vorhang { filter: brightness(0) blur(4px); }
+.cl-veraendert-fach { aspect-ratio: 1; border-radius: 14px; border: 2px solid var(--cl-rand); background: rgba(255, 255, 255, 0.05); color: var(--cl-akzent); display: flex; align-items: center; justify-content: center; cursor: pointer; animation: cl-landen 0.5s; }
+.cl-veraendert-fach .cl-icon { width: 54%; height: 54%; }
+.cl-veraendert-fach:disabled { cursor: default; opacity: 1; }
+.cl-veraendert-fach.zu { background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.04) 0 8px, transparent 8px 16px); }
+.cl-veraendert-fach.gewaehlt { border-color: var(--cl-akzent); box-shadow: 0 0 16px var(--cl-glanz); background: rgba(255, 255, 255, 0.12); }
+.cl-veraendert-zeit { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.cl-veraendert-zeit i { display: block; height: 100%; width: 100%; background: var(--cl-akzent); }
+.cl-veraendert-zeit.weg { visibility: hidden; }
+/* Klopfzeichen */
+.cl-klopf-wand { position: relative; height: 150px; border-radius: 14px; border: 0; cursor: pointer; overflow: hidden; touch-action: manipulation;
+  background: repeating-linear-gradient(90deg, #5a3a1c 0 22px, #4a2e16 22px 24px), #5a3a1c; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6); color: rgba(255, 255, 255, 0.55); font-weight: 700; font-size: 15px; }
+.cl-klopf-wand:active { filter: brightness(1.15); }
+.cl-klopf-wand.von-innen { filter: brightness(1.35); transform: scale(0.99); }
+.cl-klopf-wand.falsch { animation: cl-wackeln 0.45s; }
+.cl-klopf-welle { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px; border-radius: 50%; border: 3px solid rgba(255, 230, 180, 0.6); animation: cl-ring 0.7s ease-out forwards; pointer-events: none; }
+.cl-mech.klopfzeichen > .cl-knopf { align-self: center; }
+/* Waage */
+.cl-waage { position: relative; height: 210px; align-self: center; width: min(460px, 100%); }
+.cl-waage-saeule { position: absolute; left: 50%; bottom: 0; width: 14px; height: 170px; margin-left: -7px; background: linear-gradient(90deg, #8a6a2a, #d9a84a, #8a6a2a); border-radius: 4px; }
+.cl-waage-saeule::after { content: ''; position: absolute; left: -40px; right: -40px; bottom: -4px; height: 14px; border-radius: 6px; background: #6a5020; }
+.cl-waage-arm { position: absolute; left: 6%; right: 6%; top: 34px; height: 0; }
+.cl-waage-balken { position: absolute; left: 0; right: 0; top: 0; height: 8px; border-radius: 4px; background: linear-gradient(#e0b25c, #8a6a2a); transform: rotate(var(--neig, 0deg)); transition: transform 0.6s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.cl-waage-balken.gleich { box-shadow: 0 0 18px var(--cl-ok); }
+.cl-waage-schale { position: absolute; top: 40px; width: 38%; min-height: 70px; padding: 6px; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-end; justify-content: center; border-radius: 0 0 50% 50%; border-bottom: 5px solid #b8893a; background: radial-gradient(ellipse at 50% 100%, rgba(255, 220, 140, 0.15), transparent 70%); transition: transform 0.6s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.cl-waage-schale.links { left: -4%; }
+.cl-waage-schale.rechts { right: -4%; }
+.cl-waage-last { width: 54px; height: 44px; border-radius: 10px 10px 4px 4px; background: linear-gradient(#5a5a62, #2a2a30); color: #fff; font-family: var(--cl-mono); font-weight: 900; display: flex; align-items: center; justify-content: center; }
+.cl-waage-gewicht { width: calc(24px + var(--g) * 6px); height: calc(24px + var(--g) * 6px); border-radius: 8px 8px 4px 4px; border: 0; cursor: pointer; background: linear-gradient(#e0b25c, #8a6a2a); color: #1a1208; font-family: var(--cl-mono); font-weight: 900; font-size: 14px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5); }
+.cl-waage-gewicht:hover { filter: brightness(1.15); }
+.cl-waage-vorrat { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 50px; align-items: flex-end; padding-top: 8px; border-top: 1px dashed var(--cl-rand); }
+/* Fehlendes Teil */
+.cl-mech.fehlteil { align-items: center; text-align: center; }
+.cl-fehlteil-loch { width: 110px; height: 110px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 54px; background: radial-gradient(circle, #050505, #1a1a1a); box-shadow: inset 0 6px 20px #000, 0 0 0 4px rgba(255, 255, 255, 0.08); }
+.cl-fehlteil-loch span { filter: grayscale(1) brightness(0.2) blur(0.5px); opacity: 0.7; }
+.cl-fehlteil-loch.bereit { box-shadow: inset 0 6px 20px #000, 0 0 0 3px var(--cl-akzent), 0 0 24px var(--cl-glanz); animation: cl-puls 1.4s infinite; }
+.cl-fehlteil-loch.einsetzen span { filter: none; opacity: 1; animation: cl-einsetzen 0.6s cubic-bezier(0.3, 1.5, 0.5, 1); }
+@keyframes cl-einsetzen { from { transform: translateY(-80px) scale(1.6); } }
+.cl-fehlteil-text { display: flex; flex-direction: column; gap: 4px; max-width: 420px; }
+
+/* ================================================================ Schmal (Handy) */
+@media (max-width: 720px) {
+  .cl-hud { gap: 8px; padding: 8px 10px; }
+  .cl-ziel { order: 5; flex-basis: 100%; min-width: 0; font-size: 12.5px; padding: 6px 10px; }
+  .cl-ort-anzeige b { font-size: 14px; }
+  .cl-lageplan { display: none; }
+  .cl-req { width: 86px; }
+  .cl-req-bild { width: 60px; height: 60px; }
+  .cl-req.wand .cl-req-bild { width: 52px; height: 52px; }
+  .cl-req-schatten { top: 48px; }
+  .cl-tischchen { top: 52px; width: 88px; margin-left: -44px; height: 44px; }
+  .cl-req.tisch .cl-req-schild { margin-top: 38px; }
+  .cl-erzaehler { bottom: 70px; font-size: 15px; padding: 10px 12px; }
+  .cl-durchgang { min-width: 58px; }
+  .cl-umsehen { width: 34px; font-size: 34px; }
+  .cl-unten { gap: 10px; padding: 8px 10px; }
+  .cl-unten .cl-wort-feld { width: 24px; height: 32px; font-size: 16px; }
+  .cl-ev-ding { bottom: 76px; right: 10px; width: 100px; }
+  .cl-nah-rahmen { padding: 8px; border-radius: 18px; }
+  .cl-auftrag-titel { font-size: 22px; }
+}
+/* Hochkant (Handy): Möbel kleiner, damit Requisiten und Raum im Verhältnis bleiben */
+@media (max-aspect-ratio: 4/5) {
+  .cl-modul { transform: translateX(-50%) scale(0.64); transform-origin: 50% 100%; }
+  .cl-modul.haengt { transform: translateX(-50%) scale(0.64) rotate(var(--neig)); transform-origin: 50% 100%; }
+  .cl-raum.spur-schief .cl-modul.haengt { transform: translateX(-50%) scale(0.64) rotate(calc(var(--neig) * 6)); }
+  .cl-kronleuchter { width: 120px; height: 90px; }
+  .cl-durchgang { height: 30%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cl-a-funkeln, .cl-a-regen, .cl-a-fisch, .cl-film-bild.aussen, .cl-intro-bild, .cl-regen-ebene, .cl-film-raum { animation: none !important; }
+}

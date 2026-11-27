@@ -87,7 +87,7 @@ const ClavisLeiter = (() => {
         geheim[id] = { loesung: g.loesung, zettel: g.zettel || null, hinweise: eigene.concat(g.hilfen || []).slice(0, 3), ereignis: ereignisAus(s.ereignis), wunschTuer: !!s.tuer };
         ids.push(id);
       });
-      if (ids.length) szenen.push({ titel: String(sz.titel || `Raum ${si + 1}`).slice(0, 60), text: String(sz.text || '').slice(0, 400), stationen: ids });
+      if (ids.length) szenen.push({ titel: String(sz.titel || `Raum ${si + 1}`).slice(0, 60), text: String(sz.text || '').slice(0, 400), art: typeof sz.art === 'string' ? sz.art.slice(0, 20) : '', stationen: ids });
     });
     if (!szenen.length) throw new Error('Kein Rätsel ließ sich bauen.');
 
@@ -330,8 +330,9 @@ const ClavisLeiter = (() => {
         else { const id = l[Math.floor(Math.random() * l.length)]; L.blockiert[id] = Date.now() + 60000; Object.assign(daten, { station: id, ort: R.stationen[id].ort, sekunden: 60 }); }
       }
       if (art === 'countdown') {
-        if (L.countdown) art = 'zeitminus';
-        else { L.countdown = { bis: Date.now() + 90000, geloest: anzahlGeloest() }; daten.sekunden = 90; }
+        // Nur, wenn es etwas zu lösen gibt; jedes gelöste Rätsel zählt (auch ein Bonus)
+        if (L.countdown || !offeneStationen().length) art = 'zeitminus';
+        else { L.countdown = { bis: Date.now() + 90000, geloest: Object.keys(L.geloest).length }; daten.sekunden = 90; }
       }
       if (art === 'zeitplus') { L.strafe -= 120; daten.sekunden = 120; }
       if (art === 'zeitminus') { L.strafe += 60; daten.sekunden = 60; }
@@ -341,8 +342,11 @@ const ClavisLeiter = (() => {
       const texte = W.texte[textStufe] || W.texte.normal;
       // Kinder: nur kindgerechte Bilder; ab 10: kein Konfetti und Kichern (passt nicht zu Gefahr und Grusel)
       const ereignisse = W.ereignisse.filter((e) => (R.alter === 'kinder' ? !!(Clavis.EREIGNISSE[e] && Clavis.EREIGNISSE[e].kinder) : !['konfetti', 'kichern'].includes(e)));
+      // Lieber ein Bild, das zur Welt passt (kein Wolfsheulen auf der Raumstation)
+      const zurWelt = ereignisse.filter((e) => ((Clavis.WELTEN[R.welt] || {}).ereignisse || []).includes(e));
+      const auswahl = zurWelt.length ? zurWelt : ereignisse;
       L.letzteWendung = Date.now();
-      senden({ typ: 'wendung', art, gut: W.gut, ereignis: ereignisse[Math.floor(Math.random() * ereignisse.length)] || (R.alter === 'kinder' ? 'konfetti' : 'uhrschlag'), text: texte[Math.floor(Math.random() * texte.length)], daten }, null);
+      senden({ typ: 'wendung', art, gut: W.gut, ereignis: auswahl[Math.floor(Math.random() * auswahl.length)] || (R.alter === 'kinder' ? 'konfetti' : 'uhrschlag'), text: texte[Math.floor(Math.random() * texte.length)], daten }, null);
       melden();
     }
 
@@ -376,7 +380,7 @@ const ClavisLeiter = (() => {
         delete L.blockiert[id];
         senden({ typ: 'geloest', station: id, von: person.id, name: person.name, belohnung: b, ereignis: g.ereignis }, null);
         // Countdown entschärft?
-        if (L.countdown && anzahlGeloest() > L.countdown.geloest) {
+        if (L.countdown && Object.keys(L.geloest).length > L.countdown.geloest) {
           L.countdown = null;
           senden({ typ: 'wendung_ende', art: 'countdown', erfolg: true, text: R.alter === 'kinder' ? 'Geschafft! Die Wecker-Rakete fliegt davon.' : 'Countdown gestoppt – gerade noch rechtzeitig!' }, null);
         }
