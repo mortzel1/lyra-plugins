@@ -10,7 +10,7 @@ installierst – von hier, aus dem neuesten Release:
 | **Arena** | 1.0.1 | Probeklausur unter echten Bedingungen |
 | **Argus** | 1.0.0 | Vertrags-Check mit belegten Zitaten |
 | **Byte** | 1.0.1 | Programmieraufgaben mit Tests – Python & Java |
-| **Clavis** | 1.4.0 | Escape Rooms mit zwei Premium-Abenteuern: Mercy Creek und Der Wald hört mit |
+| **Clavis** | 1.5.0 | Drei Premium-Abenteuer – neu: NULLMEILE, ausschließlich im Team mit 2–8 Personen |
 | **Crux** | 1.1.0 | Kreuzworträtsel aus deinem Lernstoff |
 | **Deep Dive** | 2.1.0 | Dein persönlicher Professor – lückenlos durch jedes Thema bis zur Prüfung |
 | **Delta** | 1.0.1 | DEAs und NEAs entwerfen, simulieren und erzeugen |

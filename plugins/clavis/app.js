@@ -295,6 +295,7 @@ function hinweisSetzen(t) {
 // ================================================================== Spielen (allein oder als Team)
 
 function spielen(entwurf, stufe, gruppe, { campus = false } = {}) {
+  if (entwurf.nurTeam) gruppe = true;
   if (z.einst.schreckErlaubt === false) entwurf = { ...entwurf, jumpscares: false };
   let gebaut;
   try { gebaut = ClavisLeiter.bauen(entwurf, stufe, (Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0); } catch (e) { return lyra.toast(meldung(e), 'fehler'); }
@@ -322,7 +323,7 @@ function spielen(entwurf, stufe, gruppe, { campus = false } = {}) {
   S.ansicht = Clavis.Spiel.erstellen(wurzel, {
     senden: (d) => S.leiter.eingang(ich, d),
     ich,
-    host: { starten: () => { S.leiter.starten(); S.einladenOffen = false; leisteMalen(); }, beenden: spielVerlassen, fertig: spielFertig },
+    host: { starten: () => { if (S.leiter.starten() === false) return; S.einladenOffen = false; leisteMalen(); }, beenden: spielVerlassen, fertig: spielFertig },
   });
   if (gruppe) {
     S.online = LyraOnline.runde({
@@ -353,7 +354,7 @@ function spielen(entwurf, stufe, gruppe, { campus = false } = {}) {
       h('div', { class: 'zeile' }, h('h3', { class: 'wachsen' }, 'Mitspielende einladen'), h('button', { class: 'knopf text klein', onclick: () => { S.einladenOffen = false; leisteMalen(); } }, '✕')),
       S.online.beitritt({ campusText: 'Teile den Raum in einen Campus-Raum – die Mitglieder spielen mit ihrer Lyra mit.' }),
       h('div', { class: 'einladen-team' }, h('div', { class: 'leise klein' }, 'Im Team'), S.online.chips('Noch niemand da – teile den Link oder QR-Code.')),
-      h('p', { class: 'leise klein' }, 'Alle sehen denselben Raum. Zettel zu manchen Rätseln bekommt jeweils nur eine Person – redet miteinander!'));
+      h('p', { class: 'leise klein' }, entwurf.nurTeam ? 'Jede Person erhält eigene Messwerte und Bedienelemente. Zufällige Zweier- und Dreiergruppen wechseln zwischen den Aufgaben. Alle bestätigen ihre Bereitschaft, bevor ihr startet.' : 'Alle sehen denselben Raum. Zettel zu manchen Rätseln bekommt jeweils nur eine Person – redet miteinander!'));
   }
   leisteMalen();
 }
@@ -426,7 +427,7 @@ function cover(welt, gross = false) {
 
 function stufenWahl(id, standard) {
   const w = z.wahl[id] || standard || 'mittel';
-  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${id === 'v-mercy-creek' ? { leicht: 85, mittel: 70, schwer: 58, experte: 46 }[k] : id === 'v-wald17' ? { leicht: 60, mittel: 50, schwer: 42, experte: 35 }[k] : s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
+  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${id === 'v-nullmeile' ? { leicht: 95, mittel: 85, schwer: 72, experte: 60 }[k] : id === 'v-mercy-creek' ? { leicht: 85, mittel: 70, schwer: 58, experte: 46 }[k] : id === 'v-wald17' ? { leicht: 60, mittel: 50, schwer: 42, experte: 35 }[k] : s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
 }
 
 function stimmungChips(e) {
@@ -452,6 +453,20 @@ function raumKarte(e) {
       h('div', { class: 'zeile', style: { gap: '8px', marginTop: '10px' } },
         h('button', { class: 'knopf', onclick: () => spielen(e, stufe, false) }, 'Allein spielen'),
         h('button', { class: 'knopf tonal', onclick: () => spielen(e, stufe, true) }, 'Im Team'))));
+}
+
+function arizonaKarte() {
+  const e = ClavisArizona.VORLAGE, stufe = z.wahl[e.id] || e.empfohlen;
+  const bild = h('div', { class: 'az-featured-art', 'aria-hidden': 'true' });
+  bild.innerHTML = Clavis.ArizonaWelt.bild('strasse');
+  return h('section', { class: 'az-featured' }, bild, h('div', { class: 'az-featured-shade' }),
+    h('div', { class: 'az-featured-copy' }, h('span', { class: 'az-team-label' }, 'NUR IM TEAM · 2–8 PERSONEN'),
+      h('span', { class: 'az-kicker' }, 'CLAVIS PREMIUM · VOL. III · ARIZONA'), h('h2', {}, 'NULLMEILE'),
+      h('div', { class: 'az-featured-subtitle' }, 'PROTOKOLL JANUS'),
+      h('p', {}, 'Ein geplatzter Reifen. Ein Labor unter der Wüste. Und eine Aufnahme eurer Ankunft, die es noch nicht geben dürfte. Nur eure verschiedenen Perspektiven halten euch in derselben Wirklichkeit.'),
+      h('div', { class: 'az-featured-meta' }, '9 Schauplätze · 8 Teamoperationen · zufällige Zweier- und Dreiergruppen · getrennte Rollenblätter'),
+      stufenWahl(e.id, e.empfohlen), h('div', { class: 'az-featured-actions' },
+        h('button', { class: 'az-btn primary', onclick: () => spielen(e, stufe, true) }, 'Team einladen →'))));
 }
 
 function frontierKarte() {
@@ -491,6 +506,7 @@ function startAnsicht() {
     k && k.inhalt && k.inhalt.typ === TYP ? h('div', { class: 'hinweis-band' }, `Aus „${k.raum.name}“ geöffnet: Wähle einen Raum und „Im Team“ – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
     h('div', { class: 'zeile zwischen-zeile' }, h('h2', { class: 'wachsen', style: { margin: 0 } }, 'Fertige Räume'),
       h('label', { class: 'schreck-schalter klein' }, h('input', { type: 'checkbox', checked: z.einst.schreckErlaubt !== false, onchange: (e) => { z.einst.schreckErlaubt = e.target.checked; lyra.speicher.schreiben('einstellungen', z.einst).catch(() => {}); } }), h('span', {}, '⚡ Jumpscares erlauben'))),
+    arizonaKarte(),
     frontierKarte(),
     premiumKarte(),
     h('div', { class: 'raum-raster' }, CLAVIS_VORLAGEN.filter(v => !v.premium).map(raumKarte)),

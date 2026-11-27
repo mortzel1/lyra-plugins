@@ -26,6 +26,7 @@ const ClavisLeiter = (() => {
   }
 
   function bauen(entwurf, stufe = 'mittel', seed = Date.now()) {
+    if (entwurf.premium === 'arizona') return ClavisArizona.bauen(entwurf, stufe, seed);
     if (entwurf.premium === 'mercy') return ClavisFrontier.bauen(entwurf, stufe, seed);
     if (entwurf.premium === 'wald17') return ClavisPremium.bauen(entwurf, stufe, seed);
     const r = Clavis.zufall(seed);
@@ -219,6 +220,7 @@ const ClavisLeiter = (() => {
   }
 
   function erstellen(gebaut, { senden, beiEnde }) {
+    if (gebaut.oeffentlich.premium === 'arizona') return ClavisArizona.erstellen(gebaut, { senden, beiEnde });
     if (gebaut.oeffentlich.premium === 'mercy') return ClavisFrontier.erstellen(gebaut, { senden, beiEnde });
     if (gebaut.oeffentlich.premium === 'wald17') return ClavisPremium.erstellen(gebaut, { senden, beiEnde });
     const R = gebaut.oeffentlich;
