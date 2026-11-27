@@ -496,6 +496,19 @@ function premiumKarte() {
         h('button', { class: 'px-button secondary', onclick: () => spielen(e, stufe, true) }, 'Gemeinsam aufbrechen'))));
 }
 
+function noirKarte() {
+  return h('section', { class: 'noir-zusatzkarte' },
+    h('div', { class: 'noir-zusatzzeichen', 'aria-hidden': 'true' }, '◈'),
+    h('div', { class: 'wachsen' }, h('div', { class: 'leise klein' }, 'CLAVIS NOIR · SEPARATER ZUSATZINHALT · NUR TEAM'),
+      h('h2', {}, 'Die Schwarze Reserve'),
+      h('p', {}, 'Ein Bankraub für 2–8 Personen. Zwölf Teamoperationen, wechselnde Gruppen, Live-Kontrollen und persönliche Festnahmen. Die Bank zählt euch mit.'),
+      h('p', { class: 'leise klein' }, 'Als eigenes Premium-Paket vorgesehen. Zum Spielen muss Clavis Noir separat installiert sein.')),
+    h('button', { class: 'knopf', onclick: async () => {
+      try { await lyra.plugin('clavis-noir'); }
+      catch (_) { await lyra.dialog('Clavis Noir', h('p', {}, 'Dieses Abenteuer wird als separates Zusatzpaket installiert. Es ist in Clavis nicht enthalten. Installiere das Paket „Clavis Noir“, um den Raum zu öffnen.'), [{ text: 'Verstanden', wert: true }]); }
+    } }, 'Clavis Noir öffnen →'));
+}
+
 function startAnsicht() {
   const k = z.kontext;
   return [
@@ -506,6 +519,7 @@ function startAnsicht() {
     k && k.inhalt && k.inhalt.typ === TYP ? h('div', { class: 'hinweis-band' }, `Aus „${k.raum.name}“ geöffnet: Wähle einen Raum und „Im Team“ – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
     h('div', { class: 'zeile zwischen-zeile' }, h('h2', { class: 'wachsen', style: { margin: 0 } }, 'Fertige Räume'),
       h('label', { class: 'schreck-schalter klein' }, h('input', { type: 'checkbox', checked: z.einst.schreckErlaubt !== false, onchange: (e) => { z.einst.schreckErlaubt = e.target.checked; lyra.speicher.schreiben('einstellungen', z.einst).catch(() => {}); } }), h('span', {}, '⚡ Jumpscares erlauben'))),
+    noirKarte(),
     arizonaKarte(),
     frontierKarte(),
     premiumKarte(),

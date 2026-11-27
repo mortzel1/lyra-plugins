@@ -1,7 +1,7 @@
 {
   "kennung": "clavis",
   "name": "Clavis",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "untertitel": "Escape Rooms zum Rätseln und Lernen – allein oder im Team",
   "kategorie": "lernen",
   "beschreibung": "Drei handgeschriebene Premium-Abenteuer: NULLMEILE – Protokoll JANUS ist ein reiner Team-Escape-Room für 2–8 Personen mit getrennten Informationen, zufälligen Zweier- und Dreiergruppen und verbindlichen gemeinsamen Aufgaben in einem geheimen Labor unter Arizona. Dazu Mercy Creek – Die letzte Schicht in den Rocky Mountains und Der Wald hört mit im Forstrevier 17. Acht Standardräume, KI-Räume aus deinen Unterlagen, vier Schwierigkeiten, Filmsequenzen, Geräusche und optionale Jumpscares.",
@@ -17,6 +17,7 @@
   ],
   "datenhinweis": "beim Bauen dein Thema, Altersstufe, Stimmung und passende Auszüge aus deinen Unterlagen an die KI – mit „Lyra (lokal)“ bleibt alles auf deinem Mac; im Team-Spiel nur der Raum (ohne Lösungen), Namen und Spielzüge – über die Seite im Browser (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen; die Lösungen bleiben auf deinem Mac",
   "funktionen": [
+    "Clavis Noir: Einstieg zum separat installierten Mega-Premium-Zusatzpaket „Die Schwarze Reserve“. Der Zusatzinhalt ist nicht im freien Clavis-Paket enthalten.",
     "Premium III: NULLMEILE – Protokoll JANUS, ausschließlich für 2–8 Personen. Neun Filmkulissen, acht echte Teamoperationen, private Rollenblätter, wechselnde Zweier- und Dreiergruppen, Gruppenfunk, gemeinsame Rettung und einstimmiges Finale.",
     "Premium II: Mercy Creek – Die letzte Schicht: neun Schauplätze, zehn verbundene Geräte, selbst gespielte Entscheidungen, Minenfahrt und mehrere Enden; eigene Klangregie, Filmsequenzen und keine automatische Computerstimme",
     "Premium: „Der Wald hört mit“ – sieben gezeichnete Schauplätze, acht verbundene Rätsel, Waldgeräusche, neun Filmsequenzen und Entscheidungen mit mehreren Enden; ab 14",
@@ -33,6 +34,9 @@
     "Eigene Räume im Editor bauen"
   ],
   "neuerungen": {
+    "1.6.0": [
+      "Startkarte für Clavis Noir – Die Schwarze Reserve, ein separat installierbarer Mega-Premium-Teamraum. Clavis enthält ausschließlich den Einstieg; Bankraub-Code und Bilder bleiben im eigenen Zusatzpaket."
+    ],
     "1.5.0": [
       "NULLMEILE – Protokoll JANUS: Ein Roadtrip endet an einer verlassenen Messstation in Arizona. Unter der Wüste wartet ein Labor, das einen möglichen nächsten Tag festhält.",
       "Ausschließlich für 2–8 unabhängige Referenzplätze: Geteilte Chiffren, unterschiedliche Gefahrenkarten, gekoppelte Ventile, verteilte Chronologie, fremde Kalibrierblätter und eine mehrstufige Anker-Rettung.",

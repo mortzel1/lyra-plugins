@@ -140,3 +140,5 @@ h2.zwischen { margin: 30px 0 12px; }
 [data-welt="western"] { --c-grund: linear-gradient(#6b3a1c, #160c05); --c-akzent: #f2b25c; --c-glanz: rgba(242, 178, 92, 0.4); }
 [data-welt="sanatorium"] { --c-grund: linear-gradient(#1d2421, #060807); --c-akzent: #9ef0c8; --c-glanz: rgba(158, 240, 200, 0.25); }
 .cover, .welt-wahl { background: var(--c-grund); }
+
+.noir-zusatzkarte{display:flex;align-items:center;gap:24px;padding:26px;margin:18px 0 25px;border:1px solid #baa06b66;background:linear-gradient(120deg,#15251e,#111711);color:#dbcfaf;border-radius:14px}.noir-zusatzzeichen{font:60px Georgia,serif;color:#d1b87c;text-shadow:0 0 35px #cab16b44}.noir-zusatzkarte h2{font:32px Georgia,serif;margin:7px 0}.noir-zusatzkarte p{line-height:1.7;max-width:650px;margin:7px 0;font-size:12px}.noir-zusatzkarte .knopf{flex-shrink:0;background:#cbb07b;color:#16271c}@media(max-width:700px){.noir-zusatzkarte{flex-wrap:wrap;padding:22px;gap:15px}.noir-zusatzzeichen{font-size:38px}.noir-zusatzkarte .wachsen{flex-basis:calc(100% - 65px)}}
