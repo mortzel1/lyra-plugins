@@ -1,10 +1,10 @@
 {
   "kennung": "clavis",
   "name": "Clavis",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "untertitel": "Escape Rooms zum Rätseln und Lernen – allein oder im Team",
   "kategorie": "lernen",
-  "beschreibung": "Neu: Das Premium-Abenteuer „Der Wald hört mit“ führt dich in sieben Schauplätze im Forstrevier 17. Acht verbundene Rätsel, eine handgeschriebene Geschichte, Entscheidungen und mehrere Enden. Clavis sperrt dich ein – und du rätselst dich hinaus. Acht fertige Räume vom Kinder-Zirkus bis zum Horror-Sanatorium, oder ein Raum, den die KI dir aus einem Thema baut, gern aus deinen Unterlagen: Dann öffnen Fragen, Begriffe und Zusammenhänge aus deinem Stoff die Schlösser. 27 Rätsel-Mechaniken, 14 Welten mit eigenem Look und Soundtrack, ein Kino-Intro, das neugierig macht – und während du rätselst, passiert ständig etwas: Schreie, Anrufe, Stromausfall, ein Geheimfach mit Bonusrätsel, ein Countdown, ein verriegeltes Schloss. Altersstufe von Kinder bis ab 18, Regler für Spannung, Gefahr, Spuk und Grusel, Jumpscares zum Ein- und Ausschalten. Allein spielen oder im Team: per Link oder QR-Code im Browser, ohne Lyra und ohne Konto, oder in Lyra Campus.",
+  "beschreibung": "Zwei handgeschriebene Premium-Abenteuer: Mercy Creek – Die letzte Schicht führt in neun Schauplätzen durch eine verlassene Goldgräberstadt der Rocky Mountains. Zehn verbundene Rätsel, eine vertuschte Minenkatastrophe, Entscheidungen und mehrere Enden. Der Wald hört mit führt in sieben Schauplätze im Forstrevier 17. Dazu acht fertige Räume vom Kinder-Zirkus bis zum Horror-Sanatorium und Räume, die die KI aus deinen Themen und Unterlagen baut. Vier Schwierigkeiten, Kino-Intros, Geräusche, Wendungen und optionale Jumpscares. Allein oder im Team per Link, QR-Code oder Lyra Campus.",
   "farbe": "#C99A3B",
   "symbol": "<circle cx='7.5' cy='9' r='4.2' fill='none' stroke-width='1.9'/><path d='M10.6 11.8L20 21.2M15.8 17l2.4-2.4M18.2 19.4l2.4-2.4' stroke-width='1.9' fill='none'/>",
   "einstieg": "index.html",
@@ -17,6 +17,7 @@
   ],
   "datenhinweis": "beim Bauen dein Thema, Altersstufe, Stimmung und passende Auszüge aus deinen Unterlagen an die KI – mit „Lyra (lokal)“ bleibt alles auf deinem Mac; im Team-Spiel nur der Raum (ohne Lösungen), Namen und Spielzüge – über die Seite im Browser (Cloudflare-Tunnel) und Lyra Campus jeweils Ende-zu-Ende-verschlüsselt; Lyra fragt vor dem Öffnen und Teilen; die Lösungen bleiben auf deinem Mac",
   "funktionen": [
+    "Premium II: Mercy Creek – Die letzte Schicht: neun Schauplätze, zehn verbundene Geräte, selbst gespielte Entscheidungen, Minenfahrt und mehrere Enden; eigene Klangregie, Filmsequenzen und keine automatische Computerstimme",
     "Premium: „Der Wald hört mit“ – sieben gezeichnete Schauplätze, acht verbundene Rätsel, Waldgeräusche, neun Filmsequenzen und Entscheidungen mit mehreren Enden; ab 14",
     "Acht fertige Räume in vier Schwierigkeiten – vom Zauberzirkus für Kinder bis zum Horror-Sanatorium ab 18",
     "Die KI baut Räume aus einem Thema oder deinen Unterlagen – Clavis macht daraus garantiert lösbare Rätsel",
@@ -31,6 +32,15 @@
     "Eigene Räume im Editor bauen"
   ],
   "neuerungen": {
+    "1.4.0": [
+      "Mercy Creek – Die letzte Schicht: ein zweites handgeschriebenes Premium-Abenteuer in den Rocky Mountains. Neun Schauplätze, zehn Rätsel und eine vertuschte Minenkatastrophe.",
+      "Verzweigte Ermittlung im Saloon und Sheriffbüro; Gold und Rettung verändern die tatsächliche Last des Förderkorbs.",
+      "Filmregie mit wechselnden Bildausschnitten, Zugfahrt, Lawine, Pianola, Grubenfahrt, Geisterspiegel und reagierendem Glockenwerk. Die Zeit pausiert während der Szenen.",
+      "Eigene gemalte Panoramen für alle neun Orte; geöffneter und geleerter Tresor, bewegte Lampen und Spiegelgestalten, Regen, Nebel, Kamerafahrten und Felssturz. Szenentexte lassen sich im Reisebuch nachlesen.",
+      "Eigene offline erzeugte Klangkulisse mit Regen, Donner, Lawine, Atem, trockenem Lachen, Schritten, Förderkorb, Metall und Glocken. Alle Hinweise sind ohne Ton verfügbar.",
+      "Erzähler überarbeitet: natürliche lokale deutsche Stimmen, keine Spaßstimmen, normales Tempo und Tonhöhe; Stimmenauswahl und Probehören im neuen Raum. Mercy Creek startet im Filmmodus mit Text und Geräuschen.",
+      "Vier Schwierigkeiten von 46 bis 85 Minuten, drei gestufte Hinweise pro Gerät, gemeinsames Reisebuch und Inventar, reduzierte Bewegung und optionale Jumpscares."
+    ],
     "1.3.0": [
       "Ein Premium-Waldabenteuer: Der Wald hört mit – eine Nacht im Forstrevier 17",
       "Acht verbundene Rätsel mit echten Geräten: Notnetz, Funk, Peilung, gekoppelte Ventile, Zeitrekonstruktion, Magnetbänder, zwei Relaisfelder und Leuchtfeuer",

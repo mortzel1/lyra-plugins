@@ -26,6 +26,7 @@ const ClavisLeiter = (() => {
   }
 
   function bauen(entwurf, stufe = 'mittel', seed = Date.now()) {
+    if (entwurf.premium === 'mercy') return ClavisFrontier.bauen(entwurf, stufe, seed);
     if (entwurf.premium === 'wald17') return ClavisPremium.bauen(entwurf, stufe, seed);
     const r = Clavis.zufall(seed);
     const st = Clavis.STUFEN[stufe] || Clavis.STUFEN.mittel;
@@ -218,6 +219,7 @@ const ClavisLeiter = (() => {
   }
 
   function erstellen(gebaut, { senden, beiEnde }) {
+    if (gebaut.oeffentlich.premium === 'mercy') return ClavisFrontier.erstellen(gebaut, { senden, beiEnde });
     if (gebaut.oeffentlich.premium === 'wald17') return ClavisPremium.erstellen(gebaut, { senden, beiEnde });
     const R = gebaut.oeffentlich;
     const G = gebaut.geheim;

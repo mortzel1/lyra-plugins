@@ -426,7 +426,7 @@ function cover(welt, gross = false) {
 
 function stufenWahl(id, standard) {
   const w = z.wahl[id] || standard || 'mittel';
-  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${id === 'v-wald17' ? { leicht: 60, mittel: 50, schwer: 42, experte: 35 }[k] : s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
+  return h('div', { class: 'stufen' }, Object.entries(Clavis.STUFEN).map(([k, s]) => h('button', { class: 'stufe' + (w === k ? ' an' : ''), title: `${s.beschreibung} · ${id === 'v-mercy-creek' ? { leicht: 85, mittel: 70, schwer: 58, experte: 46 }[k] : id === 'v-wald17' ? { leicht: 60, mittel: 50, schwer: 42, experte: 35 }[k] : s.minuten} Min.`, onclick: (e) => { e.stopPropagation(); z.wahl[id] = k; zeichnen(); } }, s.name)));
 }
 
 function stimmungChips(e) {
@@ -454,6 +454,20 @@ function raumKarte(e) {
         h('button', { class: 'knopf tonal', onclick: () => spielen(e, stufe, true) }, 'Im Team'))));
 }
 
+function frontierKarte() {
+  const e = ClavisFrontier.VORLAGE, stufe = z.wahl[e.id] || e.empfohlen;
+  const bild = h('div', { class: 'mc-featured-art', 'aria-hidden': 'true' });
+  bild.innerHTML = Clavis.FrontierWelt.bild('strasse');
+  return h('section', { class: 'mc-featured' }, bild, h('div', { class: 'mc-featured-shade' }),
+    h('div', { class: 'mc-featured-copy' }, h('span', { class: 'mc-eyebrow' }, 'CLAVIS PREMIUM · VOL. II · ROCKY MOUNTAINS'),
+      h('h2', {}, 'Mercy Creek'), h('div', { class: 'mc-featured-subtitle' }, 'DIE LETZTE SCHICHT'),
+      h('p', {}, 'Dreizehn Bergleute wurden aus den Büchern gestrichen. Heute Nacht steht die letzte Schicht auf deinem Namen. Eine verlassene Stadt, ein Goldgräberbergwerk und ein Erbe, das du besser ausschlägst.'),
+      h('div', { class: 'mc-featured-meta' }, '9 Schauplätze · 10 verbundene Mechanismen · Filmmodus mit eigener Klangregie · ab 14'),
+      stufenWahl(e.id, e.empfohlen),
+      h('div', { class: 'mc-featured-actions' }, h('button', { class: 'mc-button primary', onclick: () => spielen(e, stufe, false) }, 'Die letzte Fahrt antreten →'),
+        h('button', { class: 'mc-button ghost', onclick: () => spielen(e, stufe, true) }, 'Gemeinsam nach Mercy Creek'))));
+}
+
 function premiumKarte() {
   const e = ClavisPremium.VORLAGE, stufe = z.wahl[e.id] || e.empfohlen;
   const bild = h('div', { class: 'px-featured-art', 'aria-hidden': 'true' });
@@ -477,6 +491,7 @@ function startAnsicht() {
     k && k.inhalt && k.inhalt.typ === TYP ? h('div', { class: 'hinweis-band' }, `Aus „${k.raum.name}“ geöffnet: Wähle einen Raum und „Im Team“ – die Mitglieder spielen mit ihrer Lyra mit.`) : null,
     h('div', { class: 'zeile zwischen-zeile' }, h('h2', { class: 'wachsen', style: { margin: 0 } }, 'Fertige Räume'),
       h('label', { class: 'schreck-schalter klein' }, h('input', { type: 'checkbox', checked: z.einst.schreckErlaubt !== false, onchange: (e) => { z.einst.schreckErlaubt = e.target.checked; lyra.speicher.schreiben('einstellungen', z.einst).catch(() => {}); } }), h('span', {}, '⚡ Jumpscares erlauben'))),
+    frontierKarte(),
     premiumKarte(),
     h('div', { class: 'raum-raster' }, CLAVIS_VORLAGEN.filter(v => !v.premium).map(raumKarte)),
     h('h2', { class: 'zwischen' }, 'Einen Raum bauen lassen'),
