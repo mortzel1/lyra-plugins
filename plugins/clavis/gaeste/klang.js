@@ -365,12 +365,137 @@ Clavis.klang = (() => {
     schritt();
   }
 
-  function intensitaet(x) { intens = Math.max(0, Math.min(1, x)); if (musikBus) musikBus.gain.value = 0.28 + intens * 0.12; }
+  // ---------------------------------------------------------------- Geräuschkulisse je Welt (unabhängig von der Musik)
+  // Regen an der Scheibe, Sturm, Wellen, Grillen, das Summen der Röhren … läuft, solange man im Raum ist (Ton an).
+  const AMBIENTE = {
+    krimi: ['regen', 'ticken', 'verkehr'], labor: ['summen', 'blubbern', 'piepen'], grab: ['wind', 'knistern', 'rieseln'], station: ['brummen', 'luefter', 'piepen'],
+    spuk: ['sturm', 'knarren', 'ticken'], bibliothek: ['ticken', 'knistern', 'windLeise'], pirat: ['wellen', 'knarren', 'moewen'], akademie: ['summen', 'ticken', 'windLeise'],
+    zirkus: ['zeltwind', 'knarren'], dschungel: ['grillen', 'voegel', 'tropfen'], unterwasser: ['tief', 'blubbern', 'sonar', 'knarren'], spielzeug: ['ticken', 'windLeise'],
+    western: ['wind', 'knarren'], sanatorium: ['summen', 'tropfen', 'knarren'],
+  };
+  const KINDER_OHNE = ['sturm', 'knarren', 'tropfen', 'tief'];
+  let amb = { knoten: [], takte: [], welt: null, alter: null, bus: null };
+  let wetterSchichten = [];
+  let verfallSchicht = null;
+  function ambBus() {
+    if (!amb.bus) { amb.bus = ctx.createGain(); amb.bus.gain.value = 0.55; amb.bus.connect(haupt); }
+    return amb.bus;
+  }
+  function dauerGeraeusch(f, q, laut, filter = 'bandpass', ziel) {
+    const s = rauschQuelle(); const fi = ctx.createBiquadFilter(); fi.type = filter; fi.frequency.value = f; fi.Q.value = q;
+    const g = ctx.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(laut, ctx.currentTime + 2.5);
+    s.connect(fi).connect(g).connect(ziel || ambBus()); s.start();
+    return { s, fi, g, knoten: [s, fi, g] };
+  }
+  function dauerSchwingung(f, laut, typ = 'sine', ziel) {
+    const o = ctx.createOscillator(); const g = ctx.createGain(); o.type = typ; o.frequency.value = f; g.gain.value = 0; g.gain.linearRampToValueAtTime(laut, ctx.currentTime + 2.5);
+    o.connect(g).connect(ziel || ambBus()); o.start();
+    return { o, g, knoten: [o, g] };
+  }
+  function schwanken(param, f, tiefe, liste) { const o = ctx.createOscillator(); const g = ctx.createGain(); o.frequency.value = f; g.gain.value = tiefe; o.connect(g).connect(param); o.start(); liste.push(o, g); }
+  function zufallsTakt(liste, min, max, f) { const h = { t: null, aus: false, stopT() { h.aus = true; clearTimeout(h.t); } }; const los = () => { if (h.aus) return; h.t = setTimeout(() => { try { if (ctx && !verdeckt) f(); } catch (_) {} los(); }, min + Math.random() * (max - min)); }; los(); liste.push(h); }
+  function schichtBauen(art, liste, takte, ziel, staerke = 1) {
+    const L = (x) => x * staerke;
+    const merk = (r) => { liste.push(...r.knoten); return r; };
+    const z = ziel || ambBus();
+    switch (art) {
+      case 'regen': merk(dauerGeraeusch(1500, 0.5, L(0.075), 'highpass', z)); merk(dauerGeraeusch(450, 0.6, L(0.03), 'bandpass', z));
+        zufallsTakt(takte, 40, 160, () => ton(1500 + Math.random() * 2500, 0.03, { laut: L(0.012), ziel: z })); break;
+      case 'starkregen': merk(dauerGeraeusch(1200, 0.4, L(0.13), 'highpass', z)); merk(dauerGeraeusch(380, 0.5, L(0.06), 'bandpass', z));
+        zufallsTakt(takte, 20, 80, () => ton(1200 + Math.random() * 3000, 0.03, { laut: L(0.016), ziel: z })); break;
+      case 'sturm': { const r = merk(dauerGeraeusch(420, 1.1, L(0.08), 'bandpass', z)); schwanken(r.fi.frequency, 0.09, 260, liste); schwanken(r.g.gain, 0.06, L(0.05), liste);
+        zufallsTakt(takte, 6000, 14000, () => rauschen(3, { laut: L(0.12), f: 300, q: 1.2, f2: 900, ziel: z })); break; }
+      case 'wind': case 'windLeise': { const r = merk(dauerGeraeusch(500, 1.2, L(art === 'wind' ? 0.05 : 0.025), 'bandpass', z)); schwanken(r.fi.frequency, 0.07, 200, liste); schwanken(r.g.gain, 0.05, L(0.02), liste); break; }
+      case 'zeltwind': { const r = merk(dauerGeraeusch(380, 1, L(0.035), 'bandpass', z)); schwanken(r.g.gain, 0.08, L(0.02), liste);
+        zufallsTakt(takte, 4000, 11000, () => rauschen(0.5, { laut: L(0.07), filter: 'lowpass', f: 260, ziel: z })); break; }
+      case 'ticken': { let a = 0; const t = setInterval(() => { if (ctx && !verdeckt) ton((a++ % 2) ? 2100 : 1650, 0.03, { typ: 'square', laut: L(0.012), ziel: z }); }, 1000); takte.push({ stopT: () => clearInterval(t) }); break; }
+      case 'summen': merk(dauerSchwingung(100, L(0.012), 'sawtooth', z)); merk(dauerSchwingung(200, L(0.006), 'sine', z));
+        zufallsTakt(takte, 5000, 15000, () => { for (let i = 0; i < 4; i++) ton(100, 0.05, { typ: 'square', laut: L(0.02), ab: i * 0.07, ziel: z }); }); break;
+      case 'brummen': merk(dauerSchwingung(50, L(0.04), 'triangle', z)); merk(dauerSchwingung(100, L(0.015), 'sine', z)); break;
+      case 'luefter': merk(dauerGeraeusch(650, 0.5, L(0.035), 'lowpass', z)); break;
+      case 'piepen': zufallsTakt(takte, 6000, 14000, () => { ton(1250, 0.09, { laut: L(0.03), ziel: z }); ton(1250, 0.09, { laut: L(0.03), ab: 0.18, ziel: z }); }); break;
+      case 'blubbern': zufallsTakt(takte, 300, 2200, () => ton(280 + Math.random() * 300, 0.14, { laut: L(0.03), gleit: 700 + Math.random() * 400, ziel: z })); break;
+      case 'knistern': zufallsTakt(takte, 60, 420, () => rauschen(0.02 + Math.random() * 0.03, { laut: L(0.03 + Math.random() * 0.04), filter: 'highpass', f: 2500, angriff: 0.002, ziel: z })); break;
+      case 'rieseln': merk(dauerGeraeusch(5200, 0.7, L(0.012), 'highpass', z)); break;
+      case 'knarren': zufallsTakt(takte, 9000, 22000, () => { ton(220 + Math.random() * 60, 1, { typ: 'sawtooth', laut: L(0.02), gleit: 160, ziel: z }); rauschen(0.9, { laut: L(0.025), f: 480, q: 9, f2: 360, ziel: z }); }); break;
+      case 'wellen': { const r = merk(dauerGeraeusch(480, 0.5, L(0.05), 'lowpass', z)); schwanken(r.g.gain, 0.11, L(0.045), liste);
+        zufallsTakt(takte, 7000, 15000, () => rauschen(2.6, { laut: L(0.08), filter: 'lowpass', f: 900, f2: 300, angriff: 0.6, ziel: z })); break; }
+      case 'moewen': zufallsTakt(takte, 11000, 26000, () => { for (let i = 0; i < 2; i++) ton(1500, 0.32, { typ: 'triangle', laut: L(0.02), gleit: 1150, ab: i * 0.4, ziel: z }); }); break;
+      case 'grillen': zufallsTakt(takte, 900, 2600, () => { for (let i = 0; i < 6; i++) ton(4300, 0.025, { laut: L(0.012), ab: i * 0.045, ziel: z }); }); break;
+      case 'voegel': zufallsTakt(takte, 2000, 6000, () => { const f = 1800 + Math.random() * 1600; for (let i = 0; i < 3; i++) ton(f, 0.08, { laut: L(0.018), ab: i * 0.12, gleit: f * 1.2, ziel: z }); }); break;
+      case 'tropfen': zufallsTakt(takte, 1500, 4200, () => ton(1300 + Math.random() * 500, 0.1, { laut: L(0.035), gleit: 650, ziel: hall })); break;
+      case 'tief': { const a = merk(dauerSchwingung(41, L(0.05), 'triangle', z)); schwanken(a.g.gain, 0.1, L(0.025), liste); break; }
+      case 'sonar': zufallsTakt(takte, 7000, 11000, () => ton(1180, 2.2, { laut: L(0.03), ziel: hall })); break;
+      case 'verkehr': zufallsTakt(takte, 14000, 30000, () => { ton(330, 0.5, { typ: 'square', laut: L(0.008), ziel: z }); ton(262, 0.6, { typ: 'square', laut: L(0.008), ab: 0.5, ziel: z }); }); break;
+      case 'wasser': { const r = merk(dauerGeraeusch(700, 0.7, L(0.06), 'lowpass', z)); schwanken(r.g.gain, 0.3, L(0.02), liste); break; }
+      case 'sand': merk(dauerGeraeusch(4500, 0.6, L(0.03), 'highpass', z)); break;
+      case 'funken': zufallsTakt(takte, 300, 1400, () => { for (let i = 0; i < 3; i++) rauschen(0.03, { laut: L(0.05), filter: 'highpass', f: 4000, ab: i * 0.04, angriff: 0.002, ziel: z }); }); break;
+      case 'flackern': zufallsTakt(takte, 800, 2500, () => { for (let i = 0; i < 3; i++) ton(120, 0.04, { typ: 'square', laut: L(0.02), ab: i * 0.06, ziel: z }); }); break;
+      case 'ranken': zufallsTakt(takte, 1500, 4000, () => rauschen(0.6, { laut: L(0.03), f: 2200, q: 2, ziel: z })); break;
+      case 'risse': zufallsTakt(takte, 3000, 8000, () => { ton(90, 0.6, { laut: L(0.06), gleit: 50, ziel: z }); rauschen(0.4, { laut: L(0.04), filter: 'lowpass', f: 500, ziel: z }); }); break;
+      case 'spielzeug': zufallsTakt(takte, 3000, 7000, () => glocke(1320 + Math.random() * 600, 0, L(0.025), hall, 0.8)); break;
+      default:
+    }
+  }
+  function schichtenStoppen(liste, takte) {
+    for (const t of takte) try { t.stopT(); } catch (_) {}
+    for (const k of liste) { try { if (k.gain && ctx) k.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8); } catch (_) {} }
+    setTimeout(() => { for (const k of liste) { try { k.stop ? k.stop() : k.disconnect(); } catch (_) {} } }, 900);
+  }
+  function ambienteStoppen(vergessen = true) {
+    schichtenStoppen(amb.knoten, amb.takte);
+    amb.knoten = []; amb.takte = [];
+    if (vergessen) { amb.welt = null; amb.alter = null; }
+    wetterSchichten.forEach((w) => w.stop()); wetterSchichten = [];
+    if (verfallSchicht) { verfallSchicht.stop(); verfallSchicht = null; }
+  }
+  /** Geräuschkulisse der Welt starten (läuft, bis ambienteStoppen) */
+  function ambiente(welt, alter) {
+    if (amb.welt === welt && amb.knoten.length + amb.takte.length) return;
+    ambienteStoppen();
+    amb.welt = welt; amb.alter = alter;
+    if (!an || verdeckt || !bereit() || !welt) return;
+    for (const art of AMBIENTE[welt] || []) {
+      if (alter === 'kinder' && KINDER_OHNE.includes(art)) continue;
+      try { schichtBauen(art, amb.knoten, amb.takte); } catch (_) {}
+    }
+  }
+  /** Wetter für eine Weile (Regen, Sturm) – z. B. während eines Ereignisses */
+  function wetter(art, sekunden = 20) {
+    if (!bereit()) return;
+    const liste = []; const takte = [];
+    try { schichtBauen(art, liste, takte); } catch (_) {}
+    const w = { stop: () => schichtenStoppen(liste, takte) };
+    wetterSchichten.push(w);
+    setTimeout(() => { w.stop(); wetterSchichten = wetterSchichten.filter((x) => x !== w); }, sekunden * 1000);
+  }
+  /** Verfall hörbar machen (0 = aus, 1–3 lauter) */
+  function verfall(art, stufe) {
+    if (verfallSchicht && verfallSchicht.art === art && verfallSchicht.stufe === stufe) return;
+    if (verfallSchicht) { verfallSchicht.stop(); verfallSchicht = null; }
+    if (!stufe || !bereit()) return;
+    const liste = []; const takte = [];
+    try { schichtBauen(art, liste, takte, null, 0.6 + stufe * 0.45); } catch (_) {}
+    verfallSchicht = { art, stufe, stop: () => schichtenStoppen(liste, takte) };
+  }
+
+  let geduckt = false;
+  function intensitaet(x) { intens = Math.max(0, Math.min(1, x)); if (musikBus && !geduckt) musikBus.gain.value = 0.28 + intens * 0.12; }
+  /** Musik und Kulisse leiser, solange jemand spricht */
+  function ducken(ja) {
+    geduckt = !!ja;
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    try {
+      if (musikBus) { musikBus.gain.cancelScheduledValues(t); musikBus.gain.setTargetAtTime(ja ? 0.1 : 0.28 + intens * 0.12, t, 0.25); }
+      if (amb.bus) { amb.bus.gain.cancelScheduledValues(t); amb.bus.gain.setTargetAtTime(ja ? 0.22 : 0.55, t, 0.25); }
+    } catch (_) {}
+  }
 
   function schalten(neu) {
     an = !!neu;
     try { localStorage.setItem('clavis:ton', an ? 'an' : 'aus'); } catch (_) {}
-    if (!an) musikStoppen(); else if (aktuell) musik(aktuell.welt, aktuell.alter, aktuell.stimmung);
+    if (!an) { musikStoppen(); const w = amb.welt; const a2 = amb.alter; ambienteStoppen(); amb.welt = w; amb.alter = a2; } else { if (aktuell) musik(aktuell.welt, aktuell.alter, aktuell.stimmung); if (amb.welt) { const w = amb.welt; amb.welt = null; ambiente(w, amb.alter); } }
   }
   function musikSchalten(neu) {
     musikAn = !!neu;
@@ -386,10 +511,12 @@ Clavis.klang = (() => {
       if (verdeckt) {
         warAn = !!musikTakt;
         musikStoppen();
+        { const w = amb.welt; const a2 = amb.alter; ambienteStoppen(); amb.welt = w; amb.alter = a2; amb.pausiert = !!w; }
         if (ctx) ctx.suspend().catch(() => {});
       } else {
         if (ctx && an) ctx.resume().catch(() => {});
         if (warAn && aktuell && document.querySelector('.cl-spiel')) musik(aktuell.welt, aktuell.alter, aktuell.stimmung);
+        if (amb.pausiert && amb.welt && document.querySelector('.cl-raum')) { const w = amb.welt; amb.welt = null; amb.pausiert = false; ambiente(w, amb.alter); }
         warAn = false;
       }
     });
@@ -397,13 +524,18 @@ Clavis.klang = (() => {
       warAn = false;
       aktuell = null;
       musikStoppen();
+      ambienteStoppen();
       if (ctx) { try { ctx.close(); } catch (_) {} }
       ctx = null;
     });
   }
 
   return {
-    spielen, piep, bereit, musik, musikStoppen, intensitaet, schalten, musikSchalten,
+    spielen, piep, bereit, musik, musikStoppen, intensitaet, schalten, musikSchalten, ambiente, ambienteStoppen, wetter, verfall, ducken, ambienteWelt: () => amb.welt,
+    /** Eine Glocke mit Tonhöhe f (für Rätsel) */
+    klingen: (f, dauer = 1.6) => { if (bereit()) try { glocke(f, 0, 0.08, hall, dauer); } catch (_) {} },
+    /** Ein Ton mit Tonhöhe f, kurz (für Rätsel) */
+    tonHoehe: (f, dauer = 0.25, typ = 'triangle') => { if (bereit()) try { ton(f, dauer, { typ, laut: 0.07 }); } catch (_) {} },
     an: () => an, musikAn: () => musikAn,
     /** Für Tests: läuft Musik, in welchem Zustand ist der Klang? */
     zustand: () => ({ musik: !!musikTakt, klang: ctx ? ctx.state : 'keiner', verdeckt }),

@@ -84,10 +84,10 @@ const SCHEMA = {
     titel: { type: 'string' }, teaser: { type: 'array', items: { type: 'string' } }, intro: { type: 'string' }, outro: { type: 'string' }, finale_text: { type: 'string' }, loesungswort: { type: 'string' },
     szenen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['art', 'stationen', 'text', 'titel'], properties: {
       titel: { type: 'string' }, text: { type: 'string' }, art: { type: 'string', enum: ['zimmer', 'keller', 'halle', 'gang', 'oben', 'technik'] },
-      stationen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['ereignis', 'ereignis_text', 'hinweise', 'inhalt', 'mech', 'ort', 'symbol', 'text', 'titel', 'tuer'], properties: {
+      stationen: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['ereignis', 'ereignis_text', 'geschichte', 'hinweise', 'inhalt', 'mech', 'ort', 'symbol', 'text', 'titel', 'tuer'], properties: {
         ort: { type: 'string' }, symbol: { type: 'string', enum: Object.keys(Clavis.ICONS).filter((x) => x !== 'ausgang') }, titel: { type: 'string' }, text: { type: 'string' },
         mech: { type: 'string', enum: Object.keys(M) }, tuer: { type: 'boolean' },
-        ereignis: { type: 'string', enum: ['keins'].concat(Object.keys(Clavis.EREIGNISSE)) }, ereignis_text: { type: 'string' },
+        ereignis: { type: 'string', enum: ['keins'].concat(Object.keys(Clavis.EREIGNISSE)) }, ereignis_text: { type: 'string' }, geschichte: { type: 'string' },
         hinweise: { type: 'array', items: { type: 'string' } }, inhalt: INHALT_SCHEMA,
       } } },
     } } },
@@ -97,21 +97,32 @@ const SCHEMA = {
 /** Zu viele Wissensaufgaben? Die überzähligen werden zu Rätseln zum Anfassen (Ort und Gegenstand bleiben).
  *  neue: so viele der neuen Rätsel zum Anfassen sollen mindestens drin sein; versatz: damit jeder Raum andere bekommt. */
 const WISSEN_ZUERST = ['wissen', 'verhoer', 'luecke', 'terminal', 'kabel', 'binaer', 'tresor', 'uhr', 'zahlenschloss', 'wortschloss', 'reihenfolge'];
-const NEU_ZUM_ANFASSEN = ['raumcode', 'fehlteil', 'spiegel', 'timing', 'veraendert', 'klopfzeichen', 'waage'];
+const NEU_ZUM_ANFASSEN = ['raumcode', 'fehlteil', 'spiegel', 'timing', 'veraendert', 'klopfzeichen', 'waage', 'zahnraeder', 'schaltkreis', 'ventile', 'sternbild', 'bildpuzzle', 'fingerabdruck', 'schattenbild', 'umfuellen',
+  'symbolsudoku', 'lichtfolge', 'funkfrequenz', 'fernrohr', 'schluessel', 'spiegelschrift', 'leitungsgewirr', 'farbmischen', 'drehringe', 'lecks', 'zahlenreihe', 'dominos', 'huetchenspiel', 'glocken', 'sonar', 'tastenfeld', 'zerrissen'];
 function abwechslung(entwurf, anteil, { neue = 0, versatz = 0 } = {}) {
+  const welt = entwurf.welt;
   const alle = (entwurf.szenen || []).flatMap((sz) => sz.stationen || []);
   const max = anteil >= 0.5 ? Math.ceil(alle.length * anteil) : Math.max(1, Math.floor(alle.length * anteil));
   const rang = (s) => (WISSEN_ZUERST.includes(s.mech) ? WISSEN_ZUERST.indexOf(s.mech) : 50);
   const wissen = alle.filter((s) => M[s.mech] && M[s.mech].art === 'wissen').sort((a, b) => rang(a) - rang(b));
-  const neuReihe = NEU_ZUM_ANFASSEN.slice(versatz % NEU_ZUM_ANFASSEN.length).concat(NEU_ZUM_ANFASSEN.slice(0, versatz % NEU_ZUM_ANFASSEN.length)).filter((x) => M[x]);
-  const vorrat = () => {
-    const benutzt = new Set(alle.map((s) => s.mech));
-    return neuReihe.filter((x) => !benutzt.has(x)).concat(Clavis.ZUM_ANFASSEN.filter((x) => M[x] && !benutzt.has(x)), neuReihe);
+  const benutzt = () => new Set(alle.map((s) => s.mech));
+  // Ein neues Rätsel, das zur Welt und – wenn möglich – zum Gegenstand passt; sonst bekommt die Station den passenden Gegenstand
+  const tauschen = (s, nurNeue) => {
+    const b = benutzt();
+    const reihe = (l) => l.slice(versatz % Math.max(1, l.length)).concat(l.slice(0, versatz % Math.max(1, l.length)));
+    const fuerDing = Clavis.passendeMechaniken(welt, s.symbol, b).filter((x) => !b.has(x) && (!nurNeue || NEU_ZUM_ANFASSEN.includes(x)));
+    const fuerWelt = reihe(Clavis.passendeMechaniken(welt, null, b)).filter((x) => !b.has(x) && (!nurNeue || NEU_ZUM_ANFASSEN.includes(x)));
+    const h = [...String(s.ort || '') + String(s.titel || '')].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, versatz + 7);
+    const neu = fuerDing.length ? fuerDing[h % Math.min(fuerDing.length, 5)] : fuerWelt[0];
+    if (!neu) return false;
+    const sk = Clavis.skin(neu, welt);
+    if (fuerDing.length) Object.assign(s, { mech: neu, inhalt: {}, hinweise: [], titel: sk.titel, text: sk.text });
+    else Object.assign(s, { mech: neu, inhalt: {}, hinweise: [], ort: sk.ort, symbol: sk.symbol, titel: sk.titel, text: sk.text });
+    return true;
   };
-  const tauschen = (s) => { const neu = vorrat()[0]; Object.assign(s, { mech: neu, inhalt: {}, hinweise: [], titel: M[neu].name, text: M[neu].kurz }); };
   let n = 0;
-  for (const s of wissen.slice(0, Math.max(0, wissen.length - max))) { tauschen(s); n++; }
-  // Mindestens ein paar neue: erst weitere Wissensfragen, dann doppelte Mechaniken, dann Buchstabensalat und Zahlenschlösser
+  for (const s of wissen.slice(0, Math.max(0, wissen.length - max))) if (tauschen(s, false)) n++;
+  // Mindestens ein paar der neuen Rätsel zum Anfassen: erst weitere Wissensfragen, dann doppelte Mechaniken, dann Buchstabensalat und Zahlenschlösser
   const zahlNeu = () => alle.filter((s) => NEU_ZUM_ANFASSEN.includes(s.mech)).length;
   const kandidaten = () => {
     const zaehler = {};
@@ -121,14 +132,22 @@ function abwechslung(entwurf, anteil, { neue = 0, versatz = 0 } = {}) {
       return wert(a) - wert(b);
     });
   };
-  while (zahlNeu() < neue) { const k = kandidaten()[0]; if (!k) break; tauschen(k); n++; }
+  let schutz = 0;
+  while (zahlNeu() < neue && schutz++ < 20) { const k = kandidaten()[0]; if (!k || !tauschen(k, true)) break; n++; }
+  // Zum Schluss: jede Station stimmig (Rätsel passt zur Welt, Gegenstand passt zum Rätsel)
+  const b = benutzt();
+  for (const s of alle) if (Clavis.stationAnpassen(s, welt, b)) n++;
   return n;
 }
 // Auch die fertigen Räume: höchstens ein Drittel Wissen und je drei der neuen Rätsel zum Anfassen (jeder Raum andere)
 CLAVIS_VORLAGEN.forEach((v, i) => abwechslung(v, 1 / 3, { neue: 3, versatz: i * 3 }));
 
-function mechanikText() {
-  return Object.entries(M).map(([k, m]) => `- "${k}" (${m.name}; Art: ${(Clavis.ARTEN || {})[m.art] || 'Sonstiges'}${m.stoff ? '; kann Lernstoff tragen' : ''}): ${m.kurz} Inhalt: ${m.felder.length ? m.felder.map((f) => `"${f.k}" = ${f.titel}`).join('; ') : 'keiner – baut sich selbst'}${m.ohneInhalt ? ' (ohne Inhalt baut es sich selbst)' : ''}.`).join('\n');
+function mechanikText(welt) {
+  return Object.entries(M).filter(([k]) => !welt || Clavis.passtWelt(k, welt)).map(([k, m]) => {
+    const p = Clavis.PASSUNG[k];
+    const dinge = p && p.o !== '*' ? ` Passende Gegenstände ("symbol"): ${p.o.filter((x) => Clavis.ICONS[x]).slice(0, 8).join(', ')}.` : '';
+    return `- "${k}" (${m.name}; Art: ${(Clavis.ARTEN || {})[m.art] || 'Sonstiges'}${m.stoff ? '; kann Lernstoff tragen' : ''}): ${m.kurz}${dinge} Inhalt: ${m.felder.length ? m.felder.map((f) => `"${f.k}" = ${f.titel}`).join('; ') : 'keiner – baut sich selbst'}${m.ohneInhalt ? ' (ohne Inhalt baut es sich selbst)' : ''}.`;
+  }).join('\n');
 }
 
 async function bauenMitKi() {
@@ -170,7 +189,7 @@ async function bauenMitKi() {
         `\nStimmung (Regler von 1 bis 10) – richte Geschichte, Orte, Texte, Rätselinhalte und Überraschungen danach aus:\n${stimmungKi(stimmung)}\n` +
         `Anzahl Überraschungen ("ereignis"): etwa ${Math.min(n, 1 + Math.round((stimmung.spannung + stimmung.gefahr + stimmung.spuk + stimmung.grusel) / 10))}; je höher Spuk und Grusel, desto unheimlicher die Ereignistexte; je höher Gefahr, desto bedrohlicher – immer passend zur Altersstufe.\n` +
         `\nBaue einen Escape Room mit genau ${nSzenen} Szene${nSzenen > 1 ? 'n' : ''} und insgesamt genau ${n} Stationen (gleichmäßig verteilt).\n` +
-        `Mechaniken (Feld "mech"):\n${mechanikText()}\n\n` +
+        `Mechaniken (Feld "mech") – nur diese passen in diese Welt:\n${mechanikText(welt)}\n\n` +
         'Regeln:\n' +
         (thema ? `- Etwa die Hälfte, höchstens ${Math.ceil(n * 0.5)} Stationen, sind Aufgaben der Art „Wissen“ mit echtem Lernstoff zum Thema (Fragen, Begriffe, Reihenfolgen, Zuordnungen). Der Rest sind Rätsel zum Anfassen.\n`
           : `- Höchstens ${Math.max(1, Math.floor(n * 0.25))} Station${Math.floor(n * 0.25) > 1 ? 'en' : ''} der Art „Wissen“ – ein Escape Room ist kein Quiz. Der Rest sind Rätsel zum Anfassen.\n`) +
@@ -183,13 +202,15 @@ async function bauenMitKi() {
         `- "symbol": ein Gegenstand, der zum Ort passt (z. B. ${w.objekte.join(', ')}).\n` +
         '- "ort": kurzer Name des Gegenstands im Raum (1–3 Wörter); "text": 1–2 Sätze, was man dort sieht; "titel": kurz und neugierig machend.\n' +
         '- "hinweise": 1–2 Hinweise, die helfen, ohne die Lösung zu verraten.\n' +
+        '- Jede Station gehört zur Geschichte: "ort"/"symbol" ist ein Gegenstand, der in diese Szene gehört, "text" erzählt in 1–2 Sätzen, warum er für die Geschichte wichtig ist, und die Mechanik passt zum Gegenstand (siehe passende Gegenstände – keine Waage an einem Computer).\n' +
+        '- "geschichte": 1 Satz – was man nach dem Lösen findet oder erfährt. Die Sätze bauen die Geschichte Schritt für Schritt auf: vom ersten Hinweis bis zur Auflösung beim letzten Rätsel.\n' +
         '- "inhalt": nur die Felder der gewählten Mechanik füllen, alle anderen leer lassen ("" , [], 0). Wörter ohne Leerzeichen. Bei "richtig" der Index der richtigen Option (ab 0). Bei "tresor" in "zahl" drei Zahlen 0–39 wie "12-7-31". Bei "uhr" eine Zeit wie "7:45". Bei "lueckentext"-Sätzen "___" für die Lücke.\n' +
         '- "intro": 3–5 Sätze, die in die Lage werfen (warum bist du hier, warum ist die Tür zu, was steht auf dem Spiel). "outro": 2–3 Sätze, wie du entkommst. "finale_text": ein Satz zur Ausgangstür.\n' +
         '- "teaser": 3–5 sehr kurze, packende Sätze (je höchstens 8 Wörter) für ein Kino-Intro, das neugierig macht – wie ein Filmtrailer, ohne etwas zu verraten. Der letzte Satz macht Lust aufs Losspielen.\n' +
         '- Ein guter Titel mit Atmosphäre.\n\n' +
         'Antwort als JSON genau in diesem Aufbau (Feldnamen exakt so, je Station alle Felder von "inhalt"):\n' +
         '{"titel": "…", "teaser": ["…"], "intro": "…", "outro": "…", "finale_text": "…", "loesungswort": "…", "szenen": [{"titel": "…", "text": "…", "art": "zimmer", "stationen": [' +
-        '{"ort": "…", "symbol": "truhe", "titel": "…", "text": "…", "mech": "wortschloss", "tuer": false, "ereignis": "keins", "ereignis_text": "", "hinweise": ["…"], ' +
+        '{"ort": "…", "symbol": "truhe", "titel": "…", "text": "…", "mech": "wortschloss", "tuer": false, "ereignis": "keins", "ereignis_text": "", "geschichte": "…", "hinweise": ["…"], ' +
         '"inhalt": {"wort": "…", "raetsel": "…", "zahl": "", "frage": "", "antwort": "", "optionen": [], "richtig": 0, "paare": [], "reihe": [], "zeit": "", "satz": "", "hinweis": "", "fragen": []}}]}]}',
       schema: SCHEMA,
       zaehlen: { schluessel: 'mech', wort: 'Station' },
@@ -208,7 +229,7 @@ async function bauenMitKi() {
     jumpscares: alter !== 'kinder' && !!z.einst.jumpscares, teaser: (j.teaser || []).map(text).filter(Boolean).slice(0, 5),
     szenen: (j.szenen || j.raeume || j.scenes || []).map((s) => ({ titel: text(s.titel || s.title), text: text(s.text), art: text(s.art || s.typ || ''), stationen: (s.stationen || s.raetsel || s.stations || []).map((x) => ({
       ort: text(x.ort), symbol: x.symbol, titel: text(x.titel), text: text(x.text), mech: x.mech, tuer: !!x.tuer, hinweise: (x.hinweise || []).map(text).filter(Boolean).slice(0, 2),
-      ereignis: x.ereignis && x.ereignis !== 'keins' ? { art: x.ereignis, text: text(x.ereignis_text) } : null, inhalt: x.inhalt || {},
+      ereignis: x.ereignis && x.ereignis !== 'keins' ? { art: x.ereignis, text: text(x.ereignis_text) } : null, inhalt: x.inhalt || {}, geschichte: text(x.geschichte || x.story || x.fund),
     })) })).filter((s) => s.stationen.length),
   };
   abwechslung(entwurf, thema ? 0.5 : 0.25, { neue: n >= 4 ? 1 : 0, versatz: Math.floor(Math.random() * 7) });

@@ -173,25 +173,61 @@
       el('path', { d: 'M60 230 C40 180 30 150 34 120 C36 105 52 104 56 118 L62 140 L58 52 C57 38 76 36 78 50 L84 118 L86 30 C86 14 106 14 106 30 L106 116 L114 40 C116 26 134 28 132 44 L126 122 L140 70 C144 56 162 60 158 76 L146 150 C140 190 132 210 130 230 Z', fill: 'currentColor' }));
   }
 
-  /** Jumpscare – art: fratze | puppe | gestalt | hand (heftig) · fledermaeuse | spinnen | katze (mild) */
-  Clavis.schreck = (buehne, art, { blut = false } = {}) => {
+  /**
+   * Jumpscare – art: fratze | puppe | gestalt | hand (heftig) · fledermaeuse | spinnen | katze (mild).
+   * staerke 1–10 (je Gerät einstellbar): 1–2 nur ein Schrei · 3–4 Schrei und flackerndes Licht · 5–6 ein Schatten huscht
+   * vorbei, kurzer Blitz · 7–8 eine Fratze taucht auf, der Raum wackelt · 9–10 Blitz, riesige Gestalt, Schrei, Beben (Blut nur ab 18).
+   */
+  Clavis.schreck = (buehne, art, { blut = false, staerke = 6 } = {}) => {
+    const st = Math.max(1, Math.min(10, Math.round(staerke)));
     const mild = ['fledermaeuse', 'spinnen', 'katze'].includes(art);
-    const schicht = el('div', { class: 'cl-schreck ' + art + (blut ? ' blut' : '') });
+    const raum = buehne.querySelector('.cl-raum') || buehne;
+    const wackeln = (ms) => { buehne.classList.remove('cl-wackeln'); void buehne.offsetWidth; buehne.classList.add('cl-wackeln'); setTimeout(() => buehne.classList.remove('cl-wackeln'), ms); };
+    const flackern = (ms) => { raum.classList.add('ev-flackern'); setTimeout(() => raum.classList.remove('ev-flackern'), ms); };
+    const schicht = el('div', { class: `cl-schreck ${art} stufe-${st <= 6 ? 'leicht' : st <= 8 ? 'mittel' : 'voll'}${blut ? ' blut' : ''}` });
+    let dauer = 900;
     if (mild) {
       k.spielen('buh');
-      if (art === 'fledermaeuse') schwarm(schicht, '🦇', 14, 'flatter');
-      if (art === 'spinnen') schwarm(schicht, '🕷', 12, 'krabbel');
+      if (st <= 2) return;
+      if (art === 'fledermaeuse') schwarm(schicht, '🦇', 4 + st * 2, 'flatter');
+      if (art === 'spinnen') schwarm(schicht, '🕷', 3 + st * 2, 'krabbel');
       if (art === 'katze') schicht.append(el('div', { class: 'cl-katze' }, el('span', {}, '🐈‍⬛'), el('b', {}, 'Fauch!')));
+      if (st >= 4) flackern(700);
+      dauer = 2200;
+    } else if (st <= 2) {
+      // Nur ein Schrei aus dem Nichts
+      k.spielen(st === 1 ? 'schrei' : 'kreischen');
+      return;
+    } else if (st <= 4) {
+      k.spielen('schrei');
+      flackern(1100);
+      if (st === 4) setTimeout(() => k.spielen('atem'), 900);
+      return;
+    } else if (st <= 6) {
+      // Ein Schatten huscht durchs Bild, kurzer Blitz
+      k.spielen('kreischen');
+      schicht.append(el('div', { class: 'cl-schreck-licht' }), el('div', { class: 'cl-schreck-schatten' }, gestalt()));
+      flackern(800);
+      dauer = 1300;
     } else {
       k.spielen('kreischen');
-      schicht.append(art === 'puppe' ? puppe(blut) : art === 'gestalt' ? gestalt() : art === 'hand' ? hand(blut) : fratze(blut));
-      if (blut) schicht.append(el('div', { class: 'cl-blutspritzer' }));
-      buehne.classList.add('cl-wackeln');
-      setTimeout(() => buehne.classList.remove('cl-wackeln'), 600);
+      if (st >= 10) setTimeout(() => k.spielen('schrei'), 350);
+      const figur = art === 'puppe' ? puppe(blut) : art === 'gestalt' ? gestalt() : art === 'hand' ? hand(blut) : fratze(blut);
+      if (st >= 9) schicht.append(el('div', { class: 'cl-schreck-licht voll' }), el('div', { class: 'cl-schreck-rot' }));
+      schicht.append(figur);
+      if (blut && st >= 7) schicht.append(el('div', { class: 'cl-blutspritzer' }));
+      wackeln(st >= 9 ? 900 : 600);
+      if (st >= 9) flackern(1400);
+      dauer = st >= 10 ? 1400 : st >= 9 ? 1150 : 800;
     }
     buehne.append(schicht);
-    setTimeout(() => { schicht.classList.add('weg'); setTimeout(() => schicht.remove(), 500); }, mild ? 2200 : 950);
+    setTimeout(() => { schicht.classList.add('weg'); setTimeout(() => schicht.remove(), 500); }, dauer);
   };
+
+  /** Beschreibung der Stärke (für den Regler) */
+  Clavis.schreckText = (st, mild) => (mild
+    ? (st <= 2 ? 'Nur ein kurzes „Buh!“' : st <= 3 ? 'Ein paar Fledermäuse oder Spinnen' : 'Ein ganzer Schwarm – und das Licht flackert')
+    : st <= 2 ? 'Nur ein Schrei aus dem Nichts' : st <= 4 ? 'Ein Schrei – und das Licht flackert' : st <= 6 ? 'Ein Schatten huscht vorbei, kurzer Blitz' : st <= 8 ? 'Eine Fratze taucht auf, der Raum wackelt' : 'Blitz, eine riesige Gestalt, Schrei und Beben');
 
   /** Konfetti (für Kinder bei jedem gelösten Rätsel) */
   Clavis.konfetti = (buehne) => {

@@ -50,9 +50,13 @@ const ClavisLeiter = (() => {
       return g;
     };
     const ereignisAus = (e) => {
-      const art = e && (e.art || e);
-      if (!art || !Clavis.EREIGNISSE[art]) return null;
-      const eigener = String((e && e.text) || '').slice(0, 300);
+      const ur = e && (e.art || e);
+      if (!ur || !Clavis.EREIGNISSE[ur]) return null;
+      // Nur, was in diese Welt passt (kein Regen im All, kein Telefon im Pharaonengrab)
+      const art = Clavis.ereignisFuerWelt ? Clavis.ereignisFuerWelt(ur, welt) : ur;
+      const weltText = ((Clavis.EREIGNIS_WELT || {})[art] || {})[welt];
+      const botschaft = ['anruf', 'funkspruch', 'brief'];
+      const eigener = art === ur || (botschaft.includes(art) && botschaft.includes(ur)) ? String((e && e.text) || '').slice(0, 300) : weltText || '';
       // Für Kinder nur kindgerechte Ereignisse (eigene Texte der KI sind dann schon kindgerecht geschrieben)
       const t = alter === 'kinder' ? (Clavis.EREIGNISSE[art].kinder ? eigener || Clavis.EREIGNISSE[art].kinder : null) : eigener || Clavis.ereignisText(art, alter, dunkel);
       return t ? { art, text: t } : null;
@@ -68,8 +72,9 @@ const ClavisLeiter = (() => {
         let mech = Clavis.MECHANIKEN[s.mech] ? s.mech : null;
         let g = mech ? mechanikBauen(mech, s.inhalt) : null;
         if (!g) {
-          // Ersatz: eine Mechanik, die sich selbst baut (möglichst noch nicht benutzt)
-          for (const x of r.mischen(Clavis.OHNE_INHALT.filter((y) => !benutzt.has(y))).concat(r.mischen(Clavis.OHNE_INHALT))) {
+          // Ersatz: eine Mechanik, die sich selbst baut – am liebsten eine, die zu Welt und Gegenstand passt
+          const passend = Clavis.passendeMechaniken ? Clavis.passendeMechaniken(welt, s.symbol, benutzt) : [];
+          for (const x of passend.concat(r.mischen(Clavis.OHNE_INHALT.filter((y) => !benutzt.has(y))), r.mischen(Clavis.OHNE_INHALT))) {
             g = mechanikBauen(x, {});
             if (g) { ersetzt.push({ ort: s.ort || '', von: s.mech || '?', zu: x }); mech = x; break; }
           }
@@ -84,12 +89,26 @@ const ClavisLeiter = (() => {
           text: String(s.text || '').slice(0, 500),
           mech, p: g.p, tuer: false,
         };
-        geheim[id] = { loesung: g.loesung, zettel: g.zettel || null, hinweise: eigene.concat(g.hilfen || []).slice(0, 3), ereignis: ereignisAus(s.ereignis), wunschTuer: !!s.tuer };
+        geheim[id] = { loesung: g.loesung, zettel: g.zettel || null, hinweise: eigene.concat(g.hilfen || []).slice(0, 3), ereignis: ereignisAus(s.ereignis), wunschTuer: !!s.tuer, eigeneGeschichte: String(s.geschichte || '').trim().slice(0, 300) };
         ids.push(id);
       });
       if (ids.length) szenen.push({ titel: String(sz.titel || `Raum ${si + 1}`).slice(0, 60), text: String(sz.text || '').slice(0, 400), art: typeof sz.art === 'string' ? sz.art.slice(0, 20) : '', stationen: ids });
     });
     if (!szenen.length) throw new Error('Kein Rätsel ließ sich bauen.');
+
+    // Die Geschichte: jedes Rätsel deckt ein Stück auf – gleichmäßig verteilt, die letzte Erkenntnis beim letzten Rätsel
+    {
+      const Q = typeof CLAVIS_GESCHICHTE !== 'undefined' ? CLAVIS_GESCHICHTE : null;
+      const kinderListe = alter === 'kinder' && !['zirkus', 'spielzeug'].includes(welt);
+      const liste = Q ? (Q.vorlagen[entwurf.id] || (kinderListe ? Q.kinder : Q.welten[welt]) || Q.kinder) : [];
+      const alleIds = szenen.flatMap((sz) => sz.stationen);
+      alleIds.forEach((id, k) => {
+        const eigen = geheim[id].eigeneGeschichte;
+        const j = alleIds.length > 1 ? Math.round((k * (liste.length - 1)) / (alleIds.length - 1)) : liste.length - 1;
+        geheim[id].geschichte = eigen || liste[Math.max(0, j)] || '';
+        delete geheim[id].eigeneGeschichte;
+      });
+    }
 
     // Türen: je Szene (außer der letzten) eine Station, die den Weg weiter öffnet
     szenen.forEach((sz, i) => {
@@ -170,11 +189,13 @@ const ClavisLeiter = (() => {
     }
 
     // ---- Jumpscares
+    // Erlaubt die Altersstufe Jumpscares, werden sie immer geplant – jedes Gerät entscheidet am Eingang selbst (an/aus, Stärke 1–10).
+    // Die Einstellung im Menü ist nur die Vorgabe.
     const schreckErlaubt = A.schreck && (entwurf.jumpscares === true || (entwurf.jumpscares !== false && stimmung.grusel >= 7));
     const mild = A.schreck === 'mild';
     const schrecken = [];
-    if (schreckErlaubt) {
-      const n = mild ? 1 : 1 + (stimmung.grusel >= 8 ? 1 : 0) + (stimmung.grusel >= 10 ? 1 : 0);
+    if (A.schreck) {
+      const n = mild ? 2 : 2 + (stimmung.grusel >= 6 ? 1 : 0) + (stimmung.grusel >= 9 ? 1 : 0);
       const arten = mild ? ['fledermaeuse', 'spinnen', 'katze'] : ['fratze', 'gestalt', 'hand', 'puppe', 'spinnen'];
       for (let i = 0; i < n; i++) schrecken.push({ bei: 0.2 + r() * 0.65, art: r.wahl(arten) });
     }
@@ -187,7 +208,7 @@ const ClavisLeiter = (() => {
 
     const oeffentlich = {
       titel: String(entwurf.titel || 'Unbenannter Raum').slice(0, 80), welt, stufe, alter, minuten, stimmung, falle, blut, teaser,
-      schreck: schreckErlaubt ? { mild, arten: mild ? ['fledermaeuse', 'spinnen', 'katze'] : ['fratze', 'gestalt', 'hand', 'puppe'] } : null,
+      schreck: A.schreck ? { mild, standard: !!schreckErlaubt, staerke: mild ? 3 : Math.max(3, Math.min(10, stimmung.grusel + 1)), arten: mild ? ['fledermaeuse', 'spinnen', 'katze'] : ['fratze', 'gestalt', 'hand', 'puppe'] } : null,
       intro: String(entwurf.intro || '').slice(0, 1500), outro: String(entwurf.outro || 'Die Tür springt auf – frische Luft. Ihr seid draußen.').slice(0, 1200),
       hinweisKosten: st.kosten, hinweisAnzahl: st.hinweise, szenen, stationen, bonus,
       finale: { laenge: wort.length, text: String(entwurf.finaleText || '').slice(0, 400) },
@@ -344,7 +365,7 @@ const ClavisLeiter = (() => {
       const ereignisse = W.ereignisse.filter((e) => (R.alter === 'kinder' ? !!(Clavis.EREIGNISSE[e] && Clavis.EREIGNISSE[e].kinder) : !['konfetti', 'kichern'].includes(e)));
       // Lieber ein Bild, das zur Welt passt (kein Wolfsheulen auf der Raumstation)
       const zurWelt = ereignisse.filter((e) => ((Clavis.WELTEN[R.welt] || {}).ereignisse || []).includes(e));
-      const auswahl = zurWelt.length ? zurWelt : ereignisse;
+      const auswahl = (zurWelt.length ? zurWelt : ereignisse).map((e) => (Clavis.ereignisFuerWelt ? Clavis.ereignisFuerWelt(e, R.welt) : e));
       L.letzteWendung = Date.now();
       senden({ typ: 'wendung', art, gut: W.gut, ereignis: auswahl[Math.floor(Math.random() * auswahl.length)] || (R.alter === 'kinder' ? 'konfetti' : 'uhrschlag'), text: texte[Math.floor(Math.random() * texte.length)], daten }, null);
       melden();
@@ -373,12 +394,12 @@ const ClavisLeiter = (() => {
           if (pos >= 0) b = { art: 'fragment', stellen: [pos], buchstaben: [G.wort[pos]], bonus: true };
           else { L.strafe -= 120; b = { art: 'zeit', sekunden: 120, bonus: true }; }
         }
-        L.geloest[id] = { von: person.id, name: person.name, zeit: Date.now() - L.start, belohnung: b };
+        L.geloest[id] = { von: person.id, name: person.name, zeit: Date.now() - L.start, belohnung: b, geschichte: g.geschichte || '' };
         if (b.art === 'fragment') b.stellen.forEach((st, i) => { L.wort[st] = b.buchstaben[i]; });
         if (b.art === 'tuer') L.szenen[b.szene] = true;
         delete L.zettelBei[id];
         delete L.blockiert[id];
-        senden({ typ: 'geloest', station: id, von: person.id, name: person.name, belohnung: b, ereignis: g.ereignis }, null);
+        senden({ typ: 'geloest', station: id, von: person.id, name: person.name, belohnung: b, ereignis: g.ereignis, geschichte: g.geschichte || '' }, null);
         // Countdown entschärft?
         if (L.countdown && Object.keys(L.geloest).length > L.countdown.geloest) {
           L.countdown = null;

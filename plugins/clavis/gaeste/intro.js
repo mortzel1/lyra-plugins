@@ -152,7 +152,7 @@
   };
 
   /** Das Intro abspielen. Ergebnis: Zeitplan läuft über beiTakt (damit „Überspringen“ alles abbrechen kann). */
-  function zeigen(flaeche, { raum, kinder, zeilen, titelBlock, beiTakt, ton }) {
+  function zeigen(flaeche, { raum, kinder, zeilen, titelBlock, beiTakt, ton, sprich = () => {} }) {
     const welt = raum.welt;
     const a = (AUSSEN[welt] || AUSSEN.akademie)(kinder);
     const huelle = el('div', { class: 'cl-film' + (kinder ? ' kinder' : '') });
@@ -181,12 +181,12 @@
     beiTakt(t, () => { ton(kinder ? 'plopp' : 'riser'); huelle.classList.add('an'); untertitel.replaceChildren(el('span', { class: 'cl-film-vorspann' }, kinder ? 'Clavis zeigt' : 'Clavis präsentiert')); });
     t += kinder ? 2200 : 2800;
     const aussenZeilen = z.splice(0, Math.max(1, Math.ceil(z.length / 2) - (z.length > 2 ? 0 : 0)));
-    aussenZeilen.forEach((x, i) => { beiTakt(t, () => { ton(kinder ? (i % 2 ? 'plopp' : 'kichern') : i === 0 ? 'braam' : 'whoosh'); zeile(x, i); }); t += Math.min(3600, 1700 + x.length * 30); });
+    aussenZeilen.forEach((x, i) => { beiTakt(t, () => { ton(kinder ? (i % 2 ? 'plopp' : 'kichern') : i === 0 ? 'braam' : 'whoosh'); zeile(x, i); sprich(x); }); t += Math.min(4200, 2000 + x.length * 45); });
     // Die Kamera fährt auf die Tür zu – und hindurch
     beiTakt(t - 1200, () => { bild.classList.add('heran'); ton('whoosh'); });
     beiTakt(t, () => { huelle.append(innen); requestAnimationFrame(() => innen.classList.add('an')); ton(kinder ? 'plopp' : 'tueroeffnen'); untertitel.replaceChildren(); });
     t += 900;
-    z.forEach((x, i) => { beiTakt(t, () => { ton(kinder ? 'kichern' : i % 2 ? 'whoosh' : 'braam'); zeile(x, i + aussenZeilen.length); }); t += Math.min(3600, 1700 + x.length * 30); });
+    z.forEach((x, i) => { beiTakt(t, () => { ton(kinder ? 'kichern' : i % 2 ? 'whoosh' : 'braam'); zeile(x, i + aussenZeilen.length); sprich(x); }); t += Math.min(4200, 2000 + x.length * 45); });
     if (!z.length) t += 2200;
     beiTakt(t, () => {
       ton(kinder ? 'fanfare' : 'braam');
@@ -194,6 +194,7 @@
       bild.classList.add('titel');
       untertitel.replaceChildren();
       huelle.append(el('div', { class: 'cl-film-titel' }, titelBlock));
+      setTimeout(() => sprich(raum.titel), 900);
     });
     t += 3800;
     return t;

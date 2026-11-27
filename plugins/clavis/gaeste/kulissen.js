@@ -238,12 +238,12 @@
       `<rect x="10" y="40" width="50" height="122" fill="#1ee8b0" opacity="0.22"/>${!k && st.grusel >= 5 ? '<path d="M35 70 q-10 4 -10 20 q0 14 6 24 l-4 22 h16 l-4 -22 q6 -10 6 -24 q0 -16 -10 -20 Z" fill="#06231c" opacity="0.75" class="cl-a-schweben"/>' : '<circle cx="35" cy="110" r="10" fill="#39f5c6" opacity="0.3" class="cl-a-schweben"/>'}` +
       `<g class="cl-a-blasen-auf">${Array.from({ length: 7 }, () => `<circle cx="${zahl(r, 16, 54).toFixed(0)}" cy="${zahl(r, 60, 160).toFixed(0)}" r="${zahl(r, 1, 2.6).toFixed(1)}" fill="none" stroke="#d9fff6" stroke-width="0.7"/>`).join('')}</g>` +
       `<rect x="10" y="18" width="5" height="144" fill="#fff" opacity="0.12"/><path d="M60 30 h8 v60" stroke="#5d6a70" stroke-width="3" fill="none"/>` }),
-    rohre: (r) => ({ vb: [150, 130], h: 30, ab: 10, inner:
-      `<path d="M0 20 H150 M0 44 H60 Q72 44 72 56 V130 M150 70 H110 Q98 70 98 82 V130" stroke="#5d6a70" stroke-width="10" fill="none"/><path d="M0 20 H150 M0 44 H60 Q72 44 72 56 V130 M150 70 H110 Q98 70 98 82 V130" stroke="#8a98a0" stroke-width="2" fill="none" transform="translate(0 -3)"/>` +
-      [24, 120].map((x) => `<rect x="${x - 4}" y="12" width="8" height="16" fill="#3a4448"/>`).join('') +
-      `<circle cx="38" cy="44" r="9" fill="#c94c4c" stroke="#3a1a1a" stroke-width="2"/><path d="M32 44 h12 M38 38 v12" stroke="#3a1a1a" stroke-width="2"/>` +
-      `<circle cx="128" cy="44" r="14" fill="#efe6cf" stroke="#5d6a70" stroke-width="3"/><path d="M118 48 a11 11 0 0 1 20 0" stroke="#d22" stroke-width="1.4" fill="none" opacity="0.6"/><line x1="128" y1="44" x2="137" y2="38" stroke="#222" stroke-width="1.6" class="cl-a-zeiger" style="transform-origin:128px 44px"/>` +
-      `<path class="cl-a-dampf" d="M96 18 q-4 -8 2 -14 q6 -6 0 -12" stroke="#cfd8dc" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>` }),
+    rohre: (r) => ({ vb: [150, 260], h: 64, ab: 0, inner:
+      `<path d="M30 0 V260 M70 0 V150 Q70 170 90 170 H150 M118 0 V120" stroke="#4d5a60" stroke-width="12" fill="none"/><path d="M30 0 V260 M70 0 V150 Q70 170 90 170 H150 M118 0 V120" stroke="#8a98a0" stroke-width="3" fill="none" transform="translate(-3 0)"/>` +
+      [40, 120, 210].map((y) => `<rect x="22" y="${y}" width="16" height="10" fill="#3a4448"/>`).join('') + `<rect x="62" y="60" width="16" height="10" fill="#3a4448"/><rect x="110" y="60" width="16" height="10" fill="#3a4448"/>` +
+      `<circle cx="30" cy="160" r="11" fill="#c94c4c" stroke="#3a1a1a" stroke-width="2"/><path d="M23 160 h14 M30 153 v14" stroke="#3a1a1a" stroke-width="2.4"/>` +
+      `<circle cx="118" cy="132" r="17" fill="#efe6cf" stroke="#5d6a70" stroke-width="4"/><path d="M106 137 a13 13 0 0 1 24 0" stroke="#d22" stroke-width="1.6" fill="none" opacity="0.6"/><line x1="118" y1="132" x2="128" y2="125" stroke="#222" stroke-width="2" class="cl-a-zeiger" style="transform-origin:118px 132px"/>` +
+      `<path class="cl-a-dampf" d="M126 116 q-4 -8 2 -14 q6 -6 0 -12" stroke="#cfd8dc" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>` }),
     paneel: (r) => ({ vb: [140, 110], h: 28, ab: 12, inner:
       `<rect width="140" height="110" rx="6" fill="#1c2238"/><rect x="4" y="4" width="132" height="102" rx="4" fill="none" stroke="#3a4468" stroke-width="2"/><rect x="12" y="12" width="70" height="44" rx="3" fill="#061018"/>` +
       `<path class="cl-a-welle-bild" d="M14 34 q6 -14 12 0 t12 0 t12 0 t12 0 t12 0" stroke="#5ad2ff" stroke-width="1.4" fill="none"/>` +
@@ -435,19 +435,29 @@
     const liste = r.mischen(B.module);
     let vorrat = [];
     const wandX = belegt.filter((b) => b.platz === 'wand').map((b) => b.x);
+    // Was schon als Rätsel-Gegenstand im Raum steht, kommt nicht noch einmal an die Wand (kein doppelter Kamin)
+    const symbole = new Set(belegt.map((b) => b.icon).filter(Boolean));
+    const DOPPELT = { kamin: 'kamin', standuhr: 'standuhr', 'regal': 'regal', 'bild portraet': 'portraet', 'bild karte': 'karte', 'bild tafel': 'tafel', tank: 'reagenz', spind: 'schrank', aktenschrank: 'schrank', kanone: 'kanone', kuckucksuhr: 'standuhr' };
+    const doppelt = (e) => symbole.has(DOPPELT[e.slice(0, 2).join(' ')] || DOPPELT[e[0]]);
+    const liste2 = liste.filter((e) => !doppelt(e));
     const module = el('div', { class: 'cl-module' });
     for (let i = 0; i < n; i++) {
-      if (!vorrat.length) vorrat = liste.slice();
+      if (!vorrat.length) vorrat = (liste2.length ? liste2 : liste).slice();
       let eintrag = vorrat.shift();
       // Szenen-Art formt den Raum: Keller ohne Fenster, Technik mit Rohren, oben mit mehr Fenstern
       if (ort === 'keller' && eintrag[0] === 'fenster') eintrag = B.module.find((m) => m[0] !== 'fenster' && m[0] !== 'bild') || eintrag;
       if (ort === 'technik' && i % 3 === 1) eintrag = ['rohre'];
       if (ort === 'oben' && i % 3 === 0) eintrag = B.module.find((m) => m[0] === 'fenster') || eintrag;
       const x = ((i + 0.5) / n) * 100 + zahl(r, -2.5, 2.5);
-      const m = modulBauen(eintrag, r, ctx);
+      let m = modulBauen(eintrag, r, ctx);
       if (!m) continue;
+      // Vor einem Wand-Rätsel hängt nichts – dort steht stattdessen etwas am Boden (keine kahle Wand)
+      if (m.ab > 6 && wandX.some((w) => Math.abs(w - x) < 9)) {
+        const stehend = (liste2.length ? liste2 : liste).map((e) => [e, modulBauen(e, r, ctx)]).find(([, mm]) => mm && mm.ab <= 6 && mm.h <= 46);
+        if (!stehend) continue;
+        [eintrag, m] = stehend;
+      }
       const haengt = m.ab > 6;
-      if (haengt && wandX.some((w) => Math.abs(w - x) < 9)) continue;
       const hoehe = m.h * (ort === 'halle' ? 1.12 : ort === 'gang' ? 0.92 : 1);
       const d = el('div', { class: `cl-modul m-${eintrag[0]}${eintrag[1] ? ' m-' + eintrag[1] : ''}${haengt ? ' haengt' : ''}`, style: { left: `${x.toFixed(2)}%`, height: `${hoehe.toFixed(1)}%`, bottom: `calc(var(--horizont-unten) + ${m.ab.toFixed(1)}%)`, aspectRatio: `${m.vb[0]} / ${m.vb[1]}`, '--neig': `${zahl(r, -1.2, 1.2).toFixed(2)}deg` } });
       d.innerHTML = svg(m.vb, m.inner);
@@ -499,5 +509,13 @@
   /** Text, wenn der Verfall eine Stufe weiter ist (1–3) */
   const verfallText = (art, stufe, kinder) => { const v = VERFALL[art]; if (!v || stufe < 1) return ''; return ((kinder && v.kinderTexte) || v.texte)[Math.min(3, stufe) - 1]; };
 
-  Clavis.Kulisse = { bauen, ortArt, verfallText, SPUR, REAKTION_MS, BAU };
+  /** Ein Fenster der Welt (für Nahaufnahmen in Zwischenszenen) */
+  function fensterInnen(welt) {
+    const B = BAU[welt] || BAU.akademie;
+    const e = B.module.find((x) => x[0] === 'fenster') || ['fenster', 'eckig', 'mond'];
+    const f = fenster(e[1], e[2], Clavis.zufall(7), false, '#3a2a1c');
+    return `<svg viewBox="0 0 ${f.vb[0]} ${f.vb[1]}" preserveAspectRatio="xMidYMid meet">${f.inner}</svg>`;
+  }
+
+  Clavis.Kulisse = { bauen, ortArt, verfallText, SPUR, REAKTION_MS, BAU, fensterInnen };
 })();

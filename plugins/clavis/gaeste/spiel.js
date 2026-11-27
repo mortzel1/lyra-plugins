@@ -56,32 +56,44 @@
     }
 
     // ---------------------------------------------------------------- Erzähler (Untertitel)
-    // Ein Klick blättert weiter – aber erst, wenn die Zeile eine Weile zu lesen war (Ereignisse verschwinden nicht im Vorbeiklicken)
-    const erzEl = el('div', { class: 'cl-erzaehler', onclick: () => { if (Date.now() - z.erzSeit > 2600) naechsteZeile(); } });
-    const ERZ_SYMBOL = { telefon: '☎', funk: '📡', ereignis: '!', erfolg: '✓', warnung: '⚠', hilfe: '💡', fund: '✦' };
+    // Der Erzähler spricht (Stimme des Geräts) – die Anzeige zeigt nur den Satz, der gerade gesprochen wird.
+    // Ein Klick springt zur nächsten Zeile. Während einer Zwischenszene wartet er.
+    const erzEl = el('div', { class: 'cl-erzaehler', onclick: () => { if (Date.now() - z.erzSeit > 1200) { Clavis.stimme.stopp(); naechsteZeile(); } } });
+    const ERZ_SYMBOL = { telefon: '☎', funk: '📡', ereignis: '!', erfolg: '✓', warnung: '⚠', hilfe: '💡', fund: '✦', geschichte: '📖', geist: '👁' };
+    const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+    const rolleVon = (art) => (art === 'telefon' ? 'telefon' : art === 'funk' ? 'funk' : art === 'geist' ? 'geist' : kinder() ? 'kind' : 'erzaehler');
+    z.erzNr = 0;
     function sagen(text, art = '') {
       if (!text) return;
       // Wer abnimmt, hört sofort zu – Anrufe und Funksprüche gehen vor
-      if (art === 'telefon' || art === 'funk') { z.erz.unshift({ text, art }); naechsteZeile(); return; }
+      if (art === 'telefon' || art === 'funk') { z.erz.unshift({ text, art }); Clavis.stimme.stopp(); naechsteZeile(); return; }
       z.erz.push({ text, art });
       if (z.erz.length > 6) z.erz.splice(0, z.erz.length - 6);
-      if (!z.erzAktiv || (z.erzArt === 'hilfe' && art !== 'hilfe')) naechsteZeile();
+      if (!z.erzAktiv || (z.erzArt === 'hilfe' && art !== 'hilfe')) { if (z.erzAktiv) Clavis.stimme.stopp(); naechsteZeile(); }
     }
     function naechsteZeile() {
       clearTimeout(z.erzTakt);
+      const nr = ++z.erzNr;
       const l = z.erz.shift();
       if (!l) { z.erzAktiv = false; erzEl.classList.remove('an'); return; }
       z.erzAktiv = true;
       z.erzArt = l.art;
       z.erzSeit = Date.now();
-      erzEl.className = 'cl-erzaehler an ' + l.art;
-      const t = el('span', { class: 'cl-erz-text' });
-      erzEl.replaceChildren(...[ERZ_SYMBOL[l.art] ? el('b', { class: 'cl-erz-symbol' }, ERZ_SYMBOL[l.art]) : null, t, z.erz.length ? el('small', { class: 'cl-erz-mehr' }, `+${z.erz.length}`) : null].filter(Boolean));
-      let i = 0;
-      const tippen = () => { if (!t.isConnected || i > l.text.length) return; t.textContent = l.text.slice(0, i); i += 2; setTimeout(tippen, l.art === 'telefon' || l.art === 'funk' ? 24 : 14); };
-      tippen();
-      const lang = ['ereignis', 'telefon', 'funk', 'warnung'].includes(l.art);
-      z.erzTakt = setTimeout(naechsteZeile, (lang ? 4800 : 3000) + l.text.length * (lang ? 62 : 48));
+      const zeige = (satz) => {
+        erzEl.className = 'cl-erzaehler an ' + l.art;
+        erzEl.replaceChildren(...[ERZ_SYMBOL[l.art] ? el('b', { class: 'cl-erz-symbol' }, ERZ_SYMBOL[l.art]) : null, el('span', { class: 'cl-erz-text' }, satz), z.erz.length ? el('small', { class: 'cl-erz-mehr' }, `+${z.erz.length}`) : null].filter(Boolean));
+      };
+      (async () => {
+        for (const satz of Clavis.stimme.saetze(l.text)) {
+          while (Clavis.Szenen && Clavis.Szenen.aktiv() && nr === z.erzNr) await warte(300);
+          if (nr !== z.erzNr) return;
+          zeige(satz);
+          const gesprochen = await Clavis.stimme.sprechen(satz, rolleVon(l.art));
+          if (nr !== z.erzNr) return;
+          await warte(gesprochen ? 350 : 1500 + satz.length * 50);
+        }
+        if (nr === z.erzNr) naechsteZeile();
+      })();
     }
 
     // ---------------------------------------------------------------- Kopf, Ziel, Lösungswort
@@ -95,9 +107,10 @@
     function ziel() {
       const jetzt = Date.now();
       const s = (ms) => Math.max(0, Math.ceil(ms / 1000));
-      if (z.countdownBis && z.countdownBis > jetzt) return { art: 'dringend', text: `⏱ ${kinder() ? 'Die Rakete startet' : 'Countdown'}: Löse irgendein Rätsel – noch ${s(z.countdownBis - jetzt)} s` };
-      if (z.dunkelBis > jetzt) return { art: 'warnung', text: `🔦 Stromausfall – leuchte mit der Maus oder dem Finger. Licht in ${s(z.dunkelBis - jetzt)} s` };
-      if (z.nebelBis > jetzt) return { art: 'warnung', text: `🌫 Nebel – lichtet sich in ${s(z.nebelBis - jetzt)} s` };
+      const ww = (a) => weltWendung(a);
+      if (z.countdownBis && z.countdownBis > jetzt) return { art: 'dringend', text: `⏱ ${(ww('countdown') && ((kinder() && ww('countdown').kinder ? 'Schnell' : ww('countdown').kurz))) || (kinder() ? 'Schnell' : 'Countdown')}: Löse irgendein Rätsel – noch ${s(z.countdownBis - jetzt)} s` };
+      if (z.dunkelBis > jetzt) return { art: 'warnung', text: `🔦 ${ww('dunkel') ? ww('dunkel').titel.replace('!', '') : 'Stromausfall'} – leuchte mit der Maus oder dem Finger. Hell in ${s(z.dunkelBis - jetzt)} s` };
+      if (z.nebelBis > jetzt) return { art: 'warnung', text: `🌫 ${ww('nebel') ? ww('nebel').titel.replace('!', '') : 'Nebel'} – vorbei in ${s(z.nebelBis - jetzt)} s` };
       const bl = Object.keys((z.stand && z.stand.blockiert) || {}).find((id) => blockiertMs(id) > 0 && !geloest(id));
       if (bl) return { art: 'warnung', text: `⛓ „${station(bl).ort}“ ist verriegelt – noch ${s(blockiertMs(bl))} s` };
       const brief = z.briefe.find((b) => b.szene === z.szene && !b.gelesen);
@@ -124,11 +137,13 @@
         el('div', { class: 'cl-hud-knoepfe' },
           z.stand && z.stand.spieler && z.stand.spieler.length > 1 ? el('span', { class: 'cl-team', title: z.stand.spieler.map((s) => s.name).join(', ') }, `👥 ${z.stand.spieler.length}`) : null,
           el('button', { class: 'cl-hud-knopf', type: 'button', title: 'Notizbuch', onclick: notizbuch }, '📓'),
+          schreckEinst().moeglich ? el('button', { class: 'cl-hud-knopf schreck' + (schreckEinst().an ? ' an' : ''), type: 'button', title: schreckEinst().an ? `Jumpscares an (Stärke ${schreckEinst().staerke}) – ausschalten` : 'Jumpscares aus – einschalten', onclick: () => { schreckSetzen(!schreckEinst().an); hudNeu(); toast(schreckEinst().an ? `⚡ Jumpscares an (Stärke ${schreckEinst().staerke})` : 'Jumpscares aus'); } }, '⚡') : null,
+          el('button', { class: 'cl-hud-knopf' + (Clavis.stimme.an() && Clavis.stimme.verfuegbar() ? '' : ' aus'), type: 'button', title: !Clavis.stimme.verfuegbar() ? 'Keine Stimme auf diesem Gerät – nur Untertitel' : Clavis.stimme.an() ? 'Erzähler-Stimme aus' : 'Erzähler-Stimme an', onclick: () => { Clavis.stimme.schalten(!Clavis.stimme.an()); hudNeu(); } }, '🗣'),
           el('button', { class: 'cl-hud-knopf' + (k.musikAn() ? '' : ' aus'), type: 'button', title: k.musikAn() ? 'Musik aus' : 'Musik an', onclick: () => { k.musikSchalten(!k.musikAn()); hudNeu(); } }, '♫'),
           el('button', { class: 'cl-hud-knopf', type: 'button', title: k.an() ? 'Ton aus' : 'Ton an', onclick: () => { k.schalten(!k.an()); hudNeu(); } }, k.an() ? '🔊' : '🔈'),
           host ? el('button', { class: 'cl-hud-knopf', type: 'button', title: 'Spiel beenden', onclick: () => host.beenden() }, '⏻') : null));
     }
-    const hudNeu = () => { const h = spiel.querySelector('.cl-hud'); if (h) h.replaceWith(hud()); };
+    const hudNeu = () => { const h = spiel.querySelector('.cl-hud'); if (h) { const n = hud(); h.replaceWith(n); spiel.style.setProperty('--hud-h', `${n.offsetHeight}px`); } };
 
     function unten() {
       const w = (z.stand && z.stand.wort) || new Array(z.raum.finale.laenge).fill(null);
@@ -170,7 +185,7 @@
         plaetze.push({ id, art: 'station', icon: s.symbol, platz, x, y, gr });
       });
       deko.forEach(([icon, text], j) => {
-        const x = j === 0 ? 7 : 93;
+        const x = j === 0 ? 13 : 87;
         const platz = Clavis.platzVon(icon);
         plaetze.push({ id: 'deko' + j, art: 'deko', icon, text, platz, x: platz === 'wand' ? x + (j ? -2 : 2) : x, y: platz === 'wand' ? 30 : platz === 'tisch' ? 64 : 70, gr: 0.78 });
       });
@@ -193,7 +208,7 @@
       const frisch = z.frisch.get(p.id) > jetzt - 1800;
       const tipp = s && !fertig && z.stand && z.stand.hinweise && z.stand.hinweise[p.id] && z.stand.hinweise[p.id].length;
       const b = el('button', {
-        class: `cl-req ${p.platz} ${p.art}${fertig ? ' fertig' : ''}${zu ? ' blockiert' : ''}${s && s.bonus ? ' bonus' : ''}${mark && mark > jetzt ? ' markiert' : ''}${dringend ? ' dringend' : ''}${frisch ? ' oeffnet' : ''}${s && s.tuer ? ' schluessel-station' : ''}`,
+        class: `cl-req ${p.platz} ${p.art} mat-${Clavis.materialVon(p.icon)}${fertig ? ' fertig' : ''}${zu ? ' blockiert' : ''}${s && s.bonus ? ' bonus' : ''}${mark && mark > jetzt ? ' markiert' : ''}${dringend ? ' dringend' : ''}${frisch ? ' oeffnet' : ''}${s && s.tuer ? ' schluessel-station' : ''}`,
         type: 'button', 'data-id': p.id, title: s ? `${s.ort} – ${s.titel}` : '',
         style: { left: `${p.x}%`, top: `${p.y}%`, '--s': String(p.gr), zIndex: String(Math.round(p.y)), '--d': `${(hash(p.id) % 7) * 0.4}s` },
         onclick: () => (s ? oeffnen(p.id) : dekoKlick(b, p)),
@@ -379,7 +394,7 @@
         if (st.grusel >= 6) teile.push('augen');
         if (st.gefahr >= 6) teile.push('gefahr-rand');
       } else teile.push('funkeln');
-      return el('div', { class: 'cl-atmo' }, teile.map((t) => el('div', { class: 'cl-deko ' + t })), z.raum && z.raum.blut ? blutDeko() : null);
+      return el('div', { class: 'cl-atmo' }, teile.map((t) => el('div', { class: 'cl-deko ' + t })));
     }
 
     function raumAnsicht() {
@@ -391,6 +406,7 @@
       z.breite = breite;
       const bau = Clavis.Kulisse.bauen({ welt: r.welt, szene: z.szene, titel: sz.titel, art: sz.art, breite, alter: r.alter, blut: r.blut, stimmung: r.stimmung, belegt: pl, lichter: sz.stationen.length, seed: hash(r.titel) });
       z.bau = bau;
+      if (r.blut) bau.wand.append(el('div', { class: 'cl-blut-wand' }, blutDeko()));
       const jetzt = Date.now();
       const raum = el('div', { class: `cl-raum verfall-${bau.verfallArt}` + (z.dunkelBis > jetzt ? ' dunkel' : '') + (z.nebelBis > jetzt ? ' vernebelt' : '') + (z.countdownBis > jetzt ? ' alarm' : ''), 'data-ort': bau.ort, 'data-licht': bau.licht, 'data-zeit': String(z.zeitStufe) },
         el('div', { class: 'cl-kamera' },
@@ -435,7 +451,7 @@
         raum.style.setProperty('--lx', `${e.touches[0].clientX - q.left}px`);
         raum.style.setProperty('--ly', `${e.touches[0].clientY - q.top}px`);
       }, { passive: true });
-      setTimeout(() => { requisitenMalen(); spurenSetzen(); }, 0);
+      setTimeout(() => { requisitenMalen(); spurenSetzen(); nebelStil(raum); }, 0);
       return raum;
     }
 
@@ -523,9 +539,9 @@
       setTimeout(() => { if (z.offen === id) nahMalen(true); }, 260);
       // Jumpscare beim Öffnen – einmal, zufällig
       const sch = z.raum.schreck;
-      if (sch && !z.schreckLokal && id !== 'finale' && Math.random() < 0.14) {
+      if (sch && schreckEinst().an && !z.schreckLokal && id !== 'finale' && Math.random() < 0.14) {
         z.schreckLokal = true;
-        setTimeout(() => { if (z.offen === id) Clavis.schreck(spiel, sch.arten[Math.floor(Math.random() * sch.arten.length)], { blut: z.raum.blut }); }, 900 + Math.random() * 900);
+        setTimeout(() => { if (z.offen === id) Clavis.schreck(spiel, sch.arten[Math.floor(Math.random() * sch.arten.length)], { blut: z.raum.blut, staerke: schreckEinst().staerke }); }, 900 + Math.random() * 900);
       }
     }
 
@@ -568,6 +584,7 @@
         b && b.art === 'fragment' ? el('div', { class: 'cl-fragment' }, el('span', {}, b.bonus ? 'Bonus-Fundstück' : 'Fundstück'), el('div', { class: 'cl-fragment-steine' }, b.stellen.map((st, i) => el('div', { class: 'cl-fragment-stein' }, el('b', {}, b.buchstaben[i]), el('small', {}, `${st + 1}. Stelle`))))) : null,
         b && b.art === 'tuer' ? el('div', { class: 'cl-fragment' }, el('span', {}, 'Ein Weg öffnet sich'), el('b', {}, `→ ${z.raum.szenen[b.szene].titel}`)) : null,
         b && b.art === 'zeit' ? el('div', { class: 'cl-fragment' }, el('span', {}, 'Bonus'), el('b', { class: 'cl-zeitbonus' }, '+2:00')) : null,
+        g.geschichte ? el('div', { class: 'cl-geschichte' }, el('small', {}, 'Du findest heraus'), el('p', {}, g.geschichte)) : null,
         el('button', { class: 'cl-knopf', type: 'button', onclick: schliessen }, 'Zurücktreten'));
     }
 
@@ -682,49 +699,85 @@
     }
 
     // ---------------------------------------------------------------- Wendungen: klar sagen, was zu tun ist
-    function auftragZeigen(d) {
+    const weltWendung = (art) => ((Clavis.WENDUNG_WELT || {})[art] || {})[z.raum && z.raum.welt] || null;
+
+    /** Was jetzt zu tun ist – bleibt stehen, bis es gelesen ist (der Knopf geht erst nach ein paar Sekunden) */
+    function auftragZeigen(d, ww) {
       const g = d.daten || {};
       const a = Clavis.AUFGABE[d.art] || { titel: 'Achtung!', tun: '' };
-      const tun = ((kinder() && a.kinder) || a.tun).replace('{ort}', g.ort || '').replace('{n}', g.stelle != null ? g.stelle + 1 : '').replace('{b}', g.buchstabe || '');
+      let tun = ((kinder() && a.kinder) || a.tun).replace('{ort}', g.ort || '').replace('{n}', g.stelle != null ? g.stelle + 1 : '').replace('{b}', g.buchstabe || '');
+      if (d.art === 'countdown' && ww) tun = `Löse schnell IRGENDEIN Rätsel, bevor es zu spät ist (90 Sekunden) – ${ww.kurz}! Schaffst du es nicht, verlierst du 2 Minuten.`;
+      if (d.art === 'dunkel' && ww) tun = 'Beweg die Maus – oder den Finger – über den Raum: Deine Lampe zeigt, wohin du leuchtest. In 60 Sekunden wird es wieder hell. Rätsel öffnen geht weiterhin.';
+      if (d.art === 'nebel' && ww) tun = `Du siehst kaum etwas – aber du kannst weiter Rätsel öffnen. In 45 Sekunden ist es vorbei.`;
       const alt = spiel.querySelector('.cl-auftrag');
       if (alt) alt.remove();
       const weg = () => { karte.classList.add('weg'); setTimeout(() => karte.remove(), 300); };
+      const lesen = d.art === 'zeitplus' || d.art === 'zeitminus' ? 2 : 4;
+      const knopf = el('button', { class: 'cl-knopf', type: 'button', disabled: true, onclick: weg }, `Lesen … ${lesen}`);
       const karte = el('div', { class: 'cl-auftrag ' + (d.gut ? 'gut' : 'schlecht') },
         el('div', { class: 'cl-auftrag-karte' },
           el('div', { class: 'cl-auftrag-symbol' }, AUFGABE_SYMBOL[d.art] || '!'),
-          el('div', { class: 'cl-auftrag-titel' }, a.titel),
-          d.text ? el('p', { class: 'cl-auftrag-text' }, d.text) : null,
+          el('div', { class: 'cl-auftrag-titel' }, (ww && ww.titel) || a.titel),
           el('div', { class: 'cl-auftrag-tun' }, el('small', {}, d.gut ? 'Das bedeutet' : 'Deine Aufgabe'), el('b', {}, tun)),
-          el('button', { class: 'cl-knopf', type: 'button', onclick: weg }, d.gut ? 'Super!' : 'Verstanden – los!')));
+          knopf));
       spiel.append(karte);
-      setTimeout(() => { if (karte.isConnected) weg(); }, d.art === 'countdown' ? 9000 : 14000);
+      let rest = lesen;
+      const zaehl = setInterval(() => { rest--; if (!knopf.isConnected) return clearInterval(zaehl); if (rest > 0) knopf.textContent = `Lesen … ${rest}`; else { clearInterval(zaehl); knopf.disabled = false; knopf.textContent = d.gut ? 'Super!' : 'Verstanden – los!'; knopf.focus(); } }, 1000);
     }
 
-    /** Ein Ereignis passiert im Raum – animiert, mit Erzähler, und es hinterlässt Spuren */
-    function ereignisZeigen(art, text) {
-      z.notizen.push(text || (Clavis.EREIGNISSE[art] || {}).text || '');
+    /** Ein Ereignis: Das Spiel friert ein, eine Zwischenszene spielt (Nahaufnahme, Effekte, Klang, Untertitel) – danach Spuren im Raum */
+    function ereignisZeigen(art0, text0) {
+      const welt = z.raum.welt;
+      const art = Clavis.ereignisFuerWelt ? Clavis.ereignisFuerWelt(art0, welt) : art0;
+      const stark = !kinder() && ((z.raum.stimmung || {}).grusel || 0) >= 6;
+      const botschaft = ['anruf', 'funkspruch', 'brief'];
+      const textBleibt = art === art0 || (botschaft.includes(art) && botschaft.includes(art0));
+      const text = (textBleibt && text0) || ((Clavis.EREIGNIS_WELT || {})[art] || {})[welt] || Clavis.ereignisText(art, z.raum.alter, stark) || (Clavis.EREIGNISSE[art] || {}).text || '';
+      z.notizen.push(text);
       const brief = art === 'brief';
-      Clavis.effekt(spiel, art, text, {
-        alter: z.raum.alter, raum: spiel.querySelector('.cl-raum'), stark: !kinder() && ((z.raum.stimmung || {}).grusel || 0) >= 6,
-        sagen: brief ? () => sagen(kinder() ? 'Ein bunter Umschlag rutscht unter der Tür hindurch! Er liegt jetzt auf dem Boden.' : 'Ein Umschlag rutscht unter der Tür hindurch und bleibt auf dem Boden liegen. Heb ihn auf!', 'ereignis') : (t, a) => sagen(t, a),
+      const erz = kinder() ? 'kind' : 'erzaehler';
+      // Wer spricht? Anrufer am Telefon, eine Stimme im Funk, der Brief wird vorgelesen – und wo von Stimmen die Rede ist, sind sie zu hören
+      const geisterhaft = !kinder() && (['fluestern', 'lachen', 'schrei', 'ketten', 'heulen'].includes(art) || /stimme|flüster|wisper|murmel|ruft|rufen|singt|summt/i.test(text));
+      const GEISTER = ['Du gehörst jetzt hierher.', 'Wir sehen dich.', 'Bleib … bei uns.', 'Hier unten ist es so kalt.', 'Komm … näher.', 'Niemand geht hier fort.'];
+      const sprache = brief ? [{ text: kinder() ? 'Ein bunter Umschlag rutscht unter der Tür hindurch. Darin steht:' : 'Ein Umschlag rutscht unter der Tür hindurch. Darin steht:', rolle: erz }, { text, rolle: 'brief' }]
+        : art === 'anruf' ? [{ text, rolle: 'telefon' }] : art === 'funkspruch' ? [{ text, rolle: 'funk' }]
+          : geisterhaft ? [{ text, rolle: erz }, { text: GEISTER[Math.floor(Math.random() * GEISTER.length)], rolle: 'geist', fluestern: true }] : [{ text, rolle: erz }];
+      Clavis.Szenen.zeigen(spiel, {
+        art, text, sprache, alter: z.raum.alter, welt, sprecher: art === 'anruf' ? 'telefon' : art === 'funkspruch' ? 'funk' : '',
+        vorher: () => {
+          if (!['anruf', 'funkspruch', 'brief'].includes(art)) Clavis.effekt(spiel, art, text, { alter: z.raum.alter, raum: spiel.querySelector('.cl-raum'), stumm: true, stark });
+          if (art === 'regen') k.wetter('starkregen', 24);
+          if (art === 'gewitter') { k.wetter('starkregen', 18); k.wetter('sturm', 18); }
+          if (art === 'beben' || art === 'explosion') k.wetter('risse', 6);
+        },
+      }).then(() => {
+        const spur = Clavis.Kulisse.SPUR[art];
+        if (brief) z.briefe.push({ szene: z.szene, text, gelesen: true });
+        if (spur && !(kinder() && spur === 'risse')) (z.spuren[z.szene] || (z.spuren[z.szene] = new Set())).add(spur);
+        spurenSetzen(); requisitenMalen(); hudNeu();
       });
-      const spur = Clavis.Kulisse.SPUR[art];
-      if (spur && !(kinder() && spur === 'risse')) {
-        (z.spuren[z.szene] || (z.spuren[z.szene] = new Set())).add(spur);
-        if (brief) z.briefe.push({ szene: z.szene, text: text || (Clavis.EREIGNISSE.brief || {}).text || '', gelesen: false });
-        setTimeout(() => { spurenSetzen(); requisitenMalen(); hudNeu(); }, brief ? 3600 : 1600);
-      }
     }
 
+    /** Eine Wendung: Zwischenszene (passend zur Welt), dann die Karte mit der Aufgabe */
     function wendungZeigen(d) {
       const g = d.daten || {};
+      const ww = weltWendung(d.art);
+      const titel = (ww && ww.titel) || (Clavis.AUFGABE[d.art] || {}).titel || '';
+      const text = ww ? ((kinder() && ww.kinder) || ww.text) : d.text;
       if (d.art === 'dunkel') z.dunkelBis = Date.now() + (g.sekunden || 60) * 1000;
-      if (d.art === 'nebel') z.nebelBis = Date.now() + (g.sekunden || 45) * 1000;
+      if (d.art === 'nebel') { z.nebelBis = Date.now() + (g.sekunden || 45) * 1000; z.nebelStil = (ww && ww.stil) || 'nebel'; }
       if (d.art === 'countdown') z.countdownBis = Date.now() + (g.sekunden || 90) * 1000;
-      Clavis.effekt(spiel, d.ereignis, d.text, { alter: z.raum.alter, raum: spiel.querySelector('.cl-raum'), stumm: true });
-      setTimeout(() => {
-        auftragZeigen(d);
-        if (z.offen && (d.art === 'countdown' || d.art === 'dunkel' || d.art === 'geheimfach')) { /* die Nahansicht bleibt offen */ }
+      z.notizen.push(text + (d.art === 'tipp' ? ` (Hinweis für ${g.ort})` : d.art === 'buchstabe' ? ` (${g.stelle + 1}. Buchstabe: ${g.buchstabe})` : ''));
+      const ereignis = Clavis.ereignisFuerWelt ? Clavis.ereignisFuerWelt(d.ereignis, z.raum.welt) : d.ereignis;
+      Clavis.Szenen.zeigen(spiel, {
+        wendung: d.art, gut: d.gut, titel, text, alter: z.raum.alter, welt: z.raum.welt, sprache: [{ text: titel, rolle: kinder() ? 'kind' : 'erzaehler' }, { text, rolle: kinder() ? 'kind' : 'erzaehler' }],
+        vorher: () => {
+          if (ereignis && !['anruf', 'funkspruch', 'brief'].includes(ereignis)) Clavis.effekt(spiel, ereignis, text, { alter: z.raum.alter, raum: spiel.querySelector('.cl-raum'), stumm: true });
+          const r = spiel.querySelector('.cl-raum');
+          if (r) { r.classList.toggle('dunkel', z.dunkelBis > Date.now()); r.classList.toggle('vernebelt', z.nebelBis > Date.now()); nebelStil(r); }
+        },
+      }).then(() => {
+        auftragZeigen(d, ww);
         if (d.art === 'geheimfach' && g.szene != null) {
           if (z.szene !== g.szene) gehen(g.szene);
           setTimeout(() => { blickAuf(g.station); markieren([g.station], 12000); }, z.szene !== g.szene ? 1200 : 100);
@@ -737,10 +790,11 @@
         if (d.art === 'buchstabe' && g.stelle != null) buchstabeFliegen('', [g.stelle], [g.buchstabe]);
         requisitenMalen();
         hudNeu();
-        const r = spiel.querySelector('.cl-raum');
-        if (r) { r.classList.toggle('dunkel', z.dunkelBis > Date.now()); r.classList.toggle('vernebelt', z.nebelBis > Date.now()); }
-      }, 900);
-      z.notizen.push(d.text + (d.art === 'tipp' ? ` (Hinweis für ${g.ort})` : d.art === 'buchstabe' ? ` (${g.stelle + 1}. Buchstabe: ${g.buchstabe})` : ''));
+      });
+    }
+    function nebelStil(r) {
+      [...r.classList].filter((c) => c.startsWith('nebel-')).forEach((c) => r.classList.remove(c));
+      if (z.nebelBis > Date.now()) r.classList.add('nebel-' + (z.nebelStil || 'nebel'));
     }
 
     /** Kleine Momente zwischendurch – unheimlich je nach Spuk und Grusel, für Kinder nur Funkeln */
@@ -801,14 +855,15 @@
       const titelBlock = el('div', { class: 'cl-kino-titelblock' },
         el('div', { class: 'cl-kino-welt' }, kinder() && w.kinderName ? w.kinderName : w.name || ''),
         el('h1', { class: 'cl-kino-titel' }, [...r.titel].map((c, i) => el('span', { style: { '--i': i } }, c === ' ' ? ' ' : c))),
-        el('div', { class: 'cl-kino-unter' }, `${(Clavis.STUFEN[r.stufe] || {}).name || ''} · ${r.minuten} Minuten${r.schreck ? ' · ⚡ Jumpscares' : ''}`));
+        el('div', { class: 'cl-kino-unter' }, `${(Clavis.STUFEN[r.stufe] || {}).name || ''} · ${r.minuten} Minuten${schreckEinst().an ? ' · ⚡ Jumpscares' : ''}`));
       const plan = (ms, f) => z.kinoTakte.push(setTimeout(f, ms));
-      const dauer = Clavis.Kino.zeigen(flaeche, { raum: r, kinder: kinder(), zeilen: teaserZeilen(), titelBlock, beiTakt: plan, ton: (n) => k.spielen(n) });
+      const dauer = Clavis.Kino.zeigen(flaeche, { raum: r, kinder: kinder(), zeilen: teaserZeilen(), titelBlock, beiTakt: plan, ton: (n) => k.spielen(n), sprich: (t) => Clavis.stimme.sprechen(t, kinder() ? 'kind' : 'trailer') });
       if (!kinder() && r.stimmung && r.stimmung.grusel >= 6) plan(dauer - 2900, () => k.spielen('schrei'));
       plan(dauer, kinoEnde);
     }
 
     function kinoEnde() {
+      Clavis.stimme.stopp();
       z.kinoTakte.forEach(clearTimeout);
       z.kinoTakte = [];
       if (z.kinoGesehen) return;
@@ -819,6 +874,7 @@
     }
 
     function eintreten() {
+      Clavis.stimme.stopp();
       z.introGesehen = true;
       k.bereit();
       k.intensitaet(0.25);
@@ -836,7 +892,7 @@
       const sz = z.raum.szenen[z.szene];
       setTimeout(() => {
         if (sz.text) sagen(sz.text);
-        sagen(kinder() ? 'Sieh dich um – fahr mit der Maus an den Rand oder wisch mit dem Finger. Alles, was glitzert, kannst du anklicken!' : 'Sieh dich um: Maus an den linken oder rechten Rand, Mausrad, Pfeiltasten oder wischen. Was schimmert, kannst du untersuchen – auch Dinge ohne Rätsel verstecken manchmal etwas.', 'hilfe');
+        sagen(kinder() ? 'Sieh dich um! Alles, was glitzert, kannst du anklicken.' : 'Sieh dich um. Was schimmert, kannst du untersuchen.', 'hilfe');
       }, 1500);
     }
 
@@ -849,10 +905,45 @@
         el('div', { class: 'cl-nah-kopf' }, el('button', { class: 'cl-zurueck', type: 'button', onclick: () => n.remove() }, '← Zurück'), el('div', { class: 'cl-wachsen' }, el('div', { class: 'cl-nah-ort' }, 'Notizbuch'), el('h3', {}, r.titel))),
         el('p', { class: 'cl-nah-text' }, r.intro),
         eigene.length ? [el('h4', {}, 'Deine Zettel'), eigene.map(([id, zt]) => el('div', { class: 'cl-notiz' }, el('b', {}, station(id).ort + ' – '), zt.text || (zt.zeilen ? `Tabelle mit ${zt.zeilen.length} Einträgen (in der Nahansicht)` : '')))] : null,
+        (z.wissen || []).length ? [el('h4', {}, 'Was wir wissen'), el('ol', { class: 'cl-wissen' }, z.wissen.map((t) => el('li', {}, t)))] : null,
         z.notizen.length ? [el('h4', {}, 'Was geschah'), z.notizen.slice().reverse().map((t) => el('div', { class: 'cl-notiz' }, t))] : el('p', { class: 'cl-leise' }, 'Noch nichts notiert.'),
         el('h4', {}, 'So geht’s'),
         el('p', { class: 'cl-leise klein' }, `Sieh dich im Raum um (Maus an den Rand, Mausrad, Pfeiltasten oder wischen) und klicke auf Dinge, die schimmern – auch Dinge ohne Rätsel können etwas verstecken; schwach schimmernde Zeichen an Wand und Boden gehören zu Zeichenschlössern. Jedes gelöste Rätsel bringt Buchstaben für das Lösungswort am Ausgang – oder öffnet eine Tür. Unterwegs passiert einiges: Was zu tun ist, steht oben in der Leiste. Hinweise kosten ${r.hinweisKosten ? zeitText(r.hinweisKosten * 1000) + ' Min.' : 'nichts'}.`))));
       spiel.append(n);
+    }
+
+    // ---------------------------------------------------------------- Jumpscares: jedes Gerät entscheidet selbst (an/aus, Stärke 1–10)
+    function schreckEinst() {
+      const s = z.raum && z.raum.schreck;
+      if (!s) return { moeglich: false, an: false, staerke: 0 };
+      let an = null; let st = NaN;
+      try { an = localStorage.getItem('clavis:schreck'); st = Number(localStorage.getItem('clavis:schreckStaerke')); } catch (_) {}
+      if (z.schreckWahl) { an = z.schreckWahl.an ? 'an' : 'aus'; st = z.schreckWahl.staerke || st; }
+      const ein = an == null ? !!s.standard : an === 'an';
+      let staerke = st >= 1 && st <= 10 ? st : s.staerke || 6;
+      if (s.mild) staerke = Math.min(staerke, 4);
+      return { moeglich: true, an: ein, staerke, mild: !!s.mild };
+    }
+    function schreckSetzen(an, staerke) {
+      const e = schreckEinst();
+      z.schreckWahl = { an, staerke: staerke || e.staerke };
+      try { localStorage.setItem('clavis:schreck', an ? 'an' : 'aus'); localStorage.setItem('clavis:schreckStaerke', String(staerke || e.staerke)); } catch (_) {}
+    }
+    /** Am Eingang gut sichtbar: Jumpscares erlauben? Und wie stark? */
+    function schreckWahl() {
+      const e = schreckEinst();
+      if (!e.moeglich) return null;
+      const max = e.mild ? 4 : 10;
+      const beschreibung = el('div', { class: 'cl-schreck-beschreibung' }, Clavis.schreckText(e.staerke, e.mild));
+      const ausgabe = el('output', {}, String(e.staerke));
+      const regler = el('input', { type: 'range', min: '1', max: String(max), step: '1', value: String(e.staerke), 'aria-label': 'Stärke der Jumpscares', oninput: (ev) => { const v = Number(ev.target.value); ausgabe.textContent = String(v); beschreibung.textContent = Clavis.schreckText(v, e.mild); schreckSetzen(true, v); } });
+      const panel = el('div', { class: 'cl-schreck-wahl' + (e.an ? '' : ' aus') },
+        el('div', { class: 'cl-schreck-kopf' }, el('span', { style: { fontSize: '26px' } }, '⚡'),
+          el('b', {}, 'Jumpscares erlauben?', el('small', {}, e.mild ? 'Nur kleine Schreckmomente: Fledermäuse, Spinnen, eine Katze.' : 'Plötzliche Schreckmomente im Raum – gilt nur für dieses Gerät.')),
+          el('button', { class: 'cl-schalter-gross' + (e.an ? ' an' : ''), type: 'button', role: 'switch', 'aria-checked': String(e.an), 'aria-label': 'Jumpscares erlauben', onclick: () => { schreckSetzen(!schreckEinst().an); panel.replaceWith(schreckWahl()); } })),
+        e.an ? [el('div', { class: 'cl-schreck-regler' }, el('small', {}, 'Stärke'), regler, ausgabe), beschreibung,
+          el('button', { class: 'cl-knopf zart klein cl-schreck-probe', type: 'button', onclick: () => { k.bereit(); const a = schreckEinst(); Clavis.schreck(spiel, a.mild ? 'fledermaeuse' : 'fratze', { blut: z.raum.blut, staerke: a.staerke }); } }, 'Probe ansehen')] : null);
+      return panel;
     }
 
     /** Die gezeichnete Außenansicht der Welt – langsam bewegt, als Hintergrund für Einleitung und Ende */
@@ -867,6 +958,7 @@
       const r = z.raum;
       const w = Clavis.WELTEN[r.welt] || {};
       const text = el('p', { class: 'cl-intro-text' });
+      if (!z.introGesprochen) { z.introGesprochen = true; setTimeout(() => { if (text.isConnected) Clavis.stimme.sprechen(r.intro, kinder() ? 'kind' : 'erzaehler'); }, 700); }
       let i = 0;
       const tippen = () => { if (!text.isConnected) return; text.textContent = r.intro.slice(0, i); i += 2; if (i % 12 === 0) k.spielen('klick'); if (i <= r.intro.length + 1) setTimeout(tippen, 20); };
       setTimeout(tippen, 500);
@@ -878,7 +970,7 @@
           el('div', { class: 'cl-intro-welt' }, `${kinder() && w.kinderName ? w.kinderName : w.name || ''} · ${(Clavis.STUFEN[r.stufe] || {}).name || ''} · ${r.minuten} Minuten`),
           el('h1', { class: 'cl-intro-titel' }, r.titel),
           text,
-          r.schreck ? el('div', { class: 'cl-warnung' }, r.schreck.mild ? '⚡ Mit kleinen Schreckmomenten' : '⚡ Achtung: Jumpscares') : null,
+          schreckWahl(),
           p === 'lobby' && spieler.length > 1 ? el('div', { class: 'cl-intro-team' }, el('span', { class: 'cl-leise' }, 'Im Team: '), spieler.map((s) => s.name).join(', ')) : null,
           p === 'lobby'
             ? (host ? el('button', { class: 'cl-knopf gross puls', type: 'button', onclick: () => host.starten() }, 'Eintreten – die Zeit läuft')
@@ -922,6 +1014,7 @@
       if (!z.kinoGesehen) { kino(); return; }
       if (phase() === 'lobby' || !z.introGesehen) { spiel.replaceChildren(intro()); return; }
       spiel.replaceChildren(hud(), raumAnsicht(), unten(), erzEl);
+      requestAnimationFrame(() => { const h = spiel.querySelector('.cl-hud'); if (h) spiel.style.setProperty('--hud-h', `${h.offsetHeight}px`); });
       z.zuletztGemalteSzene = z.szene;
       if (offen) {
         z.offen = offen;
@@ -949,12 +1042,15 @@
       if (raum) { raum.classList.toggle('dunkel', z.dunkelBis > jetzt); raum.classList.toggle('vernebelt', z.nebelBis > jetzt); raum.classList.toggle('alarm', z.countdownBis > jetzt); }
       // Läuft die Zeit ab, verfällt der Raum – Stufe für Stufe, mit einem Satz vom Erzähler
       if (imSpiel()) {
+        if (k.ambienteWelt() !== z.raum.welt) k.ambiente(z.raum.welt, z.raum.alter);
         const stufe = zeitStufe();
         if (stufe !== z.zeitStufe) {
           if (stufe > z.zeitStufe && z.bau) sagen(Clavis.Kulisse.verfallText(z.bau.verfallArt, stufe, kinder()), 'warnung');
           z.zeitStufe = stufe;
         }
+        if (z.bau) k.verfall(z.bau.verfallArt, stufe);
         if (raum && raum.dataset.zeit !== String(stufe)) raum.dataset.zeit = String(stufe);
+        if (raum) nebelStil(raum);
       }
       if (z.offen && z.offen !== 'finale') {
         const n = spiel.querySelector('.cl-nah');
@@ -971,7 +1067,7 @@
         const st = z.raum.stimmung || {};
         if (st.spannung >= 6 && rest != null && rest > 0 && anteil < 0.2 && Math.floor(rest / 1000) % (st.spannung >= 9 ? 2 : 3) === 0) k.spielen('herz');
         // Lange nichts passiert: sanft auf etwas Ungelöstes zeigen (kein Hinweis, nur ein Blick)
-        if (!z.offen && jetzt - z.letzterFortschritt > 140000) {
+        if (!z.offen && !(Clavis.Szenen && Clavis.Szenen.aktiv()) && jetzt - z.letzterFortschritt > 140000) {
           const offen = stationenDerSzene(z.szene).filter((id) => !geloest(id) && blockiertMs(id) <= 0);
           if (offen.length) {
             const id = offen[Math.floor(Math.random() * offen.length)];
@@ -1087,6 +1183,7 @@
             z.notizen.push(`${s.ort}: gelöst${d.name && team ? ` (${d.name})` : ''}${b.art === 'fragment' ? ` – Buchstaben ${b.buchstaben.join(', ')}` : b.art === 'zeit' ? ' – 2 Minuten geschenkt' : ''}`);
           }
           if (b.art === 'fragment') setTimeout(() => buchstabeFliegen(d.station, b.stellen, b.buchstaben), z.offen ? 1400 : 300);
+          if (d.geschichte) { z.wissen = z.wissen || []; if (!z.wissen.includes(d.geschichte)) z.wissen.push(d.geschichte); setTimeout(() => sagen(d.geschichte, 'geschichte'), 1600); }
           if (s && s.mech === 'fehlteil') { z.inventar = z.inventar.filter((x) => x.fuer !== d.station); setTimeout(untenNeu, 300); }
           if (d.ereignis) setTimeout(() => ereignisZeigen(d.ereignis.art, d.ereignis.text), 2400);
           break;
@@ -1113,17 +1210,21 @@
           z.notizen.push(d.text);
           break;
         case 'schreck':
-          if (imSpiel() && z.raum.schreck) Clavis.schreck(spiel, d.art, { blut: z.raum.blut });
+          if (imSpiel() && z.raum.schreck && schreckEinst().an && !(Clavis.Szenen && Clavis.Szenen.aktiv())) Clavis.schreck(spiel, d.art, { blut: z.raum.blut, staerke: schreckEinst().staerke });
           break;
-        case 'ende':
+        case 'ende': {
+          const imRaum = !!spiel.querySelector('.cl-raum') && !z.ende;
           z.ende = d.ergebnis;
           z.offen = null;
           k.musikStoppen();
-          k.spielen(d.ergebnis.geschafft ? 'ende' : 'falsch');
-          if (d.ergebnis.geschafft && kinder()) setTimeout(() => Clavis.konfetti(spiel), 300);
-          malen();
+          k.ambienteStoppen();
+          const danach = () => { k.spielen(d.ergebnis.geschafft ? 'ende' : 'falsch'); if (d.ergebnis.geschafft && kinder()) setTimeout(() => Clavis.konfetti(spiel), 300); malen(); };
+          if (imRaum && Clavis.Szenen) Clavis.Szenen.outro(spiel, { raum: z.raum, ergebnis: d.ergebnis, kinder: kinder() }).then(danach);
+          else danach();
           break;
+        }
         case 'vorbei': case 'entfernt':
+          k.ambienteStoppen();
           z.vorbei = d.typ;
           z.kinoTakte.forEach(clearTimeout);
           malen();

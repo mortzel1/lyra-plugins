@@ -149,6 +149,18 @@ Clavis.WELTEN = {
 
 // ================================================================== Symbole (24×24, Strichzeichnung)
 Clavis.ICONS = {
+  waage: 'M12 3v17M8 20h8M4 6h16M6 6l-3 7a3 2 0 0 0 6 0zM18 6l-3 7a3 2 0 0 0 6 0z',
+  zahnrad: 'M12 7a5 5 0 1 0 .01 0M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1M12 10a2 2 0 1 0 .01 0',
+  fernrohr: 'M3 14l13-6 2 4-13 6zM16 8l3-1.5 1.5 3L17.5 11M8 16l-2 5M10 15l3 6',
+  glocke: 'M12 3a1 1 0 0 1 1 1v1a6 6 0 0 1 5 6v4l2 3H4l2-3v-4a6 6 0 0 1 5-6V4a1 1 0 0 1 1-1zM10 20a2 2 0 0 0 4 0',
+  kessel: 'M4 9h16M5 9l1 9a3 3 0 0 0 3 2h6a3 3 0 0 0 3-2l1-9M8 9V7M16 9V7M9 5c0-1 1-2 1-3M13 5c0-1 1-2 1-3',
+  tastenfeld: 'M6 3h12v18H6zM9 7h1M12 7h1M15 7h1M9 11h1M12 11h1M15 11h1M9 15h1M12 15h1M15 15h1M12 18h1',
+  sonar: 'M12 12m-1 0a1 1 0 1 0 2 0 1 1 0 1 0-2 0M12 12m-5 0a5 5 0 1 0 10 0 5 5 0 1 0-10 0M12 12m-9 0a9 9 0 1 0 18 0 9 9 0 1 0-18 0M12 12l6-6',
+  ventil: 'M3 15h18M3 19h18M12 15V9M8 9h8M12 5v4M8 5h8',
+  domino: 'M7 3h10v18H7zM7 12h10M10 7h.01M14 7h.01M12 16h.01M10 18h.01M14 18h.01',
+  becher: 'M7 18l2-12h6l2 12zM5 20h14M9 9h6',
+  krug: 'M7 6h9l1 3v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9zM16 9h2a2 2 0 0 1 0 4h-1M8 4h8',
+  fingerabdruck: 'M12 3a8 8 0 0 0-8 8v3M20 11a8 8 0 0 0-3-6M8 18v-6a4 4 0 0 1 8 0v3M12 12v8M16 15v3',
   schreibtisch: 'M3 10h18M5 10v9M19 10v9M5 14h6M11 10v4M14 7h4v3h-4zM6 7h5v3',
   akte: 'M4 5h6l2 2h8v12H4zM4 9h16M8 13h8M8 16h5',
   telefon: 'M6 4c-1.5 1-2 3-1 5.5 2 4.5 5 7.5 9.5 9.5 2.5 1 4.5.5 5.5-1l-2.5-3-3 1.5c-2-1-4-3-5-5L11 8 8 4.5z',
@@ -311,18 +323,18 @@ Clavis.WENDUNGEN = {
 // ================================================================== Inszenierung im Raum
 /** Wo ein Gegenstand im Raum steht: an der Wand, auf einem Tisch oder auf dem Boden */
 Clavis.PLATZ = {
-  wand: ['bild', 'portraet', 'wandbild', 'spiegel', 'tafel', 'karte', 'monitor', 'schaltkasten', 'luke', 'steuerrad', 'stern', 'hufeisen', 'telefon'],
+  wand: ['bild', 'portraet', 'wandbild', 'spiegel', 'tafel', 'karte', 'monitor', 'schaltkasten', 'luke', 'steuerrad', 'stern', 'hufeisen', 'telefon', 'tastenfeld', 'sonar', 'ventil', 'glocke', 'zahnrad'],
   tisch: ['schreibmaschine', 'mikroskop', 'reagenz', 'kerze', 'globus', 'buch', 'kompass', 'flasche', 'laterne', 'lampe', 'radio', 'computer', 'spieluhr', 'muschel',
-    'taucherhelm', 'wuerfel', 'vase', 'schluessel', 'spritze', 'akte', 'funk', 'zylinder', 'beamer'],
+    'taucherhelm', 'wuerfel', 'vase', 'schluessel', 'spritze', 'akte', 'funk', 'zylinder', 'beamer', 'waage', 'domino', 'becher', 'krug', 'fingerabdruck'],
 };
 Clavis.platzVon = (icon) => (Clavis.PLATZ.wand.includes(icon) ? 'wand' : Clavis.PLATZ.tisch.includes(icon) ? 'tisch' : 'boden');
 
 /** Material der Nahansicht – so sieht das Rätsel aus der Nähe aus */
 Clavis.MATERIAL = {
-  metall: ['tresor', 'schaltkasten', 'steuerpult', 'luke', 'reaktor', 'kuehlschrank', 'funk', 'radio', 'kanone', 'roboter', 'raumanzug', 'taucherhelm', 'rollstuhl', 'anker', 'zug'],
-  papier: ['akte', 'buch', 'karte', 'schreibmaschine', 'lesepult', 'regal', 'bild', 'portraet'],
+  metall: ['tresor', 'schaltkasten', 'steuerpult', 'luke', 'reaktor', 'kuehlschrank', 'funk', 'radio', 'kanone', 'roboter', 'raumanzug', 'taucherhelm', 'rollstuhl', 'anker', 'zug', 'zahnrad', 'ventil', 'glocke', 'tastenfeld', 'waage', 'kessel', 'fernrohr'],
+  papier: ['akte', 'buch', 'karte', 'schreibmaschine', 'lesepult', 'regal', 'bild', 'portraet', 'fingerabdruck'],
   stein: ['statue', 'sarkophag', 'wandbild', 'altar', 'vase', 'totem', 'kamin'],
-  bildschirm: ['computer', 'monitor', 'beamer', 'tafel', 'telefon'],
+  bildschirm: ['computer', 'monitor', 'beamer', 'tafel', 'telefon', 'sonar'],
   glas: ['reagenz', 'flasche', 'spiegel', 'laterne', 'lampe', 'kerze', 'globus', 'kompass', 'ballon', 'muschel', 'mikroskop', 'spritze'],
 };
 Clavis.materialVon = (icon) => Object.keys(Clavis.MATERIAL).find((m) => Clavis.MATERIAL[m].includes(icon)) || 'holz';
